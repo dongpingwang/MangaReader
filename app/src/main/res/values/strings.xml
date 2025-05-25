@@ -1,0 +1,42 @@
+<resources>
+    <string name="app_name">MangaReader</string>
+
+    <string name="navi_book_shelf">书架</string>
+    <string name="navi_setting">设置</string>
+    <string name="btn_browser_book">添加一本书</string>
+    <string name="menu_pick_file">添加书籍</string>
+    <string name="menu_wifi_transfer">WiFi传书</string>
+    <string name="menu_shelf_edit">书架管理</string>
+    <string name="menu_layout_edit">书架布局</string>
+    <string name="menu_show_big_image">查看大图</string>
+    <string name="menu_download_image">本地缓存</string>
+    <string name="image_cache_success">已保存到%s</string>
+    <string name="image_cache_fail">保存失败</string>
+    <string name="error_book_file_not_found">请检查书籍文件路径或者文件查看权限</string>
+    <string name="confirm">确定</string>
+    <string name="jump_the_page">跳到到页面</string>
+    <string name="hint_page_range">页码范围1-%d</string>
+    <string name="picker_book">浏览书籍</string>
+    <string name="dialog_access_file_msg">由于系统存储限制，请授予阅读器查看文件权限~</string>
+    <string name="understand">明白</string>
+    <string name="sort_asc">正序</string>
+    <string name="sort_desc">反序</string>
+
+    <string name="page_switch_effect">翻页动画</string>
+    <string name="image_quality">图片质量</string>
+    <string name="image_scale">图片缩放</string>
+    <string name="image_quality_none">极低</string>
+    <string name="image_quality_low">低</string>
+    <string name="image_quality_medium">中</string>
+    <string name="image_quality_high">高</string>
+    <string name="image_scale_none">无</string>
+    <string name="image_scale_crop">填充</string>
+    <string name="image_scale_fit">自适应</string>
+    <string name="image_scale_fill_height">高填充</string>
+    <string name="image_scale_fill_width">宽填充</string>
+    <string name="image_scale_inside">居中</string>
+    <string name="page_switch_effect_horizon">左右</string>
+    <string name="page_switch_effect_vertical">上下</string>
+    <string name="page_switch_effect_curl">仿真</string>
+
+</resources>

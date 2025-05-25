@@ -1,0 +1,2 @@
+-keep class com.wolf2.reader.reader.** { *; }
+-keep class com.wolf2.reader.mode.entity.** { *;}
