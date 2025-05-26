@@ -149,7 +149,7 @@ class ReadViewModel(val bookId: String) : ViewModel() {
             val ret = ImageCacheUtil.cacheImage(pageContent)
             Timber.d("cacheImage: ret = $ret")
             if (!ret) return@launch
-            ToastUtil.toast(
+            ToastUtil.toastOnUiThread(
                 globalContext.getString(
                     R.string.image_cache_success,
                     ImageCacheUtil.cacheImageDir
