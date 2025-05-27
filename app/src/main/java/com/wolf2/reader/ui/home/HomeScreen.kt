@@ -3,6 +3,8 @@ package com.wolf2.reader.ui.home
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
@@ -49,34 +51,43 @@ fun HomeScreen() {
         factory = HomeViewModel.provideFactory()
     )
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    Column {
-        HomeTopAppBar(uiState, viewModel)
+
+    Column(modifier = Modifier.fillMaxSize()) {
+        HomeTopAppBar(
+            curPageIndex = uiState.curTab,
+            onNavigationToSearch = {
+                viewModel.onEvent(HomeUiEvent.OnNavigationToSearch)
+            },
+            onNavigationToBrowser = {
+                viewModel.onEvent(HomeUiEvent.OnNavigationToBrowser)
+            })
         HomeContent(uiState)
-        HomeBottomBar(uiState, viewModel)
+        HomeBottomBar(uiState, onTabChange = { viewModel.onEvent(HomeUiEvent.OnTabChange(it)) })
     }
 }
 
 @Composable
 private fun HomeDropMenu(
-    expanded: Boolean = false,
     onNavigationToBrowser: () -> Unit = {},
     onDismissRequest: () -> Unit = {}
 ) {
-
     DropdownMenu(
-        expanded = expanded,
+        expanded = true,
         onDismissRequest = onDismissRequest,
         shape = ShapeDefaults.Medium
     ) {
-        DropdownMenuItem(text = { Text(stringResource(R.string.menu_pick_file)) }, leadingIcon = {
-            Icon(
-                imageVector = Icons.Outlined.CreateNewFolder,
-                contentDescription = null
-            )
-        }, onClick = {
-            onNavigationToBrowser()
-            onDismissRequest()
-        })
+        DropdownMenuItem(
+            text = { Text(stringResource(R.string.menu_pick_file)) },
+            leadingIcon = {
+                Icon(
+                    imageVector = Icons.Outlined.CreateNewFolder,
+                    contentDescription = null
+                )
+            },
+            onClick = {
+                onNavigationToBrowser()
+                onDismissRequest()
+            })
         DropdownMenuItem(
             text = { Text(stringResource(R.string.menu_wifi_transfer)) },
             leadingIcon = {
@@ -88,67 +99,76 @@ private fun HomeDropMenu(
             onClick = {
                 onDismissRequest()
             })
-        DropdownMenuItem(text = { Text(stringResource(R.string.menu_shelf_edit)) }, leadingIcon = {
-            Icon(
-                painter = painterResource(R.drawable.ic_arrange),
-                contentDescription = null
-            )
-        }, onClick = {
-            onDismissRequest()
-        })
+        DropdownMenuItem(
+            text = { Text(stringResource(R.string.menu_shelf_edit)) },
+            leadingIcon = {
+                Icon(
+                    painter = painterResource(R.drawable.ic_arrange),
+                    contentDescription = null
+                )
+            },
+            onClick = {
+                onDismissRequest()
+            })
 
-        DropdownMenuItem(text = { Text(stringResource(R.string.menu_layout_edit)) }, leadingIcon = {
-            Icon(
-                imageVector = Icons.Outlined.ViewQuilt,
-                contentDescription = null
-            )
-        }, onClick = {
-            onDismissRequest()
-        })
+        DropdownMenuItem(
+            text = { Text(stringResource(R.string.menu_layout_edit)) },
+            leadingIcon = {
+                Icon(
+                    imageVector = Icons.Outlined.ViewQuilt,
+                    contentDescription = null
+                )
+            },
+            onClick = {
+                onDismissRequest()
+            })
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun HomeTopAppBar(uiState: HomeUiState, viewModel: HomeViewModel) {
-    val curPageIndex = uiState.curTab
-    var expanded by remember { mutableStateOf(false) }
-
+private fun HomeTopAppBar(
+    curPageIndex: Int,
+    onNavigationToSearch: () -> Unit = {},
+    onNavigationToBrowser: () -> Unit = {}
+) {
+    var showMenuDrop by remember { mutableStateOf(false) }
     TopAppBar(title = {
         Text(text = stringResource(if (curPageIndex == 0) R.string.navi_book_shelf else R.string.navi_setting))
     }, actions = {
 
-        HomeDropMenu(
-            expanded = expanded,
-            onNavigationToBrowser = { viewModel.onEvent(HomeUiEvent.OnNavigationToBrowser) },
-            onDismissRequest = { expanded = false })
+        if (showMenuDrop) {
+            HomeDropMenu(
+                onNavigationToBrowser = onNavigationToBrowser,
+                onDismissRequest = { showMenuDrop = false })
+        }
 
         AnimatedVisibility(curPageIndex == 0) {
-            IconButton(onClick = { viewModel.onEvent(HomeUiEvent.OnNavigationToSearch) }) {
-                Icon(
-                    imageVector = Icons.Outlined.Search,
-                    contentDescription = null
-                )
-            }
-        }
-        AnimatedVisibility(curPageIndex == 0) {
-            IconButton(onClick = { expanded = true }) {
-                Icon(
-                    imageVector = Icons.Outlined.Menu,
-                    contentDescription = null
-                )
+            Row {
+                IconButton(onClick = onNavigationToSearch) {
+                    Icon(
+                        imageVector = Icons.Outlined.Search,
+                        contentDescription = null
+                    )
+                }
+                IconButton(onClick = { showMenuDrop = true }) {
+                    Icon(
+                        imageVector = Icons.Outlined.Menu,
+                        contentDescription = null
+                    )
+                }
             }
         }
     })
 }
 
 @Composable
-private fun HomeBottomBar(uiState: HomeUiState, homeViewModel: HomeViewModel) {
+private fun HomeBottomBar(uiState: HomeUiState, onTabChange: (Int) -> Unit = {}) {
     NavigationBar {
         var isSelected = uiState.curTab == 0
         NavigationBarItem(
             selected = isSelected,
-            onClick = { homeViewModel.onEvent(HomeUiEvent.OnTabChange(0)) },
+            onClick = { onTabChange(0) },
             icon = {
                 BadgedBox(badge = {
                     if (!uiState.showBadge) return@BadgedBox
@@ -174,7 +194,7 @@ private fun HomeBottomBar(uiState: HomeUiState, homeViewModel: HomeViewModel) {
         isSelected = uiState.curTab == 1
         NavigationBarItem(
             selected = isSelected,
-            onClick = { homeViewModel.onEvent(HomeUiEvent.OnTabChange(1)) },
+            onClick = { onTabChange(1) },
             icon = {
                 Icon(
                     imageVector = if (isSelected) Icons.Filled.Settings else Icons.Outlined.Settings,

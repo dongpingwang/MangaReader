@@ -28,6 +28,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -36,10 +37,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.wolf2.reader.R
 import com.wolf2.reader.config.ebookMimeTypes
+import com.wolf2.reader.globalViewContext
 import com.wolf2.reader.ui.common.LoadingIndicator
 import com.wolf2.reader.util.LoadResult
 import kotlinx.coroutines.launch
@@ -65,12 +70,25 @@ fun BrowserScreen() {
 
         if (showAccessDialog) {
             AccessDialog(
-                viewModel = viewModel,
                 uiState = uiState,
                 onDismissRequest = { showAccessDialog = false })
         }
 
         PickerFilesIndicator(viewModel = viewModel, uiState = uiState)
+    }
+
+    val lifecycleOwner = LocalLifecycleOwner.current
+
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME) {
+                viewModel.onEvent(BrowserUiEvent.OnAccessChange)
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+        }
     }
 }
 
@@ -113,19 +131,17 @@ private fun BrowserTopAppBar(
 
 @Composable
 private fun AccessDialog(
-    viewModel: BrowserViewModel, uiState: BrowserUiState,
+    uiState: BrowserUiState,
     onDismissRequest: () -> Unit = {}
 ) {
-    val accessLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.StartActivityForResult()
-    ) {
-        viewModel.onEvent(BrowserUiEvent.OnAccessChange)
+    fun startAccessSettings() {
+        globalViewContext?.activity?.startActivity(Intent(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION))
     }
 
     AlertDialog(onDismissRequest = onDismissRequest, confirmButton = {
         TextButton(onClick = {
+            startAccessSettings()
             onDismissRequest()
-            accessLauncher.launch(Intent(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION))
         }) {
             Text(stringResource(R.string.understand))
         }
@@ -177,6 +193,7 @@ private fun ColumnScope.PickFilesContent(
         contract = ActivityResultContracts.OpenMultipleDocuments()
     ) { uris ->
         Timber.d("picker files: $uris")
+        if (uris.isEmpty()) return@rememberLauncherForActivityResult
         viewModel.onEvent(BrowserUiEvent.OnPickFiles(uris))
     }
     Box(
