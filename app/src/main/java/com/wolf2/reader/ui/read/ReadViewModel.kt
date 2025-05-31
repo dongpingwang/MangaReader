@@ -1,5 +1,6 @@
 package com.wolf2.reader.ui.read
 
+
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -12,7 +13,10 @@ import com.wolf2.reader.config.PageSwitchEffect
 import com.wolf2.reader.mode.db.DatabaseHelper
 import com.wolf2.reader.mode.entity.ReadRecord
 import com.wolf2.reader.mode.entity.book.Book
+import com.wolf2.reader.mode.entity.book.PageContent
+import com.wolf2.reader.reader.LocalFileReader
 import com.wolf2.reader.ui.util.ImageCacheUtil
+import com.wolf2.reader.util.LoadResult
 import com.wolf2.reader.util.ToastUtil
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -27,7 +31,7 @@ data class ReadUiState(
     val pagerSwitchEffect: PageSwitchEffect = AppConfig.pagerSwitchEffectLD.value!!,
     val darkMode: Boolean = false,
     val readRecord: ReadRecord = ReadRecord(),
-    val book: Book = Book(),
+    val bookResult: LoadResult<Book> = LoadResult.Loading,
 ) {
     val curPage: Int
         get() = readRecord.curPage
@@ -48,6 +52,7 @@ class ReadViewModel(val bookId: String) : ViewModel() {
     private var _uiState = MutableStateFlow(ReadUiState())
     val uiState = _uiState.asStateFlow()
 
+    private var fileReader: LocalFileReader? = null
     private var readRecord: ReadRecord? = null
 
     private val imageQualityObserver = object : (ImageQuality) -> Unit {
@@ -84,24 +89,31 @@ class ReadViewModel(val bookId: String) : ViewModel() {
             }
 
             launch(Dispatchers.IO) {
-                val record = getReadRecord(bookId) ?: return@launch
-                _uiState.update { it.copy(readRecord = record) }
+                val book = DatabaseHelper.bookDao().queryByUuid(bookId)
+                if (book == null) {
+                    Timber.e("book from db is null")
+                    _uiState.update { it.copy(bookResult = LoadResult.Error(Throwable())) }
+                    return@launch
+                }
+                val reader = LocalFileReader(book)
+                fileReader = reader
+                if (!reader.readBook()) {
+                    Timber.e("readBook fail")
+                    _uiState.update { it.copy(bookResult = LoadResult.Error(Throwable())) }
+                    return@launch
+                }
+                var record = DatabaseHelper.readRecordDao().getReadRecord(bookId) ?: ReadRecord(
+                    bookUuid = book.uuid,
+                    pageCount = book.pageContents.size,
+                    lastReadTimeMillis = System.currentTimeMillis()
+                )
+                _uiState.update {
+                    it.copy(
+                        bookResult = LoadResult.Success(book),
+                        readRecord = record
+                    )
+                }
             }
-        }
-    }
-
-    private fun getReadRecord(bookUuid: String): ReadRecord? {
-        return DatabaseHelper.readRecordDao().getReadRecord(bookUuid)
-    }
-
-    fun injectBook(book: Book) {
-        val uiState = _uiState.value
-        var readRecord = uiState.readRecord
-        if (readRecord.bookUuid.isEmpty()) {
-            readRecord = readRecord.copy(bookUuid = book.uuid, pageCount = book.pageCount())
-            _uiState.update { it.copy(book = book, readRecord = readRecord) }
-        } else {
-            _uiState.update { it.copy(book = book) }
         }
     }
 
@@ -120,33 +132,41 @@ class ReadViewModel(val bookId: String) : ViewModel() {
         }
     }
 
+    fun updateRecordOnMemory() {
+        readRecord?.let { r -> _uiState.update { it.copy(readRecord = r) } }
+    }
+
     fun getCurPage(): Int {
         readRecord?.let { return it.curPage }
         return _uiState.value.curPage
     }
 
-
     fun toggleDarkMode() {
+        updateRecordOnMemory()
         AppConfig.darkModeLD.postValue(AppConfig.darkModeLD.value != true)
     }
 
     fun setPagerSwitchEffect(effect: PageSwitchEffect) {
+        updateRecordOnMemory()
         AppConfig.pagerSwitchEffectLD.postValue(effect)
     }
 
     fun setImageQuality(quality: ImageQuality) {
+        updateRecordOnMemory()
         AppConfig.imageQualityLD.postValue(quality)
     }
 
     fun setImageScale(scale: ImageScale) {
+        updateRecordOnMemory()
         AppConfig.imageScaleLD.postValue(scale)
     }
 
     fun cacheImage() {
         viewModelScope.launch(Dispatchers.IO) {
-            val uiState = _uiState.value
-            val pageContent = uiState.book.pageContents[getCurPage()]
-            val ret = ImageCacheUtil.cacheImage(pageContent)
+            val book = (_uiState.value.bookResult as LoadResult.Success<Book>).data
+            val pageContent = book.pageContents[getCurPage()]
+            val buffer = fileReader?.getImageBuffer(pageContent)
+            val ret = if (buffer == null) false else ImageCacheUtil.cacheImage(buffer)
             Timber.d("cacheImage: ret = $ret")
             if (!ret) return@launch
             ToastUtil.toastOnUiThread(
@@ -156,6 +176,10 @@ class ReadViewModel(val bookId: String) : ViewModel() {
                 )
             )
         }
+    }
+
+    fun getImageBuffer(page: PageContent): ByteArray? {
+        return fileReader?.getImageBuffer(page)
     }
 
     override fun onCleared() {

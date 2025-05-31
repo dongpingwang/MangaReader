@@ -53,9 +53,11 @@ import com.wolf2.reader.config.ImageQuality
 import com.wolf2.reader.config.ImageScale
 import com.wolf2.reader.config.PageSwitchEffect
 import com.wolf2.reader.globalViewContext
+import com.wolf2.reader.mode.entity.book.Book
 import com.wolf2.reader.ui.home.Routes
 import com.wolf2.reader.ui.read.ReadUiState
 import com.wolf2.reader.ui.read.ReadViewModel
+import com.wolf2.reader.util.LoadResult
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -65,6 +67,7 @@ internal fun BoxScope.ReadBottomContent(
 ) {
 
     val uiState by readViewModel.uiState.collectAsStateWithLifecycle()
+    val book = (uiState.bookResult as LoadResult.Success<Book>).data
     var showJumpPageDialog by remember { mutableStateOf(false) }
     var curSelectIndex by remember { mutableIntStateOf(-1) }
 
@@ -78,7 +81,7 @@ internal fun BoxScope.ReadBottomContent(
                 Icon(imageVector = Icons.Outlined.Toc, contentDescription = null)
             }, onClick = {
                 curSelectIndex = 0
-                globalViewContext?.navController?.navigate("${Routes.READ_CHAPTER}/${readUiState.book.uuid}")
+                globalViewContext?.navController?.navigate("${Routes.READ_CHAPTER}/${book.uuid}")
             })
             NavigationBarItem(selected = curSelectIndex == 1, icon = {
                 Icon(
@@ -124,7 +127,7 @@ internal fun BoxScope.ReadBottomContent(
         }
     }
     if (showJumpPageDialog) {
-        JumpPageDialog(pageCount = readUiState.book.pageCount(), onConfirmRequest = {
+        JumpPageDialog(pageCount = book.pageContents.size, onConfirmRequest = {
             readViewModel.updateReadRecord(it - 1, true)
         }, onDismissRequest = {
             showJumpPageDialog = false
@@ -138,6 +141,7 @@ private fun ProgressAdjuster(
     readUiState: ReadUiState,
     onShowJumpPageDialog: () -> Unit = {}
 ) {
+    val book = (readUiState.bookResult as LoadResult.Success<Book>).data
     Column(
         modifier = Modifier
             .padding(bottom = 80.dp)
@@ -158,7 +162,7 @@ private fun ProgressAdjuster(
             }
             Slider(
                 value = sliderPosition,
-                valueRange = 1F..readUiState.book.pageCount().toFloat(),
+                valueRange = 1F..book.pageContents.size.toFloat(),
                 onValueChange = { sliderPosition = it },
                 onValueChangeFinished = {
                     readViewModel.updateReadRecord(sliderPosition.toInt(), true)
@@ -170,7 +174,7 @@ private fun ProgressAdjuster(
             }
         }
         TextButton(onClick = { onShowJumpPageDialog() }) {
-            Text("${sliderPosition.toInt()}/${readUiState.book.pageCount()}")
+            Text("${sliderPosition.toInt()}/${book.pageContents.size}")
         }
     }
 }

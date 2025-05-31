@@ -979,6 +979,25 @@ MOBIPart * mobi_get_resource_by_fid(const MOBIRawml *rawml, const char *fid) {
     return mobi_get_resource_by_uid(rawml, part_id);
 }
 
+MOBIPart * mobi_get_markup_by_uid(const MOBIRawml *rawml, const size_t uid) {
+    if (rawml == NULL) {
+        debug_print("%s", "Rawml structure not initialized\n");
+        return NULL;
+    }
+    if (rawml->markup == NULL) {
+        debug_print("%s", "Rawml structure not initialized\n");
+        return NULL;
+    }
+    MOBIPart *curr = rawml->markup;
+    while (curr != NULL) {
+        if (curr->uid == uid) {
+            return curr;
+        }
+        curr = curr->next;
+    }
+    return NULL;
+}
+
 /**
  @brief Get MOBIFiletype type of MOBIPart resource record with given unique id
  

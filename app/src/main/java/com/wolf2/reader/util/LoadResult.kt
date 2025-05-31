@@ -10,8 +10,4 @@ sealed class LoadResult<out T> {
     fun isLoading(): Boolean {
         return this is Loading
     }
-
-    fun isNone(): Boolean {
-        return this is None
-    }
 }

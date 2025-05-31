@@ -12,7 +12,7 @@ import com.wolf2.reader.convert.toBook
 import com.wolf2.reader.globalViewContext
 import com.wolf2.reader.mode.db.DatabaseHelper
 import com.wolf2.reader.mode.entity.book.Book
-import com.wolf2.reader.reader.EpubFileReader
+import com.wolf2.reader.reader.LocalFileReader
 import com.wolf2.reader.ui.browser.BrowserUiEvent.*
 import com.wolf2.reader.util.LoadResult
 import com.wolf2.reader.util.takePersistableUriPermission
@@ -65,7 +65,7 @@ class BrowserViewModel() : ViewModel() {
                         val documentFile =
                             DocumentFile.fromSingleUri(globalContext, it) ?: return@fastForEach
                         val book = documentFile.toBook()
-                        EpubFileReader.create(book).parseEpub()
+                        LocalFileReader(book).readBook()
                         newBooks.add(book)
                     }
                     _uiState.update { it.copy(pickFileStatus = LoadResult.Success(Unit)) }

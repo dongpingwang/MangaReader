@@ -14,37 +14,39 @@ import androidx.compose.ui.graphics.Color
 import coil.compose.AsyncImage
 import com.wolf2.reader.config.toContentScale
 import com.wolf2.reader.config.toFilterQuality
-import com.wolf2.reader.convert.toImageBuffer
+import com.wolf2.reader.mode.entity.book.Book
 import com.wolf2.reader.ui.read.ReadUiState
 import com.wolf2.reader.ui.read.ReadViewModel
-import timber.log.Timber
+import com.wolf2.reader.util.LoadResult
 
 @Composable
 internal fun VHPagerContent(
-    readViewModel: ReadViewModel,
+    videModel: ReadViewModel,
     isVerticalPager: Boolean,
-    readUiState: ReadUiState,
+    uiState: ReadUiState,
     onImageClick: () -> Unit = {}
 ) {
-    val pagerState = rememberPagerState(initialPage = readUiState.curPage) { readUiState.book.pageCount() }
-    val background = if (readUiState.darkMode) Color.Black else Color.Transparent
-    val imageScale = readUiState.imageScale.toContentScale()
-    val imageQuality = readUiState.imageQuality.toFilterQuality()
-    LaunchedEffect(readUiState) {
-        snapshotFlow { readUiState.curPage }.collect {
+    val book = (uiState.bookResult as LoadResult.Success<Book>).data
+    val pagerState =
+        rememberPagerState(initialPage = uiState.readRecord.curPage) { book.pageContents.size }
+    val background = if (uiState.darkMode) Color.Black else Color.Transparent
+    val imageScale = uiState.imageScale.toContentScale()
+    val imageQuality = uiState.imageQuality.toFilterQuality()
+    LaunchedEffect(uiState) {
+        snapshotFlow { uiState.curPage }.collect {
             pagerState.scrollToPage(it)
         }
     }
     LaunchedEffect(pagerState) {
         snapshotFlow { pagerState.settledPage }.collect {
-            readViewModel.updateReadRecord(it)
+            videModel.updateReadRecord(it)
         }
     }
     if (isVerticalPager) {
         VerticalPager(pagerState) {
-            val content = readUiState.book.pageContents[it]
+            val content = book.pageContents[it]
             AsyncImage(
-                model = content.toImageBuffer(),
+                model = videModel.getImageBuffer(content),
                 contentScale = imageScale,
                 filterQuality = imageQuality,
                 contentDescription = null,
@@ -58,9 +60,9 @@ internal fun VHPagerContent(
         }
     } else {
         HorizontalPager(pagerState) {
-            val content = readUiState.book.pageContents[it]
+            val content = book.pageContents[it]
             AsyncImage(
-                model = content.toImageBuffer(),
+                model = videModel.getImageBuffer(content),
                 contentScale = imageScale,
                 filterQuality = imageQuality,
                 contentDescription = null,

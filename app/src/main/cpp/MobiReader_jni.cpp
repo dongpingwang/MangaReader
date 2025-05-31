@@ -9,23 +9,64 @@
 #define LOGE(...) __android_log_print(ANDROID_LOG_ERROR, TAG, __VA_ARGS__)
 
 static jfieldID nativeMOBIDataPtr = nullptr;
+static jfieldID nativeMOBIRawmlPtr = nullptr;
 
-//JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
-//    LOGI("--------JNI_OnLoad--------");
-//    JNIEnv *env;
-//    if (vm->GetEnv(reinterpret_cast<void **>(&env), JNI_VERSION_1_6) != JNI_OK) {
-//        return JNI_ERR;
-//    }
-//    jclass clazz = env->FindClass("com/wolf2/reader/reader/MobiFileReader");
-//    if (clazz == nullptr) {
-//        return JNI_ERR;
-//    }
-//    nativeMOBIDataPtr = env->GetFieldID(clazz, "nativeMOBIDataPtr", "J");
-//    if (nativeMOBIDataPtr == nullptr) {
-//        return JNI_ERR;
-//    }
-//    return JNI_VERSION_1_6;
-//}
+int injectNativeMOBIDataPtr(JNIEnv *env, jobject thiz, MOBIData *m) {
+    jclass clazz = env->FindClass("com/wolf2/reader/reader/MobiFileReader");
+    if (clazz == nullptr) {
+        return JNI_ERR;
+    }
+    nativeMOBIDataPtr = env->GetFieldID(clazz, "nativeMOBIDataPtr", "J");
+    if (nativeMOBIDataPtr == nullptr) {
+        return JNI_ERR;
+    }
+    env->SetLongField(thiz, nativeMOBIDataPtr, reinterpret_cast<jlong>(m));
+    return JNI_OK;
+}
+
+int injectNativeMOBIRawmlPtr(JNIEnv *env, jobject thiz, MOBIRawml *rawml) {
+    jclass clazz = env->FindClass("com/wolf2/reader/reader/MobiFileReader");
+    if (clazz == nullptr) {
+        return JNI_ERR;
+    }
+    nativeMOBIRawmlPtr = env->GetFieldID(clazz, "nativeMOBIRawmlPtr", "J");
+    if (nativeMOBIRawmlPtr == nullptr) {
+        return JNI_ERR;
+    }
+    env->SetLongField(thiz, nativeMOBIRawmlPtr, reinterpret_cast<jlong>(rawml));
+    return JNI_OK;
+}
+
+MOBIData *getNativeMOBIDataPtr(JNIEnv *env, jobject thiz) {
+    jlong handle = env->GetLongField(thiz, nativeMOBIDataPtr);
+    auto m = reinterpret_cast<MOBIData *>(handle);
+    return m;
+}
+
+MOBIRawml *getNativeMOBIRawmlPtr(JNIEnv *env, jobject thiz) {
+    jlong handle = env->GetLongField(thiz, nativeMOBIRawmlPtr);
+    auto rawml = reinterpret_cast<MOBIRawml *>(handle);
+    return rawml;
+}
+
+static int write_file(const unsigned char *buffer, const size_t len, const char *path) {
+    errno = 0;
+    FILE *file = fopen(path, "wb");
+    if (file == NULL) {
+        int errsv = errno;
+        LOGE("Could not open file for writing: %s (%s)\n", path, strerror(errsv));
+        return -1;
+    }
+    size_t n = fwrite(buffer, 1, len, file);
+    if (n != len) {
+        int errsv = errno;
+        LOGE("Error writing to file: %s (%s)\n", path, strerror(errsv));
+        fclose(file);
+        return -1;
+    }
+    fclose(file);
+    return 0;
+}
 
 extern "C"
 JNIEXPORT jint JNICALL
@@ -53,31 +94,18 @@ Java_com_wolf2_reader_reader_MobiFileReader_nativeInit(JNIEnv *env, jobject thiz
         mobi_free(m);
         return MOBI_ERROR;
     }
-    env->SetLongField(thiz, nativeMOBIDataPtr, reinterpret_cast<jlong>(m));
-
-//    MOBIRawml *rawml = mobi_init_rawml(m);
-//    if (rawml == nullptr) {
-//        mobi_free(m);
-//        return MOBI_ERROR;
-//    }
-//
-//    mobi_ret = mobi_parse_rawml(rawml, m);
-//    if (mobi_ret != MOBI_SUCCESS) {
-//        mobi_free(m);
-//        mobi_free_rawml(rawml);
-//        return MOBI_ERROR;
-//    }
-
-
-
-
-
-
-
-
-//
-//    mobi_free_rawml(rawml);
-//    mobi_free(m);
+    MOBIRawml *rawml = mobi_init_rawml(m);
+    if (rawml == nullptr) {
+        mobi_free_rawml(rawml);
+        return MOBI_ERROR;
+    }
+    mobi_ret = mobi_parse_rawml(rawml, m);
+    if (mobi_ret != MOBI_SUCCESS) {
+        mobi_free_rawml(rawml);
+        return MOBI_ERROR;
+    }
+    injectNativeMOBIDataPtr(env, thiz, m);
+    injectNativeMOBIRawmlPtr(env, thiz, rawml);
 
     return MOBI_SUCCESS;
 }
@@ -87,20 +115,18 @@ extern "C"
 JNIEXPORT void JNICALL
 Java_com_wolf2_reader_reader_MobiFileReader_nativeDestroy(JNIEnv *env, jobject thiz) {
     LOGI("--------nativeDestroy--------");
-    jlong handle = env->GetLongField(thiz, nativeMOBIDataPtr);
-    auto *m = reinterpret_cast<MOBIData *>(handle);
+    auto *m = getNativeMOBIDataPtr(env, thiz);
     if (m) {
         mobi_free(m);
         delete m;
-        env->SetLongField(thiz, nativeMOBIDataPtr, 0);
+        env->SetLongField(thiz, nativeMOBIDataPtr, 0L);
     }
 }
 
 extern "C"
 JNIEXPORT jstring JNICALL
-Java_com_wolf2_reader_reader_MobiFileReader_getTitle(JNIEnv *env, jobject thiz) {
-    jlong handle = env->GetLongField(thiz, nativeMOBIDataPtr);
-    auto *m = reinterpret_cast<MOBIData *>(handle);
+Java_com_wolf2_reader_reader_MobiFileReader_nativeGetTitle(JNIEnv *env, jobject thiz) {
+    auto *m = getNativeMOBIDataPtr(env, thiz);
     const char *title = "";
     if (m) {
         title = mobi_meta_get_title(m);
@@ -110,9 +136,8 @@ Java_com_wolf2_reader_reader_MobiFileReader_getTitle(JNIEnv *env, jobject thiz) 
 }
 extern "C"
 JNIEXPORT jstring JNICALL
-Java_com_wolf2_reader_reader_MobiFileReader_getAuthor(JNIEnv *env, jobject thiz) {
-    jlong handle = env->GetLongField(thiz, nativeMOBIDataPtr);
-    auto *m = reinterpret_cast<MOBIData *>(handle);
+Java_com_wolf2_reader_reader_MobiFileReader_nativeGetAuthor(JNIEnv *env, jobject thiz) {
+    auto *m = getNativeMOBIDataPtr(env, thiz);
     const char *author = "";
     if (m) {
         author = mobi_meta_get_author(m);
@@ -122,9 +147,8 @@ Java_com_wolf2_reader_reader_MobiFileReader_getAuthor(JNIEnv *env, jobject thiz)
 }
 extern "C"
 JNIEXPORT jbyteArray JNICALL
-Java_com_wolf2_reader_reader_MobiFileReader_getCoverImage(JNIEnv *env, jobject thiz) {
-    jlong handle = env->GetLongField(thiz, nativeMOBIDataPtr);
-    auto *m = reinterpret_cast<MOBIData *>(handle);
+Java_com_wolf2_reader_reader_MobiFileReader_nativeGetCoverImage(JNIEnv *env, jobject thiz) {
+    auto *m = getNativeMOBIDataPtr(env, thiz);
     if (m) {
         MOBIPdbRecord *record = nullptr;
         MOBIExthHeader *exth = mobi_get_exthrecord_by_tag(m, EXTH_COVEROFFSET);
@@ -132,6 +156,7 @@ Java_com_wolf2_reader_reader_MobiFileReader_getCoverImage(JNIEnv *env, jobject t
             uint32_t offset = mobi_decode_exthvalue((unsigned char *) exth->data, exth->size);
             size_t first_resource = mobi_get_first_resource_record(m);
             size_t uid = first_resource + offset;
+            LOGE("CoverImage Index:%zu", uid);
             record = mobi_get_record_by_seqnumber(m, uid);
         }
         if (record == nullptr || record->size < 4) {
@@ -172,3 +197,90 @@ Java_com_wolf2_reader_reader_MobiFileReader_getCoverImage(JNIEnv *env, jobject t
     }
     return nullptr;
 }
+
+jobject createPageContent(JNIEnv *env, jobject thiz, size_t uid) {
+    jclass cls = env->FindClass("com/wolf2/reader/mode/entity/book/PageContent");
+    if (cls == nullptr) {
+        return nullptr;
+    }
+    jmethodID constructor = env->GetMethodID(cls, "<init>", "(Ljava/lang/String;I)V");
+    if (constructor == nullptr) {
+        env->DeleteLocalRef(cls);
+        return nullptr;
+    }
+    jstring href = env->NewStringUTF("");
+    jobject pageContent = env->NewObject(cls, constructor, href, (jint) uid);
+    env->DeleteLocalRef(href);
+    env->DeleteLocalRef(cls);
+    return pageContent;
+}
+
+extern "C"
+JNIEXPORT jobject JNICALL
+Java_com_wolf2_reader_reader_MobiFileReader_nativeGetPageContents(JNIEnv *env, jobject thiz) {
+    jclass arrayListClz = env->FindClass("java/util/ArrayList");
+    if (arrayListClz == nullptr) {
+        return nullptr;
+    }
+    jmethodID constructor = env->GetMethodID(arrayListClz, "<init>", "()V");
+    jobject arrayList = env->NewObject(arrayListClz, constructor);
+    if (arrayList == nullptr) {
+        return nullptr;
+    }
+    jmethodID addMethod = env->GetMethodID(arrayListClz, "add", "(Ljava/lang/Object;)Z");
+    if (addMethod == nullptr) {
+        return nullptr;
+    }
+    MOBIRawml *rawml = getNativeMOBIRawmlPtr(env, thiz);
+    if (!rawml) {
+        return nullptr;
+    }
+    int markupCount = 0;
+    MOBIPart *markup = rawml->markup;
+    while (markup != nullptr) {
+        markupCount++;
+        jobject pageContent = createPageContent(env, thiz, markup->uid);
+        env->CallBooleanMethod(arrayList, addMethod, pageContent);
+        env->DeleteLocalRef(pageContent);
+        markup = markup->next;
+    }
+    LOGE("markupCount:%d", markupCount);
+    return arrayList;
+}
+
+extern "C"
+JNIEXPORT jbyteArray JNICALL
+Java_com_wolf2_reader_reader_MobiFileReader_nativeGetResourceData(JNIEnv *env, jobject thiz,
+                                                                  jint uid) {
+    MOBIRawml *rawml = getNativeMOBIRawmlPtr(env, thiz);
+    if (rawml == nullptr) {
+        return nullptr;
+    }
+    MOBIPart *resource = mobi_get_resource_by_uid(rawml, uid);
+    jbyteArray ret = env->NewByteArray(resource->size);
+    if (ret == nullptr) {
+        return nullptr;
+    }
+    env->SetByteArrayRegion(ret, 0, resource->size, reinterpret_cast<jbyte *>(resource->data));
+    return ret;
+}
+
+extern "C"
+JNIEXPORT jbyteArray JNICALL
+Java_com_wolf2_reader_reader_MobiFileReader_nativeGetMarkupData(JNIEnv *env, jobject thiz,
+                                                                jint uid) {
+    MOBIRawml *rawml = getNativeMOBIRawmlPtr(env, thiz);
+    if (rawml == nullptr) {
+        return nullptr;
+    }
+    MOBIPart *resource = mobi_get_markup_by_uid(rawml, uid);
+    jbyteArray ret = env->NewByteArray(resource->size);
+    if (ret == nullptr) {
+        return nullptr;
+    }
+    env->SetByteArrayRegion(ret, 0, resource->size, reinterpret_cast<jbyte *>(resource->data));
+    return ret;
+}
+
+
+

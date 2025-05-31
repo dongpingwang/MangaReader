@@ -14,9 +14,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import com.wolf2.reader.config.toContentScale
 import com.wolf2.reader.config.toFilterQuality
-import com.wolf2.reader.convert.toImageBuffer
+import com.wolf2.reader.mode.entity.book.Book
 import com.wolf2.reader.ui.read.ReadUiState
 import com.wolf2.reader.ui.read.ReadViewModel
+import com.wolf2.reader.util.LoadResult
 import eu.wewox.pagecurl.ExperimentalPageCurlApi
 import eu.wewox.pagecurl.page.PageCurl
 import eu.wewox.pagecurl.page.rememberPageCurlState
@@ -25,37 +26,38 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalPageCurlApi::class)
 @Composable
 fun CurlPageContent(
-    readViewModel: ReadViewModel,
-    readUiState: ReadUiState,
+    viewModel: ReadViewModel,
+    uiState: ReadUiState,
     onImageClick: () -> Unit = {}
 ) {
+    val book = (uiState.bookResult as LoadResult.Success<Book>).data
     val scope = rememberCoroutineScope()
-    val pageState = rememberPageCurlState(initialCurrent = readUiState.curPage)
-    val background = if (readUiState.darkMode) Color.Black else Color.Transparent
-    val imageScale = readUiState.imageScale.toContentScale()
-    val imageQuality = readUiState.imageQuality.toFilterQuality()
+    val pageState = rememberPageCurlState(initialCurrent = uiState.curPage)
+    val background = if (uiState.darkMode) Color.Black else Color.Transparent
+    val imageScale = uiState.imageScale.toContentScale()
+    val imageQuality = uiState.imageQuality.toFilterQuality()
 
     LaunchedEffect(pageState) {
         snapshotFlow { pageState.current }.collect {
-            readViewModel.updateReadRecord(it)
+            viewModel.updateReadRecord(it)
         }
     }
-    LaunchedEffect(readUiState.curPage, pageState.max) {
+    LaunchedEffect(uiState.curPage, pageState.max) {
         snapshotFlow { pageState.max }.collect {
             if (it > 0) {
-                scope.launch { pageState.snapTo(readUiState.curPage) }
+                scope.launch { pageState.snapTo(uiState.curPage) }
             }
         }
-        snapshotFlow { readUiState.curPage }.collect {
+        snapshotFlow { uiState.curPage }.collect {
             if (pageState.max > 0) {
                 scope.launch { pageState.snapTo(it) }
             }
         }
     }
 
-    PageCurl(count = readUiState.book.pageCount(), state = pageState) {
-        val content = readUiState.book.pageContents[it]
-        val buffer = content.toImageBuffer()
+    PageCurl(count = book.pageContents.size, state = pageState) {
+        val content = book.pageContents[it]
+        val buffer = viewModel.getImageBuffer(content)
         Image(
             bitmap = BitmapFactory.decodeByteArray(buffer, 0, buffer?.size ?: 0).asImageBitmap(),
             contentScale = imageScale,
@@ -65,7 +67,6 @@ fun CurlPageContent(
                 .fillMaxSize()
                 .background(background)
                 .combinedClickable(onLongClick = {
-                    //showBottomSheet = true
                 }, onClick = onImageClick)
         )
     }

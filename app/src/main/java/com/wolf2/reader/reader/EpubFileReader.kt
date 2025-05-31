@@ -10,23 +10,12 @@ import com.wolf2.reader.util.filePathFromFileUri
 import com.wolf2.reader.util.traceMillis
 import org.jsoup.Jsoup
 import timber.log.Timber
-import java.io.File
 
-class EpubFileReader(val book: Book) {
+class EpubFileReader(private val book: Book) {
 
     companion object {
         init {
             System.loadLibrary("reader_jni")
-        }
-
-        private var reader: EpubFileReader? = null
-
-        fun create(book: Book): EpubFileReader {
-            return EpubFileReader(book).also { reader = it }
-        }
-
-        fun cache(): EpubFileReader? {
-            return reader
         }
     }
 
@@ -40,18 +29,27 @@ class EpubFileReader(val book: Book) {
         return isFileExists && isInitSuccess
     }
 
-    fun parseEpub() {
+    fun readEpub() {
         if (!isFileExists) return
         traceMillis {
-            val path = book.uri.filePathFromFileUri() ?: return@traceMillis.also {
+            val path = book.uri.filePathFromFileUri()
+            if (path == null) {
                 Timber.e("BOOK Path is NULL")
+                return@traceMillis
             }
+
             Timber.d("book uri : ${book.uri}")
             Timber.d("book path: %s", path)
 
             val initStatus = nativeInit(path)
             Timber.d("initStatus: ret = $initStatus")
             isInitSuccess = initStatus == 0
+
+            if (!isInitSuccess) {
+                Timber.e("Native Init fail")
+                return@traceMillis
+            }
+
             parseCover()?.let {
                 book.cover = it
                 cacheCoverImage()

@@ -7,7 +7,6 @@ import com.wolf2.reader.globalViewContext
 import com.wolf2.reader.mode.db.DatabaseHelper
 import com.wolf2.reader.mode.entity.ReadRecord
 import com.wolf2.reader.mode.entity.book.Book
-import com.wolf2.reader.reader.EpubFileReader
 import com.wolf2.reader.ui.home.Routes
 import com.wolf2.reader.util.LoadResult
 import kotlinx.coroutines.Dispatchers
@@ -40,8 +39,6 @@ class BookShelfViewModel : ViewModel() {
         }
     }
 
-    @Volatile
-    private var parsing = false
     private val _uiState = MutableStateFlow(BookShelfUiState())
     val uiState = _uiState.asStateFlow()
 
@@ -65,41 +62,6 @@ class BookShelfViewModel : ViewModel() {
                 }
             }
         }
-    }
-
-    fun triggerParseEpub(book: Book) {
-        Timber.d("triggerParseEpub: parsing = $parsing")
-        if (parsing) return
-        viewModelScope.launch(Dispatchers.IO) {
-            parsing = true
-            _uiState.update {
-                it.copy(bookParseStatus = LoadResult.Loading)
-            }
-            EpubFileReader.create(book).parseEpub()
-            updateBook(book)
-            _uiState.update {
-                it.copy(bookParseStatus = LoadResult.None)
-            }
-            parsing = false
-        }
-    }
-
-    private fun updateBook(book: Book) {
-        val books = _uiState.value.books.toMutableList()
-        val index = books.indexOf(book)
-        if (index >= 0) {
-            books[index] = book
-            _uiState.update { it.copy(books = books) }
-        }
-    }
-
-    fun needParseFile(book: Book): Boolean {
-        val isNeedParse =
-            book.isPageContentsEmpty() || EpubFileReader.cache()?.book?.uri != book.uri
-        if (isNeedParse) {
-            triggerParseEpub(book)
-        }
-        return isNeedParse
     }
 
     fun onEvent(event: BookShelfUiEvent) {

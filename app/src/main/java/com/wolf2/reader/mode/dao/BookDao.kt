@@ -22,6 +22,9 @@ interface BookDao {
     @Query("SELECT * FROM BOOK WHERE uri = :uri")
     fun queryByUri(uri: Uri): Book?
 
+    @Query("SELECT * FROM BOOK WHERE uuid = :uuid")
+    fun queryByUuid(uuid: String): Book?
+
     @Insert
     fun insertAll(songs: List<Book>)
 

@@ -28,8 +28,4 @@ data class Book(
     var pageContents: List<PageContent> = emptyList(), // 每页内容
     @ColumnInfo(name = "lastAddedTimeMillis")
     var lastAddedTimeMillis: Long = System.currentTimeMillis() // 添加时间
-) {
-    fun isPageContentsEmpty(): Boolean = pageContents.isEmpty()
-
-    fun pageCount(): Int = pageContents.size
-}
+)

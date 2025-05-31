@@ -3,8 +3,6 @@ package com.wolf2.reader.convert
 import androidx.documentfile.provider.DocumentFile
 import com.wolf2.reader.mode.entity.book.Book
 import com.wolf2.reader.mode.entity.book.Chapter
-import com.wolf2.reader.mode.entity.book.PageContent
-import com.wolf2.reader.reader.EpubFileReader
 
 fun DocumentFile.toBook(): Book {
     return Book(
@@ -12,12 +10,6 @@ fun DocumentFile.toBook(): Book {
         title = this.name ?: "",
         mimeType = this.type ?: ""
     )
-}
-
-fun PageContent.toImageBuffer(): ByteArray? {
-    val reader = EpubFileReader.cache() ?: return null
-    val imageHref = reader.pageHref2ImageHref(this.pageHref) ?: return null
-    return reader.getImage(imageHref)
 }
 
 fun List<Chapter>.getPageRange(chapterIndex: Int, pageCount: Int): Pair<Int, Int> {
