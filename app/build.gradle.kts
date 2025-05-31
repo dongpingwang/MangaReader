@@ -18,8 +18,8 @@ android {
         applicationId = "com.wolf2.reader"
         minSdk = 24
         targetSdk = 35
-        versionCode = 1
-        versionName = "v0.1.0-20250525"
+        versionCode = 2
+        versionName = "v0.2.0-20250601"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
