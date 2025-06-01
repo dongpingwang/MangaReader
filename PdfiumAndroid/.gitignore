@@ -1,0 +1,17 @@
+src/main/libs
+src/main/obj
+
+*.iml
+.gradle
+/local.properties
+.idea/
+.DS_Store
+/build
+/captures
+
+
+# build directories
+builddir/*
+freetype-*
+libpng
+publish-mavencentral.gradle

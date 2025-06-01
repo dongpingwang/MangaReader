@@ -96,6 +96,9 @@ dependencies {
     // https://github.com/oleksandrbalan/pagecurl
     implementation(project(":pagecurl"))
 
+    // https://github.com/oothp/PdfiumAndroid
+    implementation(project(":PdfiumAndroid"))
+
     // https://github.com/jhy/jsoup
     implementation(libs.jsoup)
 
