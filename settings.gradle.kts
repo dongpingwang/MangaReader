@@ -35,3 +35,4 @@ rootProject.name = "MangaReader"
 include(":app")
 include(":pagecurl")
 include(":PdfiumAndroid")
+include(":measure")

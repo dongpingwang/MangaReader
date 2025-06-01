@@ -99,11 +99,11 @@ dependencies {
     // https://github.com/oothp/PdfiumAndroid
     implementation(project(":PdfiumAndroid"))
 
+    // https://github.com/measure-sh/measure
+    implementation(project(":measure"))
+
     // https://github.com/jhy/jsoup
     implementation(libs.jsoup)
-
-    // https://github.com/square/leakcanary
-    // debugImplementation(libs.leakcanary.android)
 
     // https://github.com/saket/telephoto
     implementation(libs.zoomable.image.coil)
