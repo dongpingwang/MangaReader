@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">MangaReader</string>
+    <string name="app_name">MReader</string>
 
     <string name="navi_book_shelf">书架</string>
     <string name="navi_setting">设置</string>
@@ -10,8 +10,10 @@
     <string name="menu_layout_edit">书架布局</string>
     <string name="menu_show_big_image">查看大图</string>
     <string name="menu_download_image">本地缓存</string>
-    <string name="image_cache_success">已保存到%s</string>
-    <string name="image_cache_fail">保存失败</string>
+    <string name="image_cache_success">图片保存成功</string>
+    <string name="display_image_cache">查看</string>
+    <string name="pick_book_success">书籍添加成功</string>
+    <string name="to_book_shelf">查看</string>
     <string name="error_book_file_not_found">请检查书籍文件路径或者文件查看权限</string>
     <string name="confirm">确定</string>
     <string name="jump_the_page">跳到到页面</string>

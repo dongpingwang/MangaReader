@@ -20,10 +20,6 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.SnackbarDuration
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
@@ -32,7 +28,6 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -46,8 +41,8 @@ import com.wolf2.reader.R
 import com.wolf2.reader.config.ebookMimeTypes
 import com.wolf2.reader.globalViewContext
 import com.wolf2.reader.ui.common.LoadingIndicator
+import com.wolf2.reader.ui.common.MySnackbar
 import com.wolf2.reader.util.LoadResult
-import kotlinx.coroutines.launch
 import timber.log.Timber
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -157,26 +152,19 @@ private fun AccessDialog(
 
 @Composable
 private fun PickerFilesIndicator(viewModel: BrowserViewModel, uiState: BrowserUiState) {
-    val scope = rememberCoroutineScope()
-    val snackbarHostState = remember { SnackbarHostState() }
-
     when (uiState.pickFileStatus) {
         is LoadResult.Loading -> LoadingIndicator()
         is LoadResult.Success -> {
-            SnackbarHost(hostState = snackbarHostState)
-            scope.launch {
-                val result = snackbarHostState
-                    .showSnackbar(
-                        message = "书籍添加成功",
-                        actionLabel = "查看书架",
-                        withDismissAction = true,
-                        duration = SnackbarDuration.Indefinite
-                    )
-                when (result) {
-                    SnackbarResult.ActionPerformed -> viewModel.onEvent(BrowserUiEvent.OnBackHandle)
-                    SnackbarResult.Dismissed -> viewModel.onEvent(BrowserUiEvent.OnSnackbarDismiss)
-                }
-            }
+            MySnackbar(
+                message = stringResource(R.string.pick_book_success),
+                actionLabel = stringResource(R.string.to_book_shelf),
+                withDismissAction = true,
+                actionPerformed = {
+                    viewModel.onEvent(BrowserUiEvent.OnBackHandle)
+                },
+                dismissed = {
+                    viewModel.onEvent(BrowserUiEvent.OnSnackbarDismiss)
+                })
         }
 
         else -> {}

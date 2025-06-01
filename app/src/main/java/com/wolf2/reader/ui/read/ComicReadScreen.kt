@@ -8,10 +8,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.wolf2.reader.R
 import com.wolf2.reader.config.PageSwitchEffect
 import com.wolf2.reader.ui.common.LoadingIndicator
+import com.wolf2.reader.ui.common.MySnackbar
 import com.wolf2.reader.ui.read.component.CurlPageContent
 import com.wolf2.reader.ui.read.component.ErrorIndicator
 import com.wolf2.reader.ui.read.component.ReadBottomContent
@@ -24,7 +27,9 @@ fun ReadScreen(bookUuid: String) {
 
     val viewModel: ReadViewModel = viewModel(factory = ReadViewModel.provideFactory(bookUuid))
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    var showBar by remember { mutableStateOf(false) }
+    var showAppBar by remember { mutableStateOf(false) }
+    var showSnack = uiState.snackbar == true
+
     Box(
         modifier = Modifier.fillMaxSize()
     ) {
@@ -37,27 +42,43 @@ fun ReadScreen(bookUuid: String) {
                         videModel = viewModel,
                         isVerticalPager = true,
                         uiState = uiState,
-                        onImageClick = { showBar = !showBar }
+                        onImageClick = { showAppBar = !showAppBar }
                     )
+
                     PageSwitchEffect.HorizontalPage -> VHPagerContent(
                         videModel = viewModel,
                         isVerticalPager = false,
                         uiState = uiState,
-                        onImageClick = { showBar = !showBar }
+                        onImageClick = { showAppBar = !showAppBar }
                     )
+
                     PageSwitchEffect.CurlPage -> CurlPageContent(
                         viewModel = viewModel,
                         uiState = uiState,
-                        onImageClick = { showBar = !showBar }
+                        onImageClick = { showAppBar = !showAppBar }
                     )
                 }
             }
+
             else -> {}
         }
 
-        if (showBar) {
+        if (showAppBar) {
             ReadTopAppBar(viewModel)
             ReadBottomContent(viewModel, uiState)
+        }
+
+        if (showSnack) {
+            MySnackbar(
+                message = stringResource(R.string.image_cache_success),
+                actionLabel = stringResource(R.string.display_image_cache),
+                withDismissAction = true,
+                actionPerformed = {
+                    viewModel.onEvent(ReadUiEvent.OnDisplayCacheImage)
+                },
+                dismissed = {
+                    viewModel.onEvent(ReadUiEvent.OnSnackbarDismiss)
+                })
         }
     }
 }

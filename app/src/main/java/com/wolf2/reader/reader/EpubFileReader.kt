@@ -74,7 +74,7 @@ class EpubFileReader(private val book: Book) {
     private fun cacheCoverImage() {
         val result = ImageCacheUtil.cacheCoverImage(book.uri.toString(), book.cover)
         if (result) {
-            book.cover.diskPath = ImageCacheUtil.getCoverDiskPath(book.uri.toString())
+            book.cover.diskPath = ImageCacheUtil.getCoverImageDiskPath(book.uri.toString())
         }
     }
 

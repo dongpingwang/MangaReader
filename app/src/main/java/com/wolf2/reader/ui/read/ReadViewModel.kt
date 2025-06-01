@@ -1,11 +1,8 @@
 package com.wolf2.reader.ui.read
 
-
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.linxiao.framework.common.globalContext
-import com.wolf2.reader.R
 import com.wolf2.reader.config.AppConfig
 import com.wolf2.reader.config.ImageQuality
 import com.wolf2.reader.config.ImageScale
@@ -16,14 +13,20 @@ import com.wolf2.reader.mode.entity.book.Book
 import com.wolf2.reader.mode.entity.book.PageContent
 import com.wolf2.reader.reader.LocalFileReader
 import com.wolf2.reader.ui.util.ImageCacheUtil
+import com.wolf2.reader.util.GalleryUtil
 import com.wolf2.reader.util.LoadResult
-import com.wolf2.reader.util.ToastUtil
+import com.wolf2.reader.util.MD5Util
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
+
+sealed class ReadUiEvent {
+    data object OnSnackbarDismiss : ReadUiEvent()
+    data object OnDisplayCacheImage : ReadUiEvent()
+}
 
 data class ReadUiState(
     val imageQuality: ImageQuality = AppConfig.imageQualityLD.value!!,
@@ -32,6 +35,7 @@ data class ReadUiState(
     val darkMode: Boolean = false,
     val readRecord: ReadRecord = ReadRecord(),
     val bookResult: LoadResult<Book> = LoadResult.Loading,
+    var snackbar: Boolean? = null
 ) {
     val curPage: Int
         get() = readRecord.curPage
@@ -53,7 +57,8 @@ class ReadViewModel(val bookId: String) : ViewModel() {
     val uiState = _uiState.asStateFlow()
 
     private var fileReader: LocalFileReader? = null
-    private var readRecord: ReadRecord? = null
+    private lateinit var readRecord: ReadRecord
+    private var cacheImagePath: String? = null
 
     private val imageQualityObserver = object : (ImageQuality) -> Unit {
         override fun invoke(v: ImageQuality) {
@@ -102,7 +107,7 @@ class ReadViewModel(val bookId: String) : ViewModel() {
                     _uiState.update { it.copy(bookResult = LoadResult.Error(Throwable())) }
                     return@launch
                 }
-                var record = DatabaseHelper.readRecordDao().getReadRecord(bookId) ?: ReadRecord(
+                readRecord = DatabaseHelper.readRecordDao().getReadRecord(bookId) ?: ReadRecord(
                     bookUuid = book.uuid,
                     pageCount = book.pageContents.size,
                     lastReadTimeMillis = System.currentTimeMillis()
@@ -110,7 +115,7 @@ class ReadViewModel(val bookId: String) : ViewModel() {
                 _uiState.update {
                     it.copy(
                         bookResult = LoadResult.Success(book),
-                        readRecord = record
+                        readRecord = readRecord
                     )
                 }
             }
@@ -133,12 +138,11 @@ class ReadViewModel(val bookId: String) : ViewModel() {
     }
 
     fun updateRecordOnMemory() {
-        readRecord?.let { r -> _uiState.update { it.copy(readRecord = r) } }
+        _uiState.update { it.copy(readRecord = readRecord) }
     }
 
     fun getCurPage(): Int {
-        readRecord?.let { return it.curPage }
-        return _uiState.value.curPage
+        return readRecord.curPage
     }
 
     fun toggleDarkMode() {
@@ -166,15 +170,14 @@ class ReadViewModel(val bookId: String) : ViewModel() {
             val book = (_uiState.value.bookResult as LoadResult.Success<Book>).data
             val pageContent = book.pageContents[getCurPage()]
             val buffer = fileReader?.getImageBuffer(pageContent)
-            val ret = if (buffer == null) false else ImageCacheUtil.cacheImage(buffer)
+            val displayName =
+                MD5Util.getMD5String16(pageContent.pageHref + pageContent.markupUid, null)
+            val ret = if (buffer == null) false else ImageCacheUtil.cacheImage(buffer, displayName)
             Timber.d("cacheImage: ret = $ret")
             if (!ret) return@launch
-            ToastUtil.toastOnUiThread(
-                globalContext.getString(
-                    R.string.image_cache_success,
-                    ImageCacheUtil.cacheImageDir
-                )
-            )
+            cacheImagePath = ImageCacheUtil.getCacheImageDiskPath(displayName)
+            updateRecordOnMemory()
+            _uiState.update { it.copy(snackbar = true) }
         }
     }
 
@@ -192,6 +195,21 @@ class ReadViewModel(val bookId: String) : ViewModel() {
                     it.pagerSwitchEffectLD.removeObserver(pagerSwitchEffectObserver)
                     it.darkModeLD.removeObserver(darkModeObserver)
                 }
+            }
+        }
+    }
+
+
+    fun onEvent(event: ReadUiEvent) {
+        when (event) {
+            is ReadUiEvent.OnSnackbarDismiss -> {
+                _uiState.update { it.copy(snackbar = null) }
+            }
+
+            is ReadUiEvent.OnDisplayCacheImage -> {
+                updateRecordOnMemory()
+                _uiState.update { it.copy(snackbar = null) }
+                cacheImagePath?.let { GalleryUtil.openImageInGallery(it) }
             }
         }
     }
