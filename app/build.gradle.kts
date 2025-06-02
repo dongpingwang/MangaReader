@@ -1,4 +1,3 @@
-
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -95,6 +94,10 @@ dependencies {
 
     // https://github.com/oleksandrbalan/pagecurl
     implementation(project(":pagecurl"))
+
+    // https://github.com/smartword-app/compose-swipeable-cards
+    // https://github.com/Aghajari/LazySwipeCards
+    implementation(project(":swipeable_cards"))
 
     // https://github.com/oothp/PdfiumAndroid
     implementation(project(":PdfiumAndroid"))

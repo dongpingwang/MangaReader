@@ -32,6 +32,8 @@ enum class PageSwitchEffect(val display: String) {
     VerticalPage(globalContext.getString(R.string.page_switch_effect_vertical)),
     HorizontalPage(globalContext.getString(R.string.page_switch_effect_horizon)),
     CurlPage(globalContext.getString(R.string.page_switch_effect_curl)),
+    VerticalList(globalContext.getString(R.string.page_switch_effect_list)),
+    SwipeTinder(globalContext.getString(R.string.page_switch_effect_swipe_tinder))
 }
 
 fun ImageQuality.toFilterQuality(): FilterQuality {
@@ -63,7 +65,7 @@ object AppConfig {
     private const val KEY_DARK_MODE = "dark_mode"
     private const val KEY_BOOK_FOLDERS = "book_folders"
 
-    val pageSwitchEffects = listOf(VerticalPage, HorizontalPage, CurlPage)
+    val pageSwitchEffects = listOf(VerticalPage, HorizontalPage, CurlPage, VerticalList, SwipeTinder)
     val imageQualities = listOf(ImageQuality.None, Low, Medium, High)
     val imageScales = listOf(ImageScale.None, Crop, Fit, FillHeight, FillWidth, Inside)
 
@@ -87,6 +89,4 @@ object AppConfig {
     )
 
     val darkModeLD by serialLiveData(default = false, name = KEY_DARK_MODE)
-
-    val bookFolders by serialLiveData(default = emptyList<String>(), name = KEY_BOOK_FOLDERS)
 }

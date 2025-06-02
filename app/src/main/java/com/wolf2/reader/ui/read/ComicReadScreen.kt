@@ -20,6 +20,7 @@ import com.wolf2.reader.ui.read.component.ErrorIndicator
 import com.wolf2.reader.ui.read.component.ReadBottomContent
 import com.wolf2.reader.ui.read.component.ReadTopAppBar
 import com.wolf2.reader.ui.read.component.VHPagerContent
+import com.wolf2.reader.ui.read.component.SwipeTinderContent
 import com.wolf2.reader.util.LoadResult
 
 @Composable
@@ -57,6 +58,14 @@ fun ReadScreen(bookUuid: String) {
                         uiState = uiState,
                         onImageClick = { showAppBar = !showAppBar }
                     )
+
+                    PageSwitchEffect.VerticalList -> {}
+
+                    PageSwitchEffect.SwipeTinder -> {
+                        SwipeTinderContent(vm = viewModel, uiState = uiState, onImageClick = {
+                            showAppBar = !showAppBar
+                        })
+                    }
                 }
             }
 

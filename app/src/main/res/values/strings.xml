@@ -40,5 +40,6 @@
     <string name="page_switch_effect_horizon">左右</string>
     <string name="page_switch_effect_vertical">上下</string>
     <string name="page_switch_effect_curl">仿真</string>
-
+    <string name="page_switch_effect_list">条漫</string>
+    <string name="page_switch_effect_swipe_tinder">划动</string>
 </resources>
