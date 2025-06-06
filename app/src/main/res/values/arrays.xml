@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="read_page_effect">
+        <item>上下</item>
+        <item>左右</item>
+        <item>仿真</item>
+        <item>条漫</item>
+        <item>划动</item>
+    </string-array>
+
+    <string-array name="shelf_layout_options">
+        <item>列表</item>
+        <item>网格</item>
+    </string-array>
+</resources>

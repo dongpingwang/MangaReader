@@ -11,9 +11,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import coil.compose.AsyncImage
-import com.wolf2.reader.config.toContentScale
-import com.wolf2.reader.config.toFilterQuality
 import com.wolf2.reader.mode.entity.book.Book
 import com.wolf2.reader.ui.read.ReadUiState
 import com.wolf2.reader.ui.read.ReadViewModel
@@ -30,8 +27,6 @@ internal fun VHPagerContent(
     val pagerState =
         rememberPagerState(initialPage = uiState.readRecord.curPage) { book.pageContents.size }
     val background = if (uiState.darkMode) Color.Black else Color.Transparent
-    val imageScale = uiState.imageScale.toContentScale()
-    val imageQuality = uiState.imageQuality.toFilterQuality()
     LaunchedEffect(uiState) {
         snapshotFlow { uiState.curPage }.collect {
             pagerState.scrollToPage(it)
@@ -42,37 +37,25 @@ internal fun VHPagerContent(
             videModel.updateReadRecord(it)
         }
     }
+
+    val modifier = Modifier
+        .fillMaxSize()
+        .background(background)
+        .clickable {
+            onImageClick()
+        }
+
     if (isVerticalPager) {
         VerticalPager(pagerState) {
             val content = book.pageContents[it]
-            AsyncImage(
-                model = videModel.getImageBuffer(content),
-                contentScale = imageScale,
-                filterQuality = imageQuality,
-                contentDescription = null,
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(background)
-                    .clickable {
-                        onImageClick()
-                    }
-            )
+            val model = videModel.getImageBuffer(content)
+            PageAsyncImage(model = model, modifier = modifier)
         }
     } else {
         HorizontalPager(pagerState) {
             val content = book.pageContents[it]
-            AsyncImage(
-                model = videModel.getImageBuffer(content),
-                contentScale = imageScale,
-                filterQuality = imageQuality,
-                contentDescription = null,
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(background)
-                    .clickable {
-                        onImageClick()
-                    }
-            )
+            val model = videModel.getImageBuffer(content)
+            PageAsyncImage(model = model, modifier = modifier)
         }
     }
 }

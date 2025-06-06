@@ -11,9 +11,9 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.graphics.asImageBitmap
-import com.wolf2.reader.config.toContentScale
-import com.wolf2.reader.config.toFilterQuality
+import androidx.compose.ui.layout.ContentScale
 import com.wolf2.reader.mode.entity.book.Book
 import com.wolf2.reader.ui.read.ReadUiState
 import com.wolf2.reader.ui.read.ReadViewModel
@@ -34,8 +34,6 @@ fun CurlPageContent(
     val scope = rememberCoroutineScope()
     val pageState = rememberPageCurlState(initialCurrent = uiState.curPage)
     val background = if (uiState.darkMode) Color.Black else Color.Transparent
-    val imageScale = uiState.imageScale.toContentScale()
-    val imageQuality = uiState.imageQuality.toFilterQuality()
 
     LaunchedEffect(pageState) {
         snapshotFlow { pageState.current }.collect {
@@ -58,11 +56,9 @@ fun CurlPageContent(
     PageCurl(count = book.pageContents.size, state = pageState) {
         val content = book.pageContents[it]
         val buffer = viewModel.getImageBuffer(content)
-        Image(
-            bitmap = BitmapFactory.decodeByteArray(buffer, 0, buffer?.size ?: 0).asImageBitmap(),
-            contentScale = imageScale,
-            filterQuality = imageQuality,
-            contentDescription = null,
+        PageImage(
+            bitmap = BitmapFactory.decodeByteArray(buffer, 0, buffer?.size ?: 0)
+                .asImageBitmap(),
             modifier = Modifier
                 .fillMaxSize()
                 .background(background)

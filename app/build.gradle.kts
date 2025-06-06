@@ -83,11 +83,9 @@ dependencies {
     implementation(libs.timber)
 
     // https://github.com/Tencent/MMKV
-    implementation(libs.mmkv)
-    // https://github.com/liangjingkanji/Serialize
-    implementation("com.github.liangjingkanji:Serialize:3.0.1") {
-        exclude("com.tencent", "mmkv-static")
-    }
+    // implementation(libs.mmkv)
+    // https://github.com/DylanCaiCoding/MMKV-KTX
+    implementation(libs.mmkv.ktx)
 
     // https://github.com/nanihadesuka/LazyColumnScrollbar
     implementation(libs.lazycolumnscrollbar)
@@ -100,18 +98,25 @@ dependencies {
     implementation(project(":swipeable_cards"))
 
     // https://github.com/oothp/PdfiumAndroid
-    implementation(project(":PdfiumAndroid"))
+    // implementation(project(":PdfiumAndroid"))
 
     // https://github.com/measure-sh/measure
-    implementation(project(":measure"))
+    // implementation(project(":measure"))
 
     // https://github.com/jhy/jsoup
     implementation(libs.jsoup)
 
     // https://github.com/saket/telephoto
-    implementation(libs.zoomable.image.coil)
-    implementation(libs.zoomable)
-    implementation(libs.zoomable.peek.overlay)
+    //implementation(libs.zoomable.image.coil)
+    //implementation(libs.zoomable)
+    //implementation(libs.zoomable.peek.overlay)
+    //implementation(libs.sub.sampling.image)
+    // https://github.com/saket/swipe
+    //implementation(libs.swipe)
+    implementation (libs.cascade)
+    implementation (libs.cascade.compose)
+    //implementation ("me.saket.bytesize:bytesize:2.0.0-beta04")
+
 
     val composeBom = platform(libs.androidx.compose.bom)
     implementation(composeBom)

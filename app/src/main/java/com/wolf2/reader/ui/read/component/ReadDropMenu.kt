@@ -12,6 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import com.wolf2.reader.R
 import com.wolf2.reader.ui.read.ReadViewModel
+import me.saket.cascade.CascadeDropdownMenu
 
 @Composable
 internal fun BoxScope.ReadDropMenu(
@@ -21,7 +22,7 @@ internal fun BoxScope.ReadDropMenu(
 ) {
     if (showMenuDrop) {
         Box(modifier = Modifier.align(Alignment.TopEnd)) {
-            DropdownMenu(
+            CascadeDropdownMenu(
                 expanded = true,
                 onDismissRequest = onDismissRequest,
                 shape = ShapeDefaults.Medium

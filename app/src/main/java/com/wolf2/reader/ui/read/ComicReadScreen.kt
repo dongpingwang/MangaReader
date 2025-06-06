@@ -12,7 +12,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.wolf2.reader.R
-import com.wolf2.reader.config.PageSwitchEffect
+import com.wolf2.reader.config.Constants
 import com.wolf2.reader.ui.common.LoadingIndicator
 import com.wolf2.reader.ui.common.MySnackbar
 import com.wolf2.reader.ui.read.component.CurlPageContent
@@ -39,29 +39,29 @@ fun ReadScreen(bookUuid: String) {
             is LoadResult.Error -> ErrorIndicator()
             is LoadResult.Success<*> -> {
                 when (uiState.pagerSwitchEffect) {
-                    PageSwitchEffect.VerticalPage -> VHPagerContent(
+                    Constants.VerticalPage -> VHPagerContent(
                         videModel = viewModel,
                         isVerticalPager = true,
                         uiState = uiState,
                         onImageClick = { showAppBar = !showAppBar }
                     )
 
-                    PageSwitchEffect.HorizontalPage -> VHPagerContent(
+                    Constants.HorizontalPage -> VHPagerContent(
                         videModel = viewModel,
                         isVerticalPager = false,
                         uiState = uiState,
                         onImageClick = { showAppBar = !showAppBar }
                     )
 
-                    PageSwitchEffect.CurlPage -> CurlPageContent(
+                    Constants.CurlPage -> CurlPageContent(
                         viewModel = viewModel,
                         uiState = uiState,
                         onImageClick = { showAppBar = !showAppBar }
                     )
 
-                    PageSwitchEffect.VerticalList -> {}
+                    Constants.VerticalList -> {}
 
-                    PageSwitchEffect.SwipeTinder -> {
+                    Constants.SwipeTinder -> {
                         SwipeTinderContent(vm = viewModel, uiState = uiState, onImageClick = {
                             showAppBar = !showAppBar
                         })

@@ -1,7 +1,6 @@
 package com.wolf2.reader.ui.read.component
 
 import android.graphics.BitmapFactory
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.fillMaxSize
@@ -17,8 +16,6 @@ import com.spartapps.swipeablecards.ui.SwipeableCardDirection
 import com.spartapps.swipeablecards.ui.SwipeableCardsProperties
 import com.spartapps.swipeablecards.ui.lazy.LazySwipeableCards
 import com.spartapps.swipeablecards.ui.lazy.items
-import com.wolf2.reader.config.toContentScale
-import com.wolf2.reader.config.toFilterQuality
 import com.wolf2.reader.mode.entity.book.Book
 import com.wolf2.reader.mode.entity.book.PageContent
 import com.wolf2.reader.ui.read.ReadUiState
@@ -33,8 +30,6 @@ fun SwipeTinderContent(
 ) {
     val book = (uiState.bookResult as LoadResult.Success<Book>).data
     val background = if (uiState.darkMode) Color.Black else Color.Transparent
-    val imageScale = uiState.imageScale.toContentScale()
-    val imageQuality = uiState.imageQuality.toFilterQuality()
 
     val state = rememberSwipeableCardsState(
         initialCardIndex = uiState.readRecord.curPage,
@@ -59,11 +54,9 @@ fun SwipeTinderContent(
     ) {
         items(book.pageContents) { content, index, offset ->
             val buffer = vm.getImageBuffer(content)
-            Image(
-                bitmap = BitmapFactory.decodeByteArray(buffer, 0, buffer?.size ?: 0).asImageBitmap(),
-                contentScale = imageScale,
-                filterQuality = imageQuality,
-                contentDescription = null,
+            PageImage(
+                bitmap = BitmapFactory.decodeByteArray(buffer, 0, buffer?.size ?: 0)
+                    .asImageBitmap(),
                 modifier = Modifier
                     .fillMaxSize()
                     .background(background)

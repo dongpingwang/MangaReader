@@ -3,26 +3,26 @@ package com.wolf2.reader.ui.home
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.wolf2.reader.config.AppConfig
 import com.wolf2.reader.globalViewContext
-import com.wolf2.reader.mode.db.DatabaseHelper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import timber.log.Timber
 
 sealed class HomeUiEvent {
     data class OnTabChange(val tab: Int) : HomeUiEvent()
     data object OnNavigationToBrowser : HomeUiEvent()
     data object OnNavigationToSearch : HomeUiEvent()
+    data class OnShelfLayoutModeChange(val mode: Int) : HomeUiEvent()
+    data class OnShelfLayoutColumnChange(val column: Int) : HomeUiEvent()
 }
 
 data class HomeUiState(
     val curTab: Int = 0,
-    val readingCount: Int = 0,
-    val showBadge: Boolean = true
+    val shelfLayoutMode: Int = AppConfig.shelfLayoutModeLD.value!!,
+    val shelfLayoutColumn: Int = AppConfig.shelfLayoutModeLD.value!!
 )
 
 class HomeViewModel : ViewModel() {
@@ -39,14 +39,23 @@ class HomeViewModel : ViewModel() {
     private val _uiState = MutableStateFlow(HomeUiState())
     val uiState = _uiState.asStateFlow()
 
+    private val shelfLayoutModeObserver = object : (Int) -> Unit {
+        override fun invoke(v: Int) {
+            _uiState.update { it.copy(shelfLayoutMode = v) }
+        }
+    }
+
+    private val shelfLayoutColumnObserver = object : (Int) -> Unit {
+        override fun invoke(v: Int) {
+            _uiState.update { it.copy(shelfLayoutColumn = v) }
+        }
+    }
+
     init {
         viewModelScope.launch {
-            launch(Dispatchers.IO) {
-                DatabaseHelper.readRecordDao().observeReadingCount().collectLatest {
-                    val readCount = it
-                    Timber.d("reading count from db : $readCount")
-                    _uiState.update { it.copy(readingCount = readCount) }
-                }
+            launch(Dispatchers.Main) {
+                AppConfig.shelfLayoutModeLD.observeForever(shelfLayoutModeObserver)
+                AppConfig.shelfLayoutColumnLD.observeForever(shelfLayoutColumnObserver)
             }
         }
     }
@@ -63,6 +72,24 @@ class HomeViewModel : ViewModel() {
 
             is HomeUiEvent.OnNavigationToSearch -> {
                 globalViewContext?.navController?.navigate(Routes.SEARCH)
+            }
+
+            is HomeUiEvent.OnShelfLayoutModeChange -> {
+                AppConfig.shelfLayoutModeLD.postValue(event.mode)
+            }
+
+            is HomeUiEvent.OnShelfLayoutColumnChange -> {
+                AppConfig.shelfLayoutColumnLD.postValue(event.column)
+            }
+        }
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        viewModelScope.launch {
+            launch(Dispatchers.Main) {
+                AppConfig.shelfLayoutModeLD.removeObserver(shelfLayoutModeObserver)
+                AppConfig.shelfLayoutColumnLD.removeObserver(shelfLayoutColumnObserver)
             }
         }
     }

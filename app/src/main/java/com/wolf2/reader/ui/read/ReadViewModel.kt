@@ -4,9 +4,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.wolf2.reader.config.AppConfig
-import com.wolf2.reader.config.ImageQuality
-import com.wolf2.reader.config.ImageScale
-import com.wolf2.reader.config.PageSwitchEffect
 import com.wolf2.reader.mode.db.DatabaseHelper
 import com.wolf2.reader.mode.entity.ReadRecord
 import com.wolf2.reader.mode.entity.book.Book
@@ -29,9 +26,7 @@ sealed class ReadUiEvent {
 }
 
 data class ReadUiState(
-    val imageQuality: ImageQuality = AppConfig.imageQualityLD.value!!,
-    val imageScale: ImageScale = AppConfig.imageScaleLD.value!!,
-    val pagerSwitchEffect: PageSwitchEffect = AppConfig.pagerSwitchEffectLD.value!!,
+    val pagerSwitchEffect: Int = AppConfig.pagerSwitchEffectLD.value!!,
     val darkMode: Boolean = false,
     val readRecord: ReadRecord = ReadRecord(),
     val bookResult: LoadResult<Book> = LoadResult.Loading,
@@ -60,18 +55,8 @@ class ReadViewModel(val bookId: String) : ViewModel() {
     private lateinit var readRecord: ReadRecord
     private var cacheImagePath: String? = null
 
-    private val imageQualityObserver = object : (ImageQuality) -> Unit {
-        override fun invoke(v: ImageQuality) {
-            _uiState.update { it.copy(imageQuality = v) }
-        }
-    }
-    private val imageScaleObserver = object : (ImageScale) -> Unit {
-        override fun invoke(v: ImageScale) {
-            _uiState.update { it.copy(imageScale = v) }
-        }
-    }
-    private val pagerSwitchEffectObserver = object : (PageSwitchEffect) -> Unit {
-        override fun invoke(v: PageSwitchEffect) {
+    private val pagerSwitchEffectObserver = object : (Int) -> Unit {
+        override fun invoke(v: Int) {
             _uiState.update { it.copy(pagerSwitchEffect = v) }
         }
     }
@@ -86,8 +71,6 @@ class ReadViewModel(val bookId: String) : ViewModel() {
         viewModelScope.launch {
             launch(Dispatchers.Main) {
                 AppConfig.let {
-                    it.imageQualityLD.observeForever(imageQualityObserver)
-                    it.imageScaleLD.observeForever(imageScaleObserver)
                     it.pagerSwitchEffectLD.observeForever(pagerSwitchEffectObserver)
                     it.darkModeLD.observeForever(darkModeObserver)
                 }
@@ -150,19 +133,9 @@ class ReadViewModel(val bookId: String) : ViewModel() {
         AppConfig.darkModeLD.postValue(AppConfig.darkModeLD.value != true)
     }
 
-    fun setPagerSwitchEffect(effect: PageSwitchEffect) {
+    fun setPagerSwitchEffect(effect: Int) {
         updateRecordOnMemory()
         AppConfig.pagerSwitchEffectLD.postValue(effect)
-    }
-
-    fun setImageQuality(quality: ImageQuality) {
-        updateRecordOnMemory()
-        AppConfig.imageQualityLD.postValue(quality)
-    }
-
-    fun setImageScale(scale: ImageScale) {
-        updateRecordOnMemory()
-        AppConfig.imageScaleLD.postValue(scale)
     }
 
     fun cacheImage() {
@@ -190,15 +163,12 @@ class ReadViewModel(val bookId: String) : ViewModel() {
         viewModelScope.launch {
             launch(Dispatchers.Main) {
                 AppConfig.let {
-                    it.imageQualityLD.removeObserver(imageQualityObserver)
-                    it.imageScaleLD.removeObserver(imageScaleObserver)
                     it.pagerSwitchEffectLD.removeObserver(pagerSwitchEffectObserver)
                     it.darkModeLD.removeObserver(darkModeObserver)
                 }
             }
         }
     }
-
 
     fun onEvent(event: ReadUiEvent) {
         when (event) {

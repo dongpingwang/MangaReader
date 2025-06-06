@@ -19,6 +19,8 @@ import timber.log.Timber
 
 sealed class BookShelfUiEvent {
     data object OnNavigationToBrowser : BookShelfUiEvent()
+    data class OnItemClick(val book: Book) : BookShelfUiEvent()
+    data class OnItemLongClick(val book: Book) : BookShelfUiEvent()
 }
 
 data class BookShelfUiState(
@@ -68,6 +70,14 @@ class BookShelfViewModel : ViewModel() {
         when (event) {
             is BookShelfUiEvent.OnNavigationToBrowser -> {
                 globalViewContext?.navController?.navigate(Routes.BROWSER_BOOK)
+            }
+
+            is BookShelfUiEvent.OnItemClick -> {
+                globalViewContext?.navController?.navigate("${Routes.READ}/${event.book.uuid}")
+            }
+
+            is BookShelfUiEvent.OnItemLongClick -> {
+
             }
         }
     }

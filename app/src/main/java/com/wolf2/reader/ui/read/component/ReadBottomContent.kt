@@ -10,7 +10,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -22,7 +22,6 @@ import androidx.compose.material.icons.outlined.LightMode
 import androidx.compose.material.icons.outlined.Toc
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -43,15 +42,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.wolf2.reader.R
 import com.wolf2.reader.config.AppConfig
-import com.wolf2.reader.config.ImageQuality
-import com.wolf2.reader.config.ImageScale
-import com.wolf2.reader.config.PageSwitchEffect
 import com.wolf2.reader.globalViewContext
 import com.wolf2.reader.mode.entity.book.Book
 import com.wolf2.reader.ui.home.Routes
@@ -113,16 +110,8 @@ internal fun BoxScope.ReadBottomContent(
         if (curSelectIndex == 3) {
             PagerAdjuster(
                 pageSwitchEffect = uiState.pagerSwitchEffect,
-                imageQuality = uiState.imageQuality,
-                imageScale = uiState.imageScale,
                 onPageSwitchEffectChange = {
                     readViewModel.setPagerSwitchEffect(it)
-                },
-                onImageQualityChange = {
-                    readViewModel.setImageQuality(it)
-                },
-                onImageScaleChange = {
-                    readViewModel.setImageScale(it)
                 })
         }
     }
@@ -179,16 +168,12 @@ private fun ProgressAdjuster(
     }
 }
 
-
 @Composable
 private fun PagerAdjuster(
-    pageSwitchEffect: PageSwitchEffect,
-    imageQuality: ImageQuality,
-    imageScale: ImageScale,
-    onPageSwitchEffectChange: (PageSwitchEffect) -> Unit = {},
-    onImageQualityChange: (ImageQuality) -> Unit = {},
-    onImageScaleChange: (ImageScale) -> Unit = {}
+    pageSwitchEffect: Int,
+    onPageSwitchEffectChange: (Int) -> Unit = {},
 ) {
+    val pageEffects = LocalContext.current.resources.getStringArray(R.array.read_page_effect)
     val scrollState = rememberScrollState()
     Column(
         modifier = Modifier
@@ -204,67 +189,20 @@ private fun PagerAdjuster(
             modifier = Modifier.padding(top = 4.dp)
         )
         LazyRow() {
-            items(AppConfig.pageSwitchEffects) { ef ->
+
+            itemsIndexed(pageEffects) { i, effect ->
                 FilterChip(
-                    selected = ef == pageSwitchEffect,
+                    selected = i == pageSwitchEffect,
                     onClick = {
-                        onPageSwitchEffectChange(ef)
+                        onPageSwitchEffectChange(i)
                     },
                     label = {
-                        Text(ef.display, maxLines = 1)
+                        Text(effect, maxLines = 1)
                     },
                     modifier = Modifier
                         .weight(1F)
                         .wrapContentWidth(Alignment.CenterHorizontally)
                         .padding(horizontal = 4.dp)
-                )
-            }
-        }
-        Row(horizontalArrangement = Arrangement.Center) {
-            AppConfig.pageSwitchEffects.onEach { ef ->
-
-            }
-        }
-        HorizontalDivider()
-        Text(
-            text = stringResource(R.string.image_quality),
-            style = MaterialTheme.typography.bodySmall,
-            modifier = Modifier.padding(top = 4.dp)
-        )
-        LazyRow() {
-            items(AppConfig.imageQualities) { quality ->
-                FilterChip(
-                    selected = quality == imageQuality,
-                    onClick = {
-                        onImageQualityChange(quality)
-                    },
-                    label = {
-                        Text(quality.display)
-                    },
-                    modifier = Modifier
-                        .weight(1F)
-                        .wrapContentWidth(Alignment.CenterHorizontally)
-                        .padding(horizontal = 4.dp),
-                )
-            }
-        }
-        HorizontalDivider()
-        Text(
-            text = stringResource(R.string.image_scale),
-            style = MaterialTheme.typography.bodySmall,
-            modifier = Modifier.padding(top = 4.dp)
-        )
-        LazyRow {
-            items(AppConfig.imageScales) { scale ->
-                FilterChip(
-                    selected = scale == imageScale,
-                    onClick = {
-                        onImageScaleChange(scale)
-                    },
-                    label = {
-                        Text(scale.display)
-                    },
-                    modifier = Modifier.padding(horizontal = 4.dp),
                 )
             }
         }
