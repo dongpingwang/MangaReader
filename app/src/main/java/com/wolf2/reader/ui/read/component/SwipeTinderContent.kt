@@ -21,6 +21,8 @@ import com.wolf2.reader.mode.entity.book.PageContent
 import com.wolf2.reader.ui.read.ReadUiState
 import com.wolf2.reader.ui.read.ReadViewModel
 import com.wolf2.reader.util.LoadResult
+import net.engawapg.lib.zoomable.rememberZoomState
+import net.engawapg.lib.zoomable.zoomable
 
 @Composable
 fun SwipeTinderContent(
@@ -60,8 +62,9 @@ fun SwipeTinderContent(
                 modifier = Modifier
                     .fillMaxSize()
                     .background(background)
-                    .combinedClickable(onLongClick = {
-                    }, onClick = onImageClick)
+                    .zoomable(zoomState = rememberZoomState(), onTap = {
+                        onImageClick()
+                    })
             )
         }
     }

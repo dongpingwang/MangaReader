@@ -15,6 +15,8 @@ import com.wolf2.reader.mode.entity.book.Book
 import com.wolf2.reader.ui.read.ReadUiState
 import com.wolf2.reader.ui.read.ReadViewModel
 import com.wolf2.reader.util.LoadResult
+import net.engawapg.lib.zoomable.rememberZoomState
+import net.engawapg.lib.zoomable.zoomable
 
 @Composable
 internal fun VHPagerContent(
@@ -41,9 +43,9 @@ internal fun VHPagerContent(
     val modifier = Modifier
         .fillMaxSize()
         .background(background)
-        .clickable {
+        .zoomable(zoomState = rememberZoomState(), onTap = {
             onImageClick()
-        }
+        })
 
     if (isVerticalPager) {
         VerticalPager(pagerState) {

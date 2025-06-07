@@ -82,6 +82,7 @@ dependencies {
     implementation(libs.timber)
 
     // https://github.com/Tencent/MMKV
+    // https://github.com/liangjingkanji/Serialize
     // https://github.com/DylanCaiCoding/MMKV-KTX
     implementation(libs.mmkv.ktx)
 
@@ -105,6 +106,8 @@ dependencies {
     implementation(libs.jsoup)
 
     // https://github.com/saket/telephoto
+    // https://github.com/usuiat/Zoomable
+    implementation (libs.zoomable)
 
     // https://github.com/saket/swipe
     // implementation(libs.swipe)

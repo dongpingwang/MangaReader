@@ -22,6 +22,8 @@ import eu.wewox.pagecurl.ExperimentalPageCurlApi
 import eu.wewox.pagecurl.page.PageCurl
 import eu.wewox.pagecurl.page.rememberPageCurlState
 import kotlinx.coroutines.launch
+import net.engawapg.lib.zoomable.rememberZoomState
+import net.engawapg.lib.zoomable.zoomable
 
 @OptIn(ExperimentalPageCurlApi::class)
 @Composable
@@ -62,8 +64,9 @@ fun CurlPageContent(
             modifier = Modifier
                 .fillMaxSize()
                 .background(background)
-                .combinedClickable(onLongClick = {
-                }, onClick = onImageClick)
+                .zoomable(zoomState = rememberZoomState(), onTap = {
+                    onImageClick()
+                })
         )
     }
 }
