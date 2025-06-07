@@ -1,10 +1,9 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
-    alias(libs.plugins.kotlin.parcelize)
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.kotlin.serialization)
-    id("androidx.room")
+    alias(libs.plugins.androidx.room)
     alias(libs.plugins.jetbrains.kotlin.kapt)
     alias(libs.plugins.ksp)
 }
@@ -83,7 +82,6 @@ dependencies {
     implementation(libs.timber)
 
     // https://github.com/Tencent/MMKV
-    // implementation(libs.mmkv)
     // https://github.com/DylanCaiCoding/MMKV-KTX
     implementation(libs.mmkv.ktx)
 
@@ -107,16 +105,14 @@ dependencies {
     implementation(libs.jsoup)
 
     // https://github.com/saket/telephoto
-    //implementation(libs.zoomable.image.coil)
-    //implementation(libs.zoomable)
-    //implementation(libs.zoomable.peek.overlay)
-    //implementation(libs.sub.sampling.image)
-    // https://github.com/saket/swipe
-    //implementation(libs.swipe)
-    implementation (libs.cascade)
-    implementation (libs.cascade.compose)
-    //implementation ("me.saket.bytesize:bytesize:2.0.0-beta04")
 
+    // https://github.com/saket/swipe
+    // implementation(libs.swipe)
+
+    implementation(libs.cascade)
+    implementation(libs.cascade.compose)
+
+    //implementation ("me.saket.bytesize:bytesize:2.0.0-beta04")
 
     val composeBom = platform(libs.androidx.compose.bom)
     implementation(composeBom)
@@ -129,28 +125,14 @@ dependencies {
     implementation(libs.androidx.paging.compose)
     implementation(libs.androidx.compose.animation.graphics)
     implementation(libs.androidx.compose.material3)
-    implementation(libs.androidx.compose.material3.adaptive)
-    implementation(libs.androidx.compose.material3.adaptive.layout)
-    implementation(libs.androidx.compose.material3.adaptive.navigation)
-    implementation(libs.androidx.compose.material3.adaptive.navigation.suite)
-    implementation(libs.androidx.compose.material)
     implementation(libs.androidx.compose.runtime)
     implementation(libs.androidx.compose.material.iconsExtended)
-    implementation(libs.androidx.compose.material.ripple)
-
-    implementation(libs.androidx.lifecycle.runtime.compose)
-    implementation(libs.androidx.coordinator.layout)
-    implementation(libs.google.android.material)
-    implementation(libs.androidx.window.core)
-    implementation(libs.accompanist.theme.adapter.appcompat)
-    implementation(libs.accompanist.theme.adapter.material3)
-    implementation(libs.accompanist.theme.adapter.material)
-    implementation(libs.coil.kt.compose)
     implementation(libs.androidx.activity.compose)
-    implementation(libs.androidx.appcompat)
+    implementation(libs.androidx.lifecycle.runtime.compose)
+    implementation(libs.google.android.material)
+    implementation(libs.coil.kt.compose)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime)
-    implementation(libs.androidx.lifecycle.viewModelCompose)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.kotlinx.serialization.json)
 
@@ -161,9 +143,7 @@ dependencies {
     // optional - Kotlin Extensions and Coroutines support for Room
     implementation(libs.androidx.room.ktx)
 
-    testImplementation(libs.junit)
     androidTestImplementation(composeBom)
-    androidTestImplementation(libs.junit)
     androidTestImplementation(libs.androidx.test.core)
     androidTestImplementation(libs.androidx.test.runner)
     androidTestImplementation(libs.androidx.test.espresso.core)
