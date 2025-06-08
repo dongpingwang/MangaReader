@@ -7,7 +7,7 @@ import android.os.Environment
 import android.provider.DocumentsContract
 import androidx.documentfile.provider.DocumentFile
 import com.linxiao.framework.common.globalContext
-import com.wolf2.reader.config.supportFileFormats
+import com.wolf2.reader.config.supportFileExtends
 
 data class DocumentFileExt(
     val file: DocumentFile, // 只会是fileUri，不是treeUri
@@ -50,7 +50,7 @@ fun listFilesFromTreeUri(treeUri: Uri): List<DocumentFileExt> {
                 listFilesRecursively(file, result)
             } else {
                 file.uri.filePathFromFileUri()?.let { path ->
-                    supportFileFormats.forEach { extend ->
+                    supportFileExtends.forEach { extend ->
                         if (path.endsWith(extend, ignoreCase = true)) {
                             result.add(DocumentFileExt(file = file, path = path))
                             return@let

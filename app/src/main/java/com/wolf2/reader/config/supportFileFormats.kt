@@ -1,10 +1,10 @@
 package com.wolf2.reader.config
 
-val supportFileFormats = listOf(".epub", ".mobi", ".azw3")
+val supportFileExtends = listOf(".epub", ".mobi", ".azw3")
 
 val ebookMimeTypes by lazy {
     mutableListOf<String>().apply {
-        supportFileFormats.forEach {
+        supportFileExtends.forEach {
             when (it) {
                 ".epub" -> add("application/epub+zip")
                 ".mobi" -> add("application/x-mobipocket-ebook")

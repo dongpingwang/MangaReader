@@ -7,6 +7,7 @@ import kotlinx.serialization.Serializable
 data class CoverImage(
     @SerialName("href")
     var href: String = "", // 封面对应的href
+    @kotlinx.serialization.Transient
     var data: ByteArray? = null, // 书籍封面书籍
     @SerialName("diskPath")
     var diskPath: String = "" // 保存到磁盘的路径

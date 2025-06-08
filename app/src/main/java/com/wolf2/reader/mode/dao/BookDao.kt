@@ -26,7 +26,7 @@ interface BookDao {
     fun queryByUuid(uuid: String): Book?
 
     @Insert
-    fun insertAll(songs: List<Book>)
+    fun insertAll(books: List<Book>)
 
     @Query("DELETE FROM BOOK")
     fun deleteAll()
