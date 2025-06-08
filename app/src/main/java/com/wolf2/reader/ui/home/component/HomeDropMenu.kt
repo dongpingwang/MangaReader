@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.CreateNewFolder
+import androidx.compose.material.icons.outlined.Send
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.icons.outlined.ViewComfy
 import androidx.compose.material3.Icon
@@ -54,7 +55,7 @@ internal fun HomeDropMenu(
             text = { Text(stringResource(R.string.menu_wifi_transfer)) },
             leadingIcon = {
                 Icon(
-                    painter = painterResource(R.drawable.ic_send),
+                    imageVector = Icons.Outlined.Send,
                     contentDescription = null
                 )
             },

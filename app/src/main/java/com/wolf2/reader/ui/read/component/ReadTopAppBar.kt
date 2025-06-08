@@ -3,6 +3,8 @@ package com.wolf2.reader.ui.read.component
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ArrowBackIosNew
+import androidx.compose.material.icons.outlined.BookmarkBorder
+import androidx.compose.material.icons.outlined.MoreVert
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -33,13 +35,13 @@ internal fun BoxScope.ReadTopAppBar(readViewModel: ReadViewModel) {
 
         }) {
             Icon(
-                painter = painterResource(R.drawable.ic_bookmark), contentDescription = null
+                imageVector = Icons.Outlined.BookmarkBorder, contentDescription = null
             )
         }
 
         IconButton(onClick = { showMenuDrop = true }) {
             Icon(
-                painter = painterResource(R.drawable.ic_more_vert), contentDescription = null
+                imageVector = Icons.Outlined.MoreVert, contentDescription = null
             )
         }
     })

@@ -39,6 +39,7 @@ android {
     buildTypes {
         release {
             isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -112,10 +113,20 @@ dependencies {
     // https://github.com/saket/swipe
     // implementation(libs.swipe)
 
+    // https://github.com/saket/cascade
     implementation(libs.cascade)
     implementation(libs.cascade.compose)
 
+    // https://github.com/valentinilk/compose-shimmer
+    // implementation("com.valentinilk.shimmer:compose-shimmer:1.3.3")
+
     //implementation ("me.saket.bytesize:bytesize:2.0.0-beta04")
+
+
+    implementation ("androidx.paging:paging-runtime:3.2.1")
+    implementation ("androidx.paging:paging-compose:3.3.0") // Compose 扩展
+    implementation ("androidx.lifecycle:lifecycle-viewmodel-compose:2.7.0")
+    implementation("androidx.room:room-paging:2.7.1")
 
     val composeBom = platform(libs.androidx.compose.bom)
     implementation(composeBom)

@@ -10,6 +10,7 @@ import androidx.compose.animation.togetherWith
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 
 @Composable
@@ -17,6 +18,31 @@ internal fun AnimatedIcon(
     selected: Boolean,
     selectedIcon: ImageVector,
     unselectedIcon: ImageVector,
+    modifier: Modifier = Modifier
+) {
+
+    AnimatedContent(
+        targetState = selected,
+        transitionSpec = {
+            (fadeIn(animationSpec = tween(150, 150)) +
+                    scaleIn(initialScale = 0.8f, animationSpec = tween(150))) togetherWith
+                    (fadeOut(animationSpec = tween(150)) +
+                            scaleOut(targetScale = 0.8f, animationSpec = tween(150)))
+        }
+    ) { targetSelected ->
+        Icon(
+            imageVector = if (targetSelected) selectedIcon else unselectedIcon,
+            contentDescription = null,
+            modifier = modifier
+        )
+    }
+}
+
+@Composable
+internal fun AnimatedIcon(
+    selected: Boolean,
+    selectedIcon: Painter,
+    unselectedIcon: Painter,
     modifier: Modifier = Modifier
 ) {
     AnimatedContent(
@@ -29,7 +55,7 @@ internal fun AnimatedIcon(
         }
     ) { targetSelected ->
         Icon(
-            imageVector = if (targetSelected) selectedIcon else unselectedIcon,
+            painter = if (targetSelected) selectedIcon else unselectedIcon,
             contentDescription = null,
             modifier = modifier
         )

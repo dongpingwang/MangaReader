@@ -1,6 +1,7 @@
 package com.wolf2.reader.mode.dao
 
 import android.net.Uri
+import androidx.paging.PagingSource
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
@@ -15,6 +16,9 @@ interface BookDao {
 
     @Query("SELECT * FROM BOOK")
     fun getAll(): List<Book>
+
+    @Query("SELECT * FROM BOOK")
+    fun allBooks(): PagingSource<Int, Book>
 
     @Query("SELECT * FROM BOOK")
     fun observeAll(): Flow<List<Book>>

@@ -5,13 +5,11 @@ import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -26,6 +24,8 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.paging.compose.LazyPagingItems
+import androidx.paging.compose.itemKey
 import coil.compose.AsyncImage
 import com.wolf2.reader.mode.entity.ReadRecord
 import com.wolf2.reader.mode.entity.book.Book
@@ -36,11 +36,11 @@ import kotlin.math.roundToInt
 @Composable
 internal fun ShelfGridContent(
     uiState: BookShelfUiState,
+    bookPagingItems: LazyPagingItems<Book>,
     column: Int,
     onItemClick: (Book) -> Unit = {},
     onItemLongClick: (Book) -> Unit = {},
 ) {
-    val books = uiState.books
     val readRecords = uiState.readRecords
     val gridState = rememberLazyGridState()
 
@@ -53,13 +53,18 @@ internal fun ShelfGridContent(
                 vertical = 8.dp
             )
         ) {
-            items(items = books) { book ->
-                GridItem(
-                    book = book,
-                    readRecord = readRecords.firstOrNull { it.bookUuid == book.uuid },
-                    onItemClick = onItemClick,
-                    onItemLongClick = onItemLongClick
-                )
+            items(
+                bookPagingItems.itemCount,
+                key = bookPagingItems.itemKey { it.uuid }
+            ) { index ->
+                bookPagingItems[index]?.let { book ->
+                    GridItem(
+                        book = book,
+                        readRecord = readRecords.firstOrNull { it.bookUuid == book.uuid },
+                        onItemClick = onItemClick,
+                        onItemLongClick = onItemLongClick
+                    )
+                }
             }
         }
     }
