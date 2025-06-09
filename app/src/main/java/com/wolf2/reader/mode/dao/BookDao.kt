@@ -43,4 +43,18 @@ interface BookDao {
 
     @Delete
     fun delete(book: Book)
+
+    @Query(
+        """
+        SELECT book.* FROM book
+        INNER JOIN (
+            SELECT bookUuid, MAX(lastReadTimeMillis) AS max_time
+            FROM READRECORD
+            GROUP BY bookUuid
+            ORDER BY max_time DESC
+            LIMIT 1
+        ) AS latest_record ON book.uuid = latest_record.bookUuid
+    """
+    )
+    fun observeLatestReadBook(): Flow<Book?>
 }

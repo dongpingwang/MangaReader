@@ -27,5 +27,6 @@
     <string name="sort_desc">反序</string>
 
     <string name="page_switch_effect">翻页动画</string>
+    <string name="fab_continue_read">继续阅读</string>
 
 </resources>

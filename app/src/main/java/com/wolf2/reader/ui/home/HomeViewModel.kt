@@ -5,7 +5,10 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.wolf2.reader.config.AppConfig
 import com.wolf2.reader.globalViewContext
+import com.wolf2.reader.mode.db.DatabaseHelper
+import com.wolf2.reader.mode.entity.book.Book
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -15,6 +18,7 @@ sealed class HomeUiEvent {
     data class OnTabChange(val tab: Int) : HomeUiEvent()
     data object OnNavigationToBrowser : HomeUiEvent()
     data object OnNavigationToSearch : HomeUiEvent()
+    data class OnNavigationToRead(val book: Book) : HomeUiEvent()
     data class OnShelfLayoutModeChange(val mode: Int) : HomeUiEvent()
     data class OnShelfLayoutColumnChange(val column: Int) : HomeUiEvent()
 }
@@ -60,6 +64,8 @@ class HomeViewModel : ViewModel() {
         }
     }
 
+    val latestReadBookFlow: Flow<Book?> = DatabaseHelper.bookDao().observeLatestReadBook()
+
     fun onEvent(event: HomeUiEvent) {
         when (event) {
             is HomeUiEvent.OnTabChange -> {
@@ -72,6 +78,10 @@ class HomeViewModel : ViewModel() {
 
             is HomeUiEvent.OnNavigationToSearch -> {
                 globalViewContext?.navController?.navigate(Routes.SEARCH)
+            }
+
+            is HomeUiEvent.OnNavigationToRead -> {
+                globalViewContext?.navController?.navigate("${Routes.READ}/${event.book.uuid}")
             }
 
             is HomeUiEvent.OnShelfLayoutModeChange -> {

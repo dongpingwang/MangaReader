@@ -13,8 +13,10 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.wolf2.reader.ui.home.component.HomeBottomBar
 import com.wolf2.reader.ui.home.component.HomeContent
 import com.wolf2.reader.ui.home.component.HomeDropMenu
+import com.wolf2.reader.ui.home.component.HomeFab
 import com.wolf2.reader.ui.home.component.HomeTopAppBar
 import com.wolf2.reader.ui.home.component.ShelfLayoutModeDialog
+import timber.log.Timber
 
 @Composable
 fun HomeScreen() {
@@ -22,6 +24,9 @@ fun HomeScreen() {
     val uiState by vm.uiState.collectAsStateWithLifecycle()
     var showMenuDrop by remember { mutableStateOf(false) }
     var showLayoutDialog by remember { mutableStateOf(false) }
+
+    val latestReadBook = vm.latestReadBookFlow.collectAsStateWithLifecycle(null)
+    Timber.d("latestReadBook: ${latestReadBook.value}")
 
     Column(modifier = Modifier.fillMaxSize()) {
         HomeTopAppBar(
@@ -50,6 +55,10 @@ fun HomeScreen() {
             onLayoutColumnChange = { vm.onEvent(HomeUiEvent.OnShelfLayoutColumnChange(it)) },
             onDismissRequest = { showLayoutDialog = false })
     }
+
+    HomeFab(showFab = latestReadBook.value != null, onClick = {
+        vm.onEvent(HomeUiEvent.OnNavigationToRead(requireNotNull(latestReadBook.value)))
+    })
 }
 
 

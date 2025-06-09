@@ -4,10 +4,8 @@ androidx-activity-compose = "1.10.1"
 androidx-appcompat = "1.7.0"
 androidx-compose-bom = "2025.04.01"
 androidx-corektx = "1.16.0"
-androidx-fragment-ktx = "1.8.6"
 androidx-lifecycle-runtime-compose = "2.8.7"
 androidx-navigation = "2.8.9"
-androidx-navigation-fragment = "2.7.6"
 androidx-paging = "3.3.6"
 androidx-test = "1.6.1"
 androidx-test-espresso = "3.6.1"
@@ -21,7 +19,6 @@ kotlinxSerializationJson = "1.8.1"
 ksp = "2.1.20-2.0.0"
 lazycolumnscrollbar = "2.2.0"
 material = "1.13.0-alpha13"
-androidx-runtime-android = "1.5.4"
 mmkvKtx = "2.0.1"
 roomCompilerVersion = "2.7.1"
 roomRuntime = "2.7.1"
@@ -29,10 +26,6 @@ roomKtx = "2.7.1"
 timber = "5.0.1"
 kolinx-binary-compatibility-validator = "0.13.2"
 diffplug-spotless = "6.24.0"
-squareup-curtains = "1.2.5"
-squareup-okhttp = "4.12.0"
-squareup-okio = "3.7.0"
-androidx-annotation = "1.7.1"
 zoomable = "2.8.0"
 
 [libraries]
@@ -44,24 +37,19 @@ androidx-compose-foundation = { module = "androidx.compose.foundation:foundation
 androidx-compose-material-iconsExtended = { module = "androidx.compose.material:material-icons-extended" }
 androidx-compose-material3 = { module = "androidx.compose.material3:material3" }
 androidx-compose-runtime = { module = "androidx.compose.runtime:runtime" }
-androidx-compose-runtime-android = { module = "androidx.compose.runtime:runtime-android", version.ref = "androidx-runtime-android" }
-androidx-annotation = { module = "androidx.annotation:annotation", version.ref = "androidx-annotation" }
 androidx-compose-ui = { module = "androidx.compose.ui:ui", version.ref = "compose-latest" }
 androidx-compose-ui-graphics = { module = "androidx.compose.ui:ui-graphics" }
 androidx-compose-ui-test = { module = "androidx.compose.ui:ui-test" }
-androidx-compose-ui-test-junit4 = { module = "androidx.compose.ui:ui-test-junit4" }
 androidx-compose-ui-test-manifest = { module = "androidx.compose.ui:ui-test-manifest" }
 androidx-compose-ui-tooling = { module = "androidx.compose.ui:ui-tooling" }
 androidx-compose-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview" }
 androidx-compose-ui-util = { module = "androidx.compose.ui:ui-util" }
 androidx-core-ktx = { module = "androidx.core:core-ktx", version.ref = "androidx-corektx" }
-androidx-fragment-ktx = { module = "androidx.fragment:fragment-ktx", version.ref = "androidx-fragment-ktx" }
 androidx-graphics-shapes = "androidx.graphics:graphics-shapes:1.0.1"
 androidx-lifecycle-runtime = { module = "androidx.lifecycle:lifecycle-runtime-ktx", version.ref = "androidx-lifecycle-runtime-compose" }
 androidx-lifecycle-runtime-compose = { module = "androidx.lifecycle:lifecycle-runtime-compose", version.ref = "androidx-lifecycle-runtime-compose" }
 androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "androidx-navigation" }
 androidx-paging-compose = { module = "androidx.paging:paging-compose", version.ref = "androidx-paging" }
-androidx-navigation-fragment = { module = "androidx.navigation:navigation-fragment", version.ref = "androidx-navigation-fragment" }
 androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "roomKtx" }
 androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "roomRuntime" }
 androidx-test-core = { module = "androidx.test:core", version.ref = "androidx-test" }
@@ -77,9 +65,6 @@ lazycolumnscrollbar = { module = "com.github.nanihadesuka:LazyColumnScrollbar", 
 mmkv-ktx = { module = "com.github.DylanCaiCoding:MMKV-KTX", version.ref = "mmkvKtx" }
 room-compiler = { module = "androidx.room:room-compiler", version.ref = "roomCompilerVersion" }
 timber = { module = "com.jakewharton.timber:timber", version.ref = "timber" }
-squareup-okhttp = { module = "com.squareup.okhttp3:okhttp", version.ref = "squareup-okhttp" }
-squareup-okio = { module = "com.squareup.okio:okio", version.ref = "squareup-okio" }
-squareup-curtains = { module = "com.squareup.curtains:curtains", version.ref = "squareup-curtains" }
 zoomable = { module = "net.engawapg.lib:zoomable", version.ref = "zoomable" }
 [plugins]
 android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }
