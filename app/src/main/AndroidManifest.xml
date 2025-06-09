@@ -29,6 +29,12 @@
             </intent-filter>
         </activity>
 
+        <activity
+            android:name="com.bobbyesp.crashhandler.CrashHandlerActivity"
+            android:label="CrashHandlerActivity"
+            android:launchMode="singleTask"
+            android:theme="@style/Theme.ComicReader"/>
+
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.fileprovider"

@@ -101,7 +101,8 @@ dependencies {
     // implementation(project(":PdfiumAndroid"))
 
     // https://github.com/measure-sh/measure
-    // implementation(project(":measure"))
+    // https://github.com/BobbyESP/Crashy
+    implementation(project(":crashhandler"))
 
     // https://github.com/jhy/jsoup
     implementation(libs.jsoup)
@@ -121,7 +122,6 @@ dependencies {
     // implementation("com.valentinilk.shimmer:compose-shimmer:1.3.3")
 
     //implementation ("me.saket.bytesize:bytesize:2.0.0-beta04")
-
 
     implementation ("androidx.paging:paging-runtime:3.2.1")
     implementation ("androidx.paging:paging-compose:3.3.0") // Compose 扩展
@@ -163,6 +163,5 @@ dependencies {
     androidTestImplementation(libs.androidx.test.espresso.core)
     androidTestImplementation(libs.androidx.compose.ui.test)
     debugImplementation(libs.androidx.compose.ui.tooling)
-    androidTestImplementation(libs.androidx.compose.ui.test.junit4)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
 }

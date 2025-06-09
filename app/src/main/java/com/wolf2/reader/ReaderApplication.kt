@@ -1,6 +1,7 @@
 package com.wolf2.reader
 
 import android.app.Application
+import com.bobbyesp.crashhandler.CrashHandler.setupCrashHandler
 import com.wolf2.reader.mode.db.DatabaseHelper
 import com.wolf2.reader.util.traceMillis
 import kotlinx.coroutines.CoroutineScope
@@ -18,6 +19,7 @@ class ReaderApplication : Application() {
                 Timber.plant(Timber.DebugTree())
                 Timber.d("create")
                 DatabaseHelper.init(app)
+                setupCrashHandler()
             }
         }
     }
