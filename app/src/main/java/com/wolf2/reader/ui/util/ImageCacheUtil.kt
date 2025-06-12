@@ -1,8 +1,8 @@
 package com.wolf2.reader.ui.util
 
+import com.linxiao.framework.encrypt.MD5Util
 import com.wolf2.reader.config.Constants
 import com.wolf2.reader.mode.entity.book.CoverImage
-import com.wolf2.reader.util.MD5Util
 import java.io.File
 
 object ImageCacheUtil {

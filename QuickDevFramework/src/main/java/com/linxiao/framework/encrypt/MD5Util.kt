@@ -1,4 +1,4 @@
-package com.wolf2.reader.util
+package com.linxiao.framework.encrypt
 
 import java.nio.charset.StandardCharsets
 import java.security.MessageDigest

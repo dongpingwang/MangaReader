@@ -33,7 +33,7 @@ private val _callMethod: Pair<String, String>
 
 private const val MAX_TAG_LENGTH = 23
 private val ANONYMOUS_CLASS = Pattern.compile("(\\$\\d+)+$")
-private val fqcnIgnore = listOf("com.arale.comicreader.util.MethodTraceKt")
+private val fqcnIgnore = listOf("com.wolf2.reader.util.MethodTraceKt")
 
 private fun createStackElementTag(element: StackTraceElement): Pair<String, String> {
     var tag = element.className.substringAfterLast('.')

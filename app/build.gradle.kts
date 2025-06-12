@@ -104,6 +104,9 @@ dependencies {
     // https://github.com/BobbyESP/Crashy
     implementation(project(":crashhandler"))
 
+    // https://github.com/lx8421bcd/QuickDevFramework
+    implementation(project(":QuickDevFramework"))
+
     // https://github.com/jhy/jsoup
     implementation(libs.jsoup)
 
