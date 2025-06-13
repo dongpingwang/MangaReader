@@ -10,3 +10,10 @@ data class AppViewContext(
 )
 
 var globalViewContext: AppViewContext? = null
+
+
+val popBackStack: () -> Unit = { globalViewContext?.navController?.popBackStack() }
+
+val navigate: (String) -> Unit = {
+    globalViewContext?.navController?.navigate(route = it)
+}

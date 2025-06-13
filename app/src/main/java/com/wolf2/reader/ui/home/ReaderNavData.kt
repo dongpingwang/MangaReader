@@ -7,4 +7,7 @@ object Routes {
     const val READ_CHAPTER = "read.chapter"
     const val BOOK_DETAIL = "book_detail"
     const val BROWSER_BOOK = "browser_book"
+    const val SETTINGS = "settings"
+    const val SETTINGS_DOWNLOAD= "settings_download"
+    const val SETTINGS_ABOUT = "settings_about"
 }

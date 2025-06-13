@@ -126,6 +126,9 @@ dependencies {
 
     //implementation ("me.saket.bytesize:bytesize:2.0.0-beta04")
 
+    // https://github.com/zhanghai/ComposePreference
+    implementation(libs.composePreference)
+
     implementation ("androidx.paging:paging-runtime:3.2.1")
     implementation ("androidx.paging:paging-compose:3.3.0") // Compose 扩展
     implementation ("androidx.lifecycle:lifecycle-viewmodel-compose:2.7.0")

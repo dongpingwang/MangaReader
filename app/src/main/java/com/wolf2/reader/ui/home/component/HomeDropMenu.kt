@@ -1,19 +1,13 @@
 package com.wolf2.reader.ui.home.component
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.offset
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.CreateNewFolder
-import androidx.compose.material.icons.outlined.Send
 import androidx.compose.material.icons.outlined.Settings
+import androidx.compose.material.icons.outlined.SyncAlt
 import androidx.compose.material.icons.outlined.ViewComfy
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import com.wolf2.reader.R
 import me.saket.cascade.CascadeDropdownMenu
@@ -55,7 +49,7 @@ internal fun HomeDropMenu(
             text = { Text(stringResource(R.string.menu_wifi_transfer)) },
             leadingIcon = {
                 Icon(
-                    imageVector = Icons.Outlined.Send,
+                    imageVector = Icons.Outlined.SyncAlt,
                     contentDescription = null
                 )
             },

@@ -7,6 +7,7 @@ import com.wolf2.reader.config.AppConfig
 import com.wolf2.reader.globalViewContext
 import com.wolf2.reader.mode.db.DatabaseHelper
 import com.wolf2.reader.mode.entity.book.Book
+import com.wolf2.reader.navigate
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -21,6 +22,7 @@ sealed class HomeUiEvent {
     data class OnNavigationToRead(val book: Book) : HomeUiEvent()
     data class OnShelfLayoutModeChange(val mode: Int) : HomeUiEvent()
     data class OnShelfLayoutColumnChange(val column: Int) : HomeUiEvent()
+    data object OnNavigationToSettings : HomeUiEvent()
 }
 
 data class HomeUiState(
@@ -73,15 +75,15 @@ class HomeViewModel : ViewModel() {
             }
 
             is HomeUiEvent.OnNavigationToBrowser -> {
-                globalViewContext?.navController?.navigate(Routes.BROWSER_BOOK)
+                navigate(Routes.BROWSER_BOOK)
             }
 
             is HomeUiEvent.OnNavigationToSearch -> {
-                globalViewContext?.navController?.navigate(Routes.SEARCH)
+                navigate(Routes.SEARCH)
             }
 
             is HomeUiEvent.OnNavigationToRead -> {
-                globalViewContext?.navController?.navigate("${Routes.READ}/${event.book.uuid}")
+                navigate("${Routes.READ}/${event.book.uuid}")
             }
 
             is HomeUiEvent.OnShelfLayoutModeChange -> {
@@ -90,6 +92,10 @@ class HomeViewModel : ViewModel() {
 
             is HomeUiEvent.OnShelfLayoutColumnChange -> {
                 AppConfig.shelfLayoutColumnLD.postValue(event.column)
+            }
+
+            is HomeUiEvent.OnNavigationToSettings -> {
+                navigate(Routes.SETTINGS)
             }
         }
     }

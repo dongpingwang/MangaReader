@@ -1,8 +1,11 @@
 package com.wolf2.reader.ui
 
 import androidx.activity.compose.LocalActivity
+import androidx.compose.foundation.background
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -19,6 +22,9 @@ import com.wolf2.reader.ui.home.Routes
 import com.wolf2.reader.ui.read.ChapterScreen
 import com.wolf2.reader.ui.read.ReadScreen
 import com.wolf2.reader.ui.search.SearchScreen
+import com.wolf2.reader.ui.setting.SettingAboutScreen
+import com.wolf2.reader.ui.setting.SettingDownloadScreen
+import com.wolf2.reader.ui.setting.SettingScreen
 import com.wolf2.reader.ui.theme.ComicReaderTheme
 
 @Composable
@@ -30,7 +36,10 @@ fun ReaderNavGraph() {
             navController = navController,
             owner = LocalViewModelStoreOwner.current!!
         )
-        NavHost(navController = navController, startDestination = Routes.HOME) {
+        NavHost(
+            navController = navController, startDestination = Routes.HOME,
+            modifier = Modifier.background(MaterialTheme.colorScheme.background)
+        ) {
             composable(Routes.HOME) {
                 HomeScreen()
             }
@@ -67,6 +76,18 @@ fun ReaderNavGraph() {
 
             composable(Routes.BROWSER_BOOK) {
                 BrowserScreen()
+            }
+
+            composable(Routes.SETTINGS) {
+                SettingScreen()
+            }
+
+            composable(Routes.SETTINGS_DOWNLOAD) {
+                SettingDownloadScreen()
+            }
+
+            composable(Routes.SETTINGS_ABOUT) {
+                SettingAboutScreen()
             }
         }
 

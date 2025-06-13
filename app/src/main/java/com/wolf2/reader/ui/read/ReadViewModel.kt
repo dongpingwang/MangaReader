@@ -3,6 +3,7 @@ package com.wolf2.reader.ui.read
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.linxiao.framework.encrypt.MD5Util
 import com.wolf2.reader.config.AppConfig
 import com.wolf2.reader.mode.db.DatabaseHelper
 import com.wolf2.reader.mode.entity.ReadRecord
@@ -12,7 +13,6 @@ import com.wolf2.reader.reader.LocalFileReader
 import com.wolf2.reader.ui.util.ImageCacheUtil
 import com.wolf2.reader.util.GalleryUtil
 import com.wolf2.reader.util.LoadResult
-import com.wolf2.reader.util.MD5Util
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -179,7 +179,7 @@ class ReadViewModel(val bookId: String) : ViewModel() {
             is ReadUiEvent.OnDisplayCacheImage -> {
                 updateRecordOnMemory()
                 _uiState.update { it.copy(snackbar = null) }
-                cacheImagePath?.let { GalleryUtil.openImageInGallery(it) }
+                cacheImagePath?.let { GalleryUtil.openGallery(it) }
             }
         }
     }

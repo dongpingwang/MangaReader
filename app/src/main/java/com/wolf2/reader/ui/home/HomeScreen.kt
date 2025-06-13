@@ -44,6 +44,7 @@ fun HomeScreen() {
             onNavigationToBrowser = { vm.onEvent(HomeUiEvent.OnNavigationToBrowser) },
             onNavigationToWifiTransfer = {},
             onShowLayoutDialog = { showLayoutDialog = true },
+            onNavigationToSettings = { vm.onEvent(HomeUiEvent.OnNavigationToSettings) },
             onDismissRequest = { showMenuDrop = false })
     }
 

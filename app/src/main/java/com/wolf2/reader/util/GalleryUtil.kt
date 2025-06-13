@@ -6,7 +6,7 @@ import com.linxiao.framework.common.globalContext
 import java.io.File
 
 object GalleryUtil {
-    fun openImageInGallery(imagePath: String) {
+    fun openGallery(imagePath: String) {
         val imageFile = File(imagePath)
         val contentUri = FileProvider.getUriForFile(
             globalContext,
@@ -16,7 +16,7 @@ object GalleryUtil {
         val intent = Intent(Intent.ACTION_VIEW).apply {
             setDataAndType(contentUri, "image/*")
             addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK.or(Intent.FLAG_ACTIVITY_CLEAR_TOP))
         }
         runCatching {
             globalContext.startActivity(intent)

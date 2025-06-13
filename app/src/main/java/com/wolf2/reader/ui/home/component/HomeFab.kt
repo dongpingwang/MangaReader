@@ -5,7 +5,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.ChromeReaderMode
+import androidx.compose.material.icons.outlined.LocalLibrary
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -35,7 +35,7 @@ fun HomeFab(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.padding(horizontal = 8.dp)
             ) {
-                Icon(imageVector = Icons.Outlined.ChromeReaderMode, contentDescription = null)
+                Icon(imageVector = Icons.Outlined.LocalLibrary, contentDescription = null)
                 Text(
                     text = stringResource(R.string.fab_continue_read),
                     modifier = Modifier.padding(start = 4.dp)
