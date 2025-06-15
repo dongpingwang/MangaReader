@@ -2,7 +2,6 @@ package com.wolf2.reader.ui.read.component
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
-import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ShapeDefaults
 import androidx.compose.material3.Text
@@ -27,11 +26,6 @@ internal fun BoxScope.ReadDropMenu(
                 onDismissRequest = onDismissRequest,
                 shape = ShapeDefaults.Medium
             ) {
-                DropdownMenuItem(
-                    text = { Text(stringResource(R.string.menu_show_big_image)) },
-                    onClick = {
-                        onDismissRequest()
-                    })
                 DropdownMenuItem(
                     text = { Text(stringResource(R.string.menu_download_image)) },
                     onClick = {

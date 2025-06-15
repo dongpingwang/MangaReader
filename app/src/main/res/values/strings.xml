@@ -10,8 +10,7 @@
     <string name="shelf_layout_mode">视图选项</string>
     <string name="shelf_grid_column">网格大小</string>
     <string name="menu_settings">设置</string>
-    <string name="menu_show_big_image">查看大图</string>
-    <string name="menu_download_image">本地缓存</string>
+    <string name="menu_download_image">保存图片</string>
     <string name="image_cache_success">图片保存成功</string>
     <string name="display_image_cache">查看</string>
     <string name="pick_book_success">书籍添加成功</string>

@@ -37,6 +37,12 @@ fun SwipeTinderContent(
         itemCount = { book.pageContents.size }
     )
 
+    LaunchedEffect(uiState) {
+        snapshotFlow { uiState.curPage }.collect {
+            state.setCurrentIndex(it)
+        }
+    }
+
     LaunchedEffect(state) {
         snapshotFlow { state.currentCardIndex }.collect {
             vm.updateReadRecord(it)
