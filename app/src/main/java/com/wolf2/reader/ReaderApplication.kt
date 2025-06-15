@@ -19,7 +19,9 @@ class ReaderApplication : Application() {
                 Timber.plant(Timber.DebugTree())
                 Timber.d("create")
                 DatabaseHelper.init(app)
-                setupCrashHandler()
+                setupCrashHandler {
+                    globalViewContext?.activity?.finish()
+                }
             }
         }
     }

@@ -24,15 +24,14 @@ object ImageCacheUtil {
 
     fun getCoverImageDiskPath(uriString: String): String {
         val fileName = MD5Util.getMD5String16(uriString, null)
-        return "${Constants.dirCoverImage}/$fileName.jpg"
+        return "${Constants.dirCoverImage}/$fileName"
     }
 
     fun cacheImage(buffer: ByteArray, displayName: String): Boolean {
         return runCatching {
             File(Constants.dirRoot).apply { if (!exists()) mkdirs() }
             File(Constants.dirCacheImage).apply { if (!exists()) mkdirs() }
-            val fileName = "$displayName.jpg"
-            File(File(Constants.dirCacheImage), fileName).writeBytes(buffer)
+            File(getCacheImageDiskPath(displayName)).writeBytes(buffer)
         }.onFailure { it.printStackTrace() }.isSuccess
     }
 
@@ -40,11 +39,11 @@ object ImageCacheUtil {
         return Constants.dirCacheImage + "/" + displayName + ".jpg"
     }
 
-    fun deleteCacheDir() {
+    fun deleteCacheDir(): Boolean {
         val file = File(Constants.dirRoot)
-        if (!file.exists()) return
-        runCatching {
+        if (!file.exists()) return false
+        return runCatching {
             file.deleteRecursively()
-        }.onFailure { it.printStackTrace() }
+        }.onFailure { it.printStackTrace() }.isSuccess
     }
 }

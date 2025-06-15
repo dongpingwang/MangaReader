@@ -71,8 +71,9 @@ fun ReaderNavGraph() {
                 arguments = listOf(navArgument("bookUuid") {
                     type = NavType.StringType
                 })
-            ) {
-                BookDetailScreen()
+            ) { backStackEntry ->
+                val bookUuid = backStackEntry.arguments?.getString("bookUuid") ?: return@composable
+                BookDetailScreen(bookUuid = bookUuid)
             }
             composable(
                 route = "${Routes.READ}/{bookUuid}",
@@ -80,8 +81,7 @@ fun ReaderNavGraph() {
                     type = NavType.StringType
                 })
             ) { backStackEntry ->
-                val bookUuid =
-                    backStackEntry.arguments?.getString("bookUuid") ?: return@composable
+                val bookUuid = backStackEntry.arguments?.getString("bookUuid") ?: return@composable
                 ReadScreen(bookUuid = bookUuid)
             }
             composable(

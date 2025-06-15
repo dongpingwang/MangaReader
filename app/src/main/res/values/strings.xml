@@ -27,6 +27,19 @@
 
     <string name="page_switch_effect">翻页动画</string>
     <string name="fab_continue_read">继续阅读</string>
+    <string name="collected">已收藏</string>
+    <string name="collect_book">收藏此漫画</string>
+    <string name="sbl_read">阅读</string>
+    <string name="sbl_menu_content_copy">复制内容</string>
+    <string name="sbl_menu_delete_read_record">删除阅读记录</string>
+    <string name="sbl_menu_share">分享</string>
+    <string name="sbl_menu_shortcut">创建快捷方式</string>
+
+    <string name="source">来源</string>
+    <string name="size">大小</string>
+    <string name="page_count">页数</string>
+    <string name="read_progress_chapter_size">%d页，%d章</string>
+    <string name="read_progress">阅读进度</string>
 
     <string name="settings_appearance">外观</string>
     <string name="settings_appearance_summary">颜色模式，视图选项，语言</string>
@@ -51,4 +64,5 @@
     <string name="settings_dynamic_color">自适应</string>
     <string name="settings_dynamic_color_summary">根据壁纸切换合适的主题（仅Android12+）</string>
     <string name="settings_color_scheme">配色主题</string>
+
 </resources>

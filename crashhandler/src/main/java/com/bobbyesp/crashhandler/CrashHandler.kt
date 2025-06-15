@@ -47,8 +47,10 @@ object CrashHandler {
      * The package information is retrieved using the package manager and includes the version name, version code, and package name.
      * The CrashReportActivity is started with a new Intent that includes the version report and the path of the log file as extras.
      */
-    fun Application.setupCrashHandler(reportInfo: ReportInfo = ReportInfo()) {
+    fun Application.setupCrashHandler(reportInfo: ReportInfo = ReportInfo(), onCrash: (() -> Unit)? = null) {
         Thread.setDefaultUncaughtExceptionHandler { _, throwable ->
+            throwable.printStackTrace()
+            onCrash?.invoke()
             val logfile = createLogFile(this, throwable.stackTraceToString())
             val packageInfo = packageManager.run {
                 if (Build.VERSION.SDK_INT >= 33) getPackageInfo(

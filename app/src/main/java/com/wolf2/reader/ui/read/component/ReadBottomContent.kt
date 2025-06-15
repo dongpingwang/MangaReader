@@ -48,8 +48,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.wolf2.reader.R
-import com.wolf2.reader.globalViewContext
 import com.wolf2.reader.mode.entity.book.Book
+import com.wolf2.reader.navigate
 import com.wolf2.reader.ui.home.Routes
 import com.wolf2.reader.ui.read.ReadUiState
 import com.wolf2.reader.ui.read.ReadViewModel
@@ -77,7 +77,7 @@ internal fun BoxScope.ReadBottomContent(
                 Icon(imageVector = Icons.Outlined.Toc, contentDescription = null)
             }, onClick = {
                 curSelectIndex = 0
-                globalViewContext?.navController?.navigate("${Routes.READ_CHAPTER}/${book.uuid}")
+                navigate("${Routes.READ_CHAPTER}/${book.uuid}")
             })
             NavigationBarItem(selected = curSelectIndex == 1, icon = {
                 Icon(

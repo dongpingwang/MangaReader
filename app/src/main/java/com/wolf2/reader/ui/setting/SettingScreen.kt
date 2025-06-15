@@ -4,7 +4,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.ArrowBackIosNew
+import androidx.compose.material.icons.outlined.ArrowBack
 import androidx.compose.material.icons.outlined.DeveloperMode
 import androidx.compose.material.icons.outlined.Download
 import androidx.compose.material.icons.outlined.Info
@@ -37,7 +37,7 @@ fun SettingScreen() {
         }, navigationIcon = {
             IconButton(onClick = popBackStack) {
                 Icon(
-                    imageVector = Icons.Outlined.ArrowBackIosNew, contentDescription = null
+                    imageVector = Icons.Outlined.ArrowBack, contentDescription = null
                 )
             }
         })

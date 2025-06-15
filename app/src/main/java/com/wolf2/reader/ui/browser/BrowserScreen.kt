@@ -10,7 +10,7 @@ import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.ArrowBackIosNew
+import androidx.compose.material.icons.outlined.ArrowBack
 import androidx.compose.material.icons.outlined.Folder
 import androidx.compose.material.icons.outlined.SdCard
 import androidx.compose.material.icons.outlined.SentimentDissatisfied
@@ -100,7 +100,7 @@ private fun BrowserTopAppBar(
         IconButton(onClick = {
             viewModel.onEvent(BrowserUiEvent.OnBackHandle)
         }) {
-            Icon(imageVector = Icons.Outlined.ArrowBackIosNew, contentDescription = null)
+            Icon(imageVector = Icons.Outlined.ArrowBack, contentDescription = null)
         }
     }, actions = {
         IconButton(onClick = { }) {
@@ -152,22 +152,20 @@ private fun AccessDialog(
 
 @Composable
 private fun PickerFilesIndicator(viewModel: BrowserViewModel, uiState: BrowserUiState) {
-    when (uiState.pickFileStatus) {
-        is LoadResult.Loading -> LoadingIndicator()
-        is LoadResult.Success -> {
-            MySnackbar(
-                message = stringResource(R.string.pick_book_success),
-                actionLabel = stringResource(R.string.to_book_shelf),
-                withDismissAction = true,
-                actionPerformed = {
-                    viewModel.onEvent(BrowserUiEvent.OnBackHandle)
-                },
-                dismissed = {
-                    viewModel.onEvent(BrowserUiEvent.OnSnackbarDismiss)
-                })
-        }
-
-        else -> {}
+    if (uiState.pickFileStatus == LoadResult.Loading) {
+        LoadingIndicator()
+    }
+    if (uiState.snackbar == true) {
+        MySnackbar(
+            message = stringResource(R.string.pick_book_success),
+            actionLabel = stringResource(R.string.to_book_shelf),
+            withDismissAction = true,
+            actionPerformed = {
+                viewModel.onEvent(BrowserUiEvent.OnBackHandle)
+            },
+            dismissed = {
+                viewModel.onEvent(BrowserUiEvent.OnSnackbarDismiss)
+            })
     }
 }
 

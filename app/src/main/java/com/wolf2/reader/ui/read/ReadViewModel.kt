@@ -6,10 +6,15 @@ import androidx.lifecycle.viewModelScope
 import com.wolf2.reader.util.MD5Util
 import com.wolf2.reader.config.AppConfig
 import com.wolf2.reader.mode.db.DatabaseHelper
+import com.wolf2.reader.mode.entity.FavoriteBook
 import com.wolf2.reader.mode.entity.ReadRecord
 import com.wolf2.reader.mode.entity.book.Book
+import com.wolf2.reader.mode.entity.book.Metadata
 import com.wolf2.reader.mode.entity.book.PageContent
+import com.wolf2.reader.navigate
+import com.wolf2.reader.popBackStack
 import com.wolf2.reader.reader.LocalFileReader
+import com.wolf2.reader.ui.home.Routes
 import com.wolf2.reader.ui.util.ImageCacheUtil
 import com.wolf2.reader.util.LoadResult
 import com.wolf2.reader.util.SystemAppUtil
@@ -24,6 +29,12 @@ import timber.log.Timber
 sealed class ReadUiEvent {
     data object OnSnackbarDismiss : ReadUiEvent()
     data object OnDisplayCacheImage : ReadUiEvent()
+    data object OnBackHandle : ReadUiEvent()
+    data class OnFavoriteChange(val favorite: Boolean) : ReadUiEvent()
+    data class OnTitleChange(val title: String) : ReadUiEvent()
+    data class OnAuthorChange(val author: String) : ReadUiEvent()
+    data object OnNavigationToRead : ReadUiEvent()
+    data object DeleteReadRecord : ReadUiEvent()
 }
 
 data class ReadUiState(
@@ -31,20 +42,21 @@ data class ReadUiState(
     val darkMode: Boolean = AppConfig.darkModeLD.value,
     val readRecord: ReadRecord = ReadRecord(),
     val bookResult: LoadResult<Book> = LoadResult.Loading,
-    var snackbar: Boolean? = null
+    val favorite: Boolean = false,
+    val snackbar: Boolean? = null
 ) {
     val curPage: Int
         get() = readRecord.curPage
 }
 
-class ReadViewModel(val bookId: String) : ViewModel() {
+class ReadViewModel(val bookUuid: String) : ViewModel() {
 
     companion object {
         @Suppress("UNCHECKED_CAST")
-        fun provideFactory(bookId: String): ViewModelProvider.Factory =
+        fun provideFactory(bookUuid: String): ViewModelProvider.Factory =
             object : ViewModelProvider.Factory {
                 override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                    return ReadViewModel(bookId) as T
+                    return ReadViewModel(bookUuid) as T
                 }
             }
     }
@@ -58,6 +70,48 @@ class ReadViewModel(val bookId: String) : ViewModel() {
 
     init {
         viewModelScope.launch {
+            launch(Dispatchers.IO) {
+                val book = DatabaseHelper.bookDao().queryByUuid(bookUuid)
+                if (book == null) {
+                    Timber.e("book from db is null")
+                    _uiState.update { it.copy(bookResult = LoadResult.Error(Throwable())) }
+                    return@launch
+                }
+                val oldMetadata = Metadata(title = book.title, author = book.author)
+                val reader = LocalFileReader(book)
+                fileReader = reader
+                if (!reader.readBook()) {
+                    Timber.e("readBook fail")
+                    _uiState.update { it.copy(bookResult = LoadResult.Error(Throwable())) }
+                    return@launch
+                }
+
+                if (oldMetadata.title.isNotEmpty()) {
+                    book.title = oldMetadata.title
+                }
+                if (oldMetadata.author.isNotEmpty()) {
+                    book.author = oldMetadata.author
+                }
+
+                readRecord = DatabaseHelper.readRecordDao().getReadRecord(bookUuid).also {
+                    Timber.d("getReadRecord:$it")
+                } ?: ReadRecord(
+                    bookUuid = book.uuid,
+                    pageCount = book.pageContents.size,
+                    lastReadTimeMillis = System.currentTimeMillis()
+                ).also {
+                    Timber.d("newReadRecord:$it")
+                }
+                val favorite = DatabaseHelper.favoriteBookDao().getFavoriteBook(bookUuid) != null
+                _uiState.update {
+                    it.copy(
+                        bookResult = LoadResult.Success(book),
+                        readRecord = readRecord,
+                        favorite = favorite
+                    )
+                }
+            }
+
             launch {
                 AppConfig.pagerSwitchEffectLD.collectLatest { v ->
                     _uiState.update { it.copy(pagerSwitchEffect = v) }
@@ -69,33 +123,6 @@ class ReadViewModel(val bookId: String) : ViewModel() {
                     _uiState.update { it.copy(darkMode = v) }
                 }
             }
-
-            launch(Dispatchers.IO) {
-                val book = DatabaseHelper.bookDao().queryByUuid(bookId)
-                if (book == null) {
-                    Timber.e("book from db is null")
-                    _uiState.update { it.copy(bookResult = LoadResult.Error(Throwable())) }
-                    return@launch
-                }
-                val reader = LocalFileReader(book)
-                fileReader = reader
-                if (!reader.readBook()) {
-                    Timber.e("readBook fail")
-                    _uiState.update { it.copy(bookResult = LoadResult.Error(Throwable())) }
-                    return@launch
-                }
-                readRecord = DatabaseHelper.readRecordDao().getReadRecord(bookId) ?: ReadRecord(
-                    bookUuid = book.uuid,
-                    pageCount = book.pageContents.size,
-                    lastReadTimeMillis = System.currentTimeMillis()
-                )
-                _uiState.update {
-                    it.copy(
-                        bookResult = LoadResult.Success(book),
-                        readRecord = readRecord
-                    )
-                }
-            }
         }
     }
 
@@ -105,7 +132,7 @@ class ReadViewModel(val bookId: String) : ViewModel() {
                 curPage = curPage,
                 lastReadTimeMillis = System.currentTimeMillis()
             )
-            DatabaseHelper.readRecordDao().insert(newRecord)
+            DatabaseHelper.readRecordDao().update(newRecord)
             // 不更新UI，防止闪烁
             readRecord = newRecord
             if (updateImmediately) {
@@ -152,7 +179,6 @@ class ReadViewModel(val bookId: String) : ViewModel() {
         return fileReader?.getImageBuffer(page)
     }
 
-
     fun onEvent(event: ReadUiEvent) {
         when (event) {
             is ReadUiEvent.OnSnackbarDismiss -> {
@@ -163,6 +189,42 @@ class ReadViewModel(val bookId: String) : ViewModel() {
                 updateRecordOnMemory()
                 _uiState.update { it.copy(snackbar = null) }
                 cacheImagePath?.let { SystemAppUtil.openGallery(it) }
+            }
+
+            is ReadUiEvent.OnBackHandle -> popBackStack()
+
+            is ReadUiEvent.OnFavoriteChange -> {
+                viewModelScope.launch(Dispatchers.IO) {
+                    val favorite = FavoriteBook(bookUuid)
+                    if (event.favorite) {
+                        DatabaseHelper.favoriteBookDao().insert(favorite)
+                    } else {
+                        DatabaseHelper.favoriteBookDao().delete(favorite)
+                    }
+                }
+            }
+
+            is ReadUiEvent.OnTitleChange, is ReadUiEvent.OnAuthorChange -> {
+                val book = (uiState.value.bookResult as LoadResult.Success<Book>).data
+                if (event is ReadUiEvent.OnTitleChange) {
+                    book.title = event.title
+                }
+                if (event is ReadUiEvent.OnAuthorChange) {
+                    book.author = event.author
+                }
+                viewModelScope.launch(Dispatchers.IO) {
+                    DatabaseHelper.bookDao().update(book)
+                }
+            }
+
+            is ReadUiEvent.OnNavigationToRead -> {
+                navigate("${Routes.READ}/${bookUuid}")
+            }
+
+            is ReadUiEvent.DeleteReadRecord -> {
+                viewModelScope.launch(Dispatchers.IO) {
+                    DatabaseHelper.readRecordDao().delete(readRecord)
+                }
             }
         }
     }

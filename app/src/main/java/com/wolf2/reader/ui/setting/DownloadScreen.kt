@@ -4,7 +4,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.ArrowBackIosNew
+import androidx.compose.material.icons.outlined.ArrowBack
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -37,7 +37,7 @@ fun DownloadScreen() {
         }, navigationIcon = {
             IconButton(onClick = popBackStack) {
                 Icon(
-                    imageVector = Icons.Outlined.ArrowBackIosNew, contentDescription = null
+                    imageVector = Icons.Outlined.ArrowBack, contentDescription = null
                 )
             }
         })

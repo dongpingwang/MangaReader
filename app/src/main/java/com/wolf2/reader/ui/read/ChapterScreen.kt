@@ -5,7 +5,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.ArrowBackIosNew
+import androidx.compose.material.icons.outlined.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -22,8 +22,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.wolf2.reader.globalViewContext
 import com.wolf2.reader.mode.entity.book.Book
+import com.wolf2.reader.popBackStack
 import com.wolf2.reader.util.LoadResult
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -36,9 +36,9 @@ fun ChapterScreen(bookUuid: String) {
     Column(modifier = Modifier.fillMaxSize()) {
         TopAppBar(navigationIcon = {
             IconButton(onClick = {
-                globalViewContext?.navController?.popBackStack()
+                popBackStack()
             }) {
-                Icon(imageVector = Icons.Outlined.ArrowBackIosNew, contentDescription = null)
+                Icon(imageVector = Icons.Outlined.ArrowBack, contentDescription = null)
             }
         }, title = {
             var selectedIndex by remember { mutableIntStateOf(0) }

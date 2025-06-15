@@ -5,10 +5,10 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
-import com.wolf2.reader.globalViewContext
 import com.wolf2.reader.mode.db.DatabaseHelper
 import com.wolf2.reader.mode.entity.ReadRecord
 import com.wolf2.reader.mode.entity.book.Book
+import com.wolf2.reader.navigate
 import com.wolf2.reader.ui.home.Routes
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -31,11 +31,12 @@ class BookShelfViewModel : ViewModel() {
 
     companion object {
         @Suppress("UNCHECKED_CAST")
-        fun provideFactory(): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
-            override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                return BookShelfViewModel() as T
+        fun provideFactory(): ViewModelProvider.Factory =
+            object : ViewModelProvider.Factory {
+                override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                    return BookShelfViewModel() as T
+                }
             }
-        }
     }
 
     private val _uiState = MutableStateFlow(BookShelfUiState())
@@ -58,7 +59,7 @@ class BookShelfViewModel : ViewModel() {
         config = PagingConfig(
             pageSize = 10,
             enablePlaceholders = true,
-            maxSize = 300
+            maxSize = 30
         )
     ) {
         DatabaseHelper.bookDao().allBooks()
@@ -67,11 +68,11 @@ class BookShelfViewModel : ViewModel() {
     fun onEvent(event: BookShelfUiEvent) {
         when (event) {
             is BookShelfUiEvent.OnNavigationToBrowser -> {
-                globalViewContext?.navController?.navigate(Routes.BROWSER_BOOK)
+                navigate(Routes.BROWSER_BOOK)
             }
 
             is BookShelfUiEvent.OnItemClick -> {
-                globalViewContext?.navController?.navigate("${Routes.READ}/${event.book.uuid}")
+                navigate("${Routes.BOOK_DETAIL}/${event.book.uuid}")
             }
 
             is BookShelfUiEvent.OnItemLongClick -> {

@@ -19,7 +19,7 @@ import com.wolf2.reader.R
 @Composable
 fun HomeFab(
     showFab: Boolean = true,
-    onClick: () -> Unit = {}
+    onNavigationToRead: () -> Unit = {}
 ) {
     if (!showFab) return
     Box(
@@ -28,7 +28,7 @@ fun HomeFab(
         contentAlignment = Alignment.BottomEnd
     ) {
         FloatingActionButton(
-            onClick = onClick,
+            onClick = onNavigationToRead,
             modifier = Modifier.padding(bottom = 100.dp, end = 16.dp)
         ) {
             Row(

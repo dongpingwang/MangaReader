@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "6d531ebcc0068afab901b835c5e77f40",
+    "identityHash": "96423422bc92cdba9742818fcb9e71b6",
     "entities": [
       {
         "tableName": "Book",
@@ -106,11 +106,42 @@
             ]
           }
         ]
+      },
+      {
+        "tableName": "FavoriteBook",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`bookUuid` TEXT NOT NULL, PRIMARY KEY(`bookUuid`), FOREIGN KEY(`bookUuid`) REFERENCES `Book`(`uuid`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "bookUuid",
+            "columnName": "bookUuid",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "bookUuid"
+          ]
+        },
+        "foreignKeys": [
+          {
+            "table": "Book",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "bookUuid"
+            ],
+            "referencedColumns": [
+              "uuid"
+            ]
+          }
+        ]
       }
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '6d531ebcc0068afab901b835c5e77f40')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '96423422bc92cdba9742818fcb9e71b6')"
     ]
   }
 }

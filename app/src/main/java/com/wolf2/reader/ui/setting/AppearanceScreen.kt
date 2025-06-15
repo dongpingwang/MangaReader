@@ -15,7 +15,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.ArrowBackIosNew
+import androidx.compose.material.icons.outlined.ArrowBack
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -80,7 +80,7 @@ fun AppearanceScreen() {
         }, navigationIcon = {
             IconButton(onClick = popBackStack) {
                 Icon(
-                    imageVector = Icons.Outlined.ArrowBackIosNew, contentDescription = null
+                    imageVector = Icons.Outlined.ArrowBack, contentDescription = null
                 )
             }
         })

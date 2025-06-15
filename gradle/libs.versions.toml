@@ -1,25 +1,26 @@
 [versions]
 androidGradlePlugin = "8.9.2"
 androidx-activity-compose = "1.10.1"
-androidx-appcompat = "1.7.0"
-androidx-compose-bom = "2025.04.01"
+androidx-appcompat = "1.7.1"
+androidx-compose-bom = "2025.05.00"
 androidx-corektx = "1.16.0"
-androidx-lifecycle-runtime-compose = "2.8.7"
+androidx-lifecycle-runtime-compose = "2.9.1"
 androidx-navigation = "2.8.9"
 androidx-paging = "3.3.6"
 androidx-test = "1.6.1"
 androidx-test-espresso = "3.6.1"
+bytesize = "2.0.0-beta04"
 cascade = "2.3.0"
 cascadeCompose = "2.3.0"
 coil = "2.7.0"
-compose-latest = "1.8.0"
-filesystem = "0.0.1"
+compose-latest = "1.8.2"
 jsoup = "1.20.1"
-kotlin = "2.1.20"
+kotlin = "2.1.21"
 kotlinxSerializationJson = "1.8.1"
-ksp = "2.1.20-2.0.0"
+ksp = "2.1.21-2.0.1"
 lazycolumnscrollbar = "2.2.0"
 material = "1.13.0-alpha13"
+material3 = "1.4.0-alpha15"
 mmkvKtx = "2.0.1"
 roomCompilerVersion = "2.7.1"
 roomRuntime = "2.7.1"
@@ -30,7 +31,6 @@ diffplug-spotless = "6.24.0"
 zoomable = "2.8.0"
 compose-preference = "1.1.1"
 
-
 [libraries]
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activity-compose" }
 androidx-appcompat = { module = "androidx.appcompat:appcompat", version.ref = "androidx-appcompat" }
@@ -38,7 +38,7 @@ androidx-compose-animation-graphics = { module = "androidx.compose.animation:ani
 androidx-compose-bom = { module = "androidx.compose:compose-bom", version.ref = "androidx-compose-bom" }
 androidx-compose-foundation = { module = "androidx.compose.foundation:foundation", version.ref = "compose-latest" }
 androidx-compose-material-iconsExtended = { module = "androidx.compose.material:material-icons-extended" }
-androidx-compose-material3 = { module = "androidx.compose.material3:material3" ,version = "1.4.0-alpha14"}
+androidx-compose-material3 = { module = "androidx.compose.material3:material3" ,version.ref = "material3"}
 androidx-compose-runtime = { module = "androidx.compose.runtime:runtime" }
 androidx-compose-ui = { module = "androidx.compose.ui:ui", version.ref = "compose-latest" }
 androidx-compose-ui-graphics = { module = "androidx.compose.ui:ui-graphics" }
@@ -61,10 +61,10 @@ androidx-room-paging = { module = "androidx.room:room-paging", version.ref = "ro
 androidx-test-core = { module = "androidx.test:core", version.ref = "androidx-test" }
 androidx-test-espresso-core = { module = "androidx.test.espresso:espresso-core", version.ref = "androidx-test-espresso" }
 androidx-test-runner = "androidx.test:runner:1.6.2"
+bytesize = { module = "me.saket.bytesize:bytesize", version.ref = "bytesize" }
 cascade-compose = { module = "me.saket.cascade:cascade-compose", version.ref = "cascadeCompose" }
 cascade = { module = "me.saket.cascade:cascade", version.ref = "cascade" }
 coil-kt-compose = { module = "io.coil-kt:coil-compose", version.ref = "coil" }
-filesystem = { module = "me.zhanghai.kotlin.filesystem:filesystem", version.ref = "filesystem" }
 google-android-material = { module = "com.google.android.material:material", version.ref = "material" }
 jsoup = { module = "org.jsoup:jsoup", version.ref = "jsoup" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
@@ -74,6 +74,7 @@ room-compiler = { module = "androidx.room:room-compiler", version.ref = "roomCom
 timber = { module = "com.jakewharton.timber:timber", version.ref = "timber" }
 zoomable = { module = "net.engawapg.lib:zoomable", version.ref = "zoomable" }
 composePreference = { module = "me.zhanghai.compose.preference:library", version.ref = "compose-preference" }
+
 [plugins]
 android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }
 android-library = { id = "com.android.library", version.ref = "androidGradlePlugin" }

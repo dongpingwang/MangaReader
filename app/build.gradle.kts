@@ -30,8 +30,8 @@ android {
             }
         }
 
-        ndk {
-            abiFilters += "arm64-v8a"
+        ndk{
+            abiFilters.add("arm64-v8a")
         }
     }
 
@@ -76,14 +76,10 @@ android {
 }
 
 dependencies {
-    // https://github.com/Reginer/aosp-android-jar
-    // https://github.com/lx8421bcd/QuickDevFramework
-
     // https://github.com/JakeWharton/timber
     implementation(libs.timber)
 
     // https://github.com/Tencent/MMKV
-    // https://github.com/liangjingkanji/Serialize
     // https://github.com/DylanCaiCoding/MMKV-KTX
     implementation(libs.mmkv.ktx)
 
@@ -94,14 +90,12 @@ dependencies {
     implementation(project(":pagecurl"))
 
     // https://github.com/smartword-app/compose-swipeable-cards
-    // https://github.com/Aghajari/LazySwipeCards
     implementation(project(":swipeable_cards"))
 
     // https://github.com/oothp/PdfiumAndroid
     // implementation(project(":PdfiumAndroid"))
 
-    // https://github.com/measure-sh/measure
-    // https://github.com/BobbyESP/Crashy
+   // https://github.com/BobbyESP/Crashy
     implementation(project(":crashhandler"))
 
     // https://github.com/jhy/jsoup
@@ -109,25 +103,16 @@ dependencies {
 
     // https://github.com/saket/telephoto
     // https://github.com/usuiat/Zoomable
-    implementation (libs.zoomable)
-
-    // https://github.com/saket/swipe
-    // implementation(libs.swipe)
+    implementation(libs.zoomable)
 
     // https://github.com/saket/cascade
     implementation(libs.cascade)
     implementation(libs.cascade.compose)
-
-    // https://github.com/valentinilk/compose-shimmer
-    // implementation("com.valentinilk.shimmer:compose-shimmer:1.3.3")
-
-    //implementation ("me.saket.bytesize:bytesize:2.0.0-beta04")
+    // https://github.com/saket/byte-size
+    implementation (libs.bytesize)
 
     // https://github.com/zhanghai/ComposePreference
     implementation(libs.composePreference)
-    // https://github.com/zhanghai/filesystem-kt
-    // implementation(libs.filesystem)
-
 
     val composeBom = platform(libs.androidx.compose.bom)
     implementation(composeBom)

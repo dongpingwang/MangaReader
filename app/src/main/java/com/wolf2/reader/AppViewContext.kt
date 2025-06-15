@@ -11,8 +11,12 @@ data class AppViewContext(
 
 var globalViewContext: AppViewContext? = null
 
-
-val popBackStack: () -> Unit = { globalViewContext?.navController?.popBackStack() }
+val popBackStack: () -> Unit = {
+    val previous = globalViewContext?.navController?.previousBackStackEntry
+    if (previous != null) {
+        globalViewContext?.navController?.popBackStack()
+    }
+}
 
 val navigate: (String) -> Unit = {
     globalViewContext?.navController?.navigate(route = it)

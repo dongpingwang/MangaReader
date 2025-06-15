@@ -9,9 +9,9 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.wolf2.reader.util.globalContext
 import com.wolf2.reader.convert.toBook
-import com.wolf2.reader.globalViewContext
 import com.wolf2.reader.mode.db.DatabaseHelper
 import com.wolf2.reader.mode.entity.book.Book
+import com.wolf2.reader.popBackStack
 import com.wolf2.reader.reader.LocalFileReader
 import com.wolf2.reader.ui.browser.BrowserUiEvent.*
 import com.wolf2.reader.util.LoadResult
@@ -31,7 +31,8 @@ sealed class BrowserUiEvent {
 
 data class BrowserUiState(
     val granted: Boolean = false,
-    val pickFileStatus: LoadResult<Unit> = LoadResult.None
+    val pickFileStatus: LoadResult<Unit> = LoadResult.Success(Unit),
+    val snackbar: Boolean? = null
 )
 
 class BrowserViewModel() : ViewModel() {
@@ -68,21 +69,25 @@ class BrowserViewModel() : ViewModel() {
                         LocalFileReader(book).readBook()
                         newBooks.add(book)
                     }
-                    _uiState.update { it.copy(pickFileStatus = LoadResult.Success(Unit)) }
+                    _uiState.update {
+                        it.copy(
+                            pickFileStatus = LoadResult.Success(Unit),
+                            snackbar = true
+                        )
+                    }
                     if (newBooks.isEmpty()) return@launch
                     DatabaseHelper.bookDao().insertAll(newBooks)
                 }
             }
 
-
-            is OnBackHandle -> globalViewContext?.navController?.popBackStack()
+            is OnBackHandle -> popBackStack()
 
             is OnAccessChange -> viewModelScope.launch(Dispatchers.IO) {
                 _uiState.update { it.copy(granted = Environment.isExternalStorageManager()) }
             }
 
             is OnSnackbarDismiss -> viewModelScope.launch(Dispatchers.IO) {
-                _uiState.update { it.copy(pickFileStatus = LoadResult.None) }
+                _uiState.update { it.copy(snackbar = null) }
             }
         }
     }

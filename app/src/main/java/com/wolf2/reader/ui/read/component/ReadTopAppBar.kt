@@ -2,7 +2,7 @@ package com.wolf2.reader.ui.read.component
 
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.ArrowBackIosNew
+import androidx.compose.material.icons.outlined.ArrowBack
 import androidx.compose.material.icons.outlined.BookmarkBorder
 import androidx.compose.material.icons.outlined.MoreVert
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -14,9 +14,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.res.painterResource
-import com.wolf2.reader.R
-import com.wolf2.reader.globalViewContext
+import com.wolf2.reader.popBackStack
 import com.wolf2.reader.ui.read.ReadViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -26,9 +24,9 @@ internal fun BoxScope.ReadTopAppBar(readViewModel: ReadViewModel) {
 
     TopAppBar(title = {}, navigationIcon = {
         IconButton(onClick = {
-            globalViewContext?.navController?.popBackStack()
+            popBackStack()
         }) {
-            Icon(imageVector = Icons.Outlined.ArrowBackIosNew, contentDescription = null)
+            Icon(imageVector = Icons.Outlined.ArrowBack, contentDescription = null)
         }
     }, actions = {
         IconButton(onClick = {

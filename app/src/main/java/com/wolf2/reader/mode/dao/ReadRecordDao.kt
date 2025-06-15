@@ -2,7 +2,6 @@ package com.wolf2.reader.mode.dao
 
 import androidx.room.Dao
 import androidx.room.Delete
-import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
@@ -20,9 +19,6 @@ interface ReadRecordDao {
 
     @Query("SELECT * FROM READRECORD WHERE bookUuid=:bookUuid")
     fun getReadRecord(bookUuid: String): ReadRecord?
-
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insert(record: ReadRecord)
 
     @Update(onConflict = OnConflictStrategy.REPLACE)
     fun update(record: ReadRecord)

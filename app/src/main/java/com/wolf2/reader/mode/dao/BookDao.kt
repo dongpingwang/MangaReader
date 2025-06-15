@@ -35,9 +35,6 @@ interface BookDao {
     @Query("DELETE FROM BOOK")
     fun deleteAll()
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insert(book: Book)
-
     @Update(onConflict = OnConflictStrategy.REPLACE)
     fun update(book: Book)
 

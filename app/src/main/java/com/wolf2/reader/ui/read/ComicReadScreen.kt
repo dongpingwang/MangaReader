@@ -68,8 +68,6 @@ fun ReadScreen(bookUuid: String) {
                     }
                 }
             }
-
-            else -> {}
         }
 
         if (showAppBar) {

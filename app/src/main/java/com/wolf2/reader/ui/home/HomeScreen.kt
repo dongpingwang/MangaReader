@@ -57,8 +57,8 @@ fun HomeScreen() {
             onDismissRequest = { showLayoutDialog = false })
     }
 
-    HomeFab(showFab = latestReadBook.value != null, onClick = {
-        vm.onEvent(HomeUiEvent.OnNavigationToRead(requireNotNull(latestReadBook.value)))
+    HomeFab(showFab = latestReadBook.value != null, onNavigationToRead = {
+        vm.onEvent(HomeUiEvent.OnNavigationToRead(requireNotNull(latestReadBook.value?.uuid)))
     })
 }
 

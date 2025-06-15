@@ -11,13 +11,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.wolf2.reader.R
 import com.wolf2.reader.config.ShelfLayout
-import com.wolf2.reader.globalViewContext
 import com.wolf2.reader.mode.entity.book.Book
 import com.wolf2.reader.ui.home.HomeUiState
 import com.wolf2.reader.ui.home.HomeViewModel
@@ -27,8 +25,7 @@ import com.wolf2.reader.ui.shelf.component.ShelfListContent
 @Composable
 fun BookShelfScreen() {
     val vm: BookShelfViewModel = viewModel(
-        factory = BookShelfViewModel.provideFactory(),
-        viewModelStoreOwner = globalViewContext?.owner ?: LocalViewModelStoreOwner.current!!
+        factory = BookShelfViewModel.provideFactory()
     )
     val uiState by vm.uiState.collectAsStateWithLifecycle()
 

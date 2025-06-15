@@ -5,7 +5,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.outlined.ArrowBackIosNew
+import androidx.compose.material.icons.outlined.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -22,15 +22,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.traversalIndex
-import com.wolf2.reader.globalViewContext
+import com.wolf2.reader.popBackStack
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchScreen() {
-
     Scaffold(modifier = Modifier.fillMaxSize(), topBar = {
         TopAppBar(title = {
-            var expanded by rememberSaveable { mutableStateOf(false) }
             var text by rememberSaveable { mutableStateOf("") }
             SearchBar(
                 modifier = Modifier.semantics { traversalIndex = 0f },
@@ -38,12 +36,9 @@ fun SearchScreen() {
                     SearchBarDefaults.InputField(
                         query = text,
                         onQueryChange = { text = it },
-                        onSearch = {
-                            // onSearch(textFieldState.text.toString())
-                            expanded = false
-                        },
-                        expanded = expanded,
-                        onExpandedChange = { expanded = it },
+                        onSearch = {},
+                        expanded = false,
+                        onExpandedChange = { },
                         placeholder = { Text("搜索书名、作者") },
                         leadingIcon = {
                             Icon(
@@ -69,17 +64,17 @@ fun SearchScreen() {
                         }
                     )
                 },
-                expanded = expanded,
-                onExpandedChange = { expanded = it },
+                expanded = false,
+                onExpandedChange = { },
             ) {
 
             }
 
         }, navigationIcon = {
             IconButton(onClick = {
-                globalViewContext?.navController?.popBackStack()
+                popBackStack()
             }) {
-                Icon(imageVector = Icons.Outlined.ArrowBackIosNew, contentDescription = null)
+                Icon(imageVector = Icons.Outlined.ArrowBack, contentDescription = null)
             }
         })
     }) { innerPadding ->

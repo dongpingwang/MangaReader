@@ -18,7 +18,7 @@ sealed class HomeUiEvent {
     data class OnTabChange(val tab: Int) : HomeUiEvent()
     data object OnNavigationToBrowser : HomeUiEvent()
     data object OnNavigationToSearch : HomeUiEvent()
-    data class OnNavigationToRead(val book: Book) : HomeUiEvent()
+    data class OnNavigationToRead(val bookUuid: String) : HomeUiEvent()
     data class OnShelfLayoutModeChange(val mode: Int) : HomeUiEvent()
     data class OnShelfLayoutColumnChange(val column: Int) : HomeUiEvent()
     data object OnNavigationToSettings : HomeUiEvent()
@@ -77,7 +77,7 @@ class HomeViewModel : ViewModel() {
             }
 
             is HomeUiEvent.OnNavigationToRead -> {
-                navigate("${Routes.READ}/${event.book.uuid}")
+                navigate("${Routes.READ}/${event.bookUuid}")
             }
 
             is HomeUiEvent.OnShelfLayoutModeChange -> {
