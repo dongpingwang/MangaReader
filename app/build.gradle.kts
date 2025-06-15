@@ -35,7 +35,6 @@ android {
         }
     }
 
-
     buildTypes {
         release {
             isMinifyEnabled = true
@@ -78,6 +77,7 @@ android {
 
 dependencies {
     // https://github.com/Reginer/aosp-android-jar
+    // https://github.com/lx8421bcd/QuickDevFramework
 
     // https://github.com/JakeWharton/timber
     implementation(libs.timber)
@@ -104,9 +104,6 @@ dependencies {
     // https://github.com/BobbyESP/Crashy
     implementation(project(":crashhandler"))
 
-    // https://github.com/lx8421bcd/QuickDevFramework
-    implementation(project(":QuickDevFramework"))
-
     // https://github.com/jhy/jsoup
     implementation(libs.jsoup)
 
@@ -128,11 +125,9 @@ dependencies {
 
     // https://github.com/zhanghai/ComposePreference
     implementation(libs.composePreference)
+    // https://github.com/zhanghai/filesystem-kt
+    // implementation(libs.filesystem)
 
-    implementation ("androidx.paging:paging-runtime:3.2.1")
-    implementation ("androidx.paging:paging-compose:3.3.0") // Compose 扩展
-    implementation ("androidx.lifecycle:lifecycle-viewmodel-compose:2.7.0")
-    implementation("androidx.room:room-paging:2.7.1")
 
     val composeBom = platform(libs.androidx.compose.bom)
     implementation(composeBom)
@@ -142,26 +137,30 @@ dependencies {
     implementation(libs.androidx.compose.ui.graphics)
     implementation(libs.androidx.graphics.shapes)
     implementation(libs.androidx.compose.ui.tooling.preview)
-    implementation(libs.androidx.paging.compose)
     implementation(libs.androidx.compose.animation.graphics)
     implementation(libs.androidx.compose.material3)
     implementation(libs.androidx.compose.runtime)
     implementation(libs.androidx.compose.material.iconsExtended)
     implementation(libs.androidx.activity.compose)
-    implementation(libs.androidx.lifecycle.runtime.compose)
     implementation(libs.google.android.material)
     implementation(libs.coil.kt.compose)
     implementation(libs.androidx.core.ktx)
+    implementation(libs.androidx.lifecycle.runtime.compose)
     implementation(libs.androidx.lifecycle.runtime)
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.kotlinx.serialization.json)
 
+    implementation(libs.androidx.paging.compose)
+    implementation(libs.androidx.paging.runtime)
+    implementation(libs.androidx.paging.runtime)
+
     implementation(libs.androidx.room.runtime)
+    implementation(libs.androidx.room.ktx)
+    implementation(libs.androidx.room.paging)
     kapt(libs.room.compiler)
     // ksp(libs.room.compiler)
     annotationProcessor(libs.room.compiler)
-    // optional - Kotlin Extensions and Coroutines support for Room
-    implementation(libs.androidx.room.ktx)
 
     androidTestImplementation(composeBom)
     androidTestImplementation(libs.androidx.test.core)

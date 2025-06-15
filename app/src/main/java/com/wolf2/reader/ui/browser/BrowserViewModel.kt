@@ -7,7 +7,7 @@ import androidx.documentfile.provider.DocumentFile
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.linxiao.framework.common.globalContext
+import com.wolf2.reader.util.globalContext
 import com.wolf2.reader.convert.toBook
 import com.wolf2.reader.globalViewContext
 import com.wolf2.reader.mode.db.DatabaseHelper

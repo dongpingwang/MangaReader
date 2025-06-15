@@ -1,4 +1,4 @@
-package com.linxiao.framework.encrypt
+package com.wolf2.reader.util
 
 import java.nio.charset.StandardCharsets
 import java.security.MessageDigest
@@ -33,8 +33,8 @@ object MD5Util {
                 ) else md5StrBuff.append(Integer.toHexString(0xFF and aByteArray.toInt()))
             }
             return when (caseType) {
-                MD5Util.CASE.LOWER -> md5StrBuff.toString().lowercase(Locale.getDefault())
-                MD5Util.CASE.UPPER -> md5StrBuff.toString().uppercase(Locale.getDefault())
+                CASE.LOWER -> md5StrBuff.toString().lowercase(Locale.getDefault())
+                CASE.UPPER -> md5StrBuff.toString().uppercase(Locale.getDefault())
                 else -> md5StrBuff.toString().uppercase(Locale.getDefault())
             }
         } catch (e: NoSuchAlgorithmException) {

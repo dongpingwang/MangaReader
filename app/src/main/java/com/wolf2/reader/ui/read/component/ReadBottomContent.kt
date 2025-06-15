@@ -48,7 +48,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.wolf2.reader.R
-import com.wolf2.reader.config.AppConfig
 import com.wolf2.reader.globalViewContext
 import com.wolf2.reader.mode.entity.book.Book
 import com.wolf2.reader.ui.home.Routes
@@ -173,7 +172,7 @@ private fun PagerAdjuster(
     pageSwitchEffect: Int,
     onPageSwitchEffectChange: (Int) -> Unit = {},
 ) {
-    val pageEffects = LocalContext.current.resources.getStringArray(R.array.read_page_effect)
+    val pageEffects = LocalContext.current.resources.getStringArray(R.array.read_page_effects)
     val scrollState = rememberScrollState()
     Column(
         modifier = Modifier

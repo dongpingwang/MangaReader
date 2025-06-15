@@ -2,9 +2,11 @@ package com.wolf2.reader.ui
 
 import androidx.activity.compose.LocalActivity
 import androidx.compose.foundation.background
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import androidx.navigation.NavType
@@ -14,6 +16,9 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.wolf2.reader.MainActivity
 import com.wolf2.reader.AppViewContext
+import com.wolf2.reader.config.AppColor
+import com.wolf2.reader.config.AppConfig
+import com.wolf2.reader.config.AppTheme
 import com.wolf2.reader.globalViewContext
 import com.wolf2.reader.ui.browser.BrowserScreen
 import com.wolf2.reader.ui.detail.BookDetailScreen
@@ -22,14 +27,29 @@ import com.wolf2.reader.ui.home.Routes
 import com.wolf2.reader.ui.read.ChapterScreen
 import com.wolf2.reader.ui.read.ReadScreen
 import com.wolf2.reader.ui.search.SearchScreen
-import com.wolf2.reader.ui.setting.SettingAboutScreen
-import com.wolf2.reader.ui.setting.SettingDownloadScreen
+import com.wolf2.reader.ui.setting.AboutScreen
+import com.wolf2.reader.ui.setting.AppearanceScreen
+import com.wolf2.reader.ui.setting.DownloadScreen
 import com.wolf2.reader.ui.setting.SettingScreen
 import com.wolf2.reader.ui.theme.ComicReaderTheme
 
 @Composable
 fun ReaderNavGraph() {
-    ComicReaderTheme {
+
+    val themeMode = AppConfig.themeMode.collectAsState()
+    val darkTheme = when (AppTheme.fromInt(themeMode.value)) {
+        AppTheme.SYSTEM -> isSystemInDarkTheme()
+        AppTheme.LIGHT -> false
+        AppTheme.DARK -> true
+    }
+    val appColor = AppConfig.appColor.collectAsState()
+
+    val amoledFlow = AppConfig.amoled.collectAsState()
+    ComicReaderTheme(
+        darkMode = darkTheme,
+        amoledMode = amoledFlow.value,
+        color = AppColor.fromInt(appColor.value)
+    ) {
         val navController = rememberNavController()
         globalViewContext = AppViewContext(
             activity = LocalActivity.current as MainActivity,
@@ -82,12 +102,16 @@ fun ReaderNavGraph() {
                 SettingScreen()
             }
 
+            composable(Routes.SETTINGS_APPEARANCE) {
+                AppearanceScreen()
+            }
+
             composable(Routes.SETTINGS_DOWNLOAD) {
-                SettingDownloadScreen()
+                DownloadScreen()
             }
 
             composable(Routes.SETTINGS_ABOUT) {
-                SettingAboutScreen()
+                AboutScreen()
             }
         }
 

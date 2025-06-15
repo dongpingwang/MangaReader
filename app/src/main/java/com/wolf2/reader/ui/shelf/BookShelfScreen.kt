@@ -16,7 +16,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.wolf2.reader.R
-import com.wolf2.reader.config.Constants
+import com.wolf2.reader.config.ShelfLayout
 import com.wolf2.reader.globalViewContext
 import com.wolf2.reader.mode.entity.book.Book
 import com.wolf2.reader.ui.home.HomeUiState
@@ -48,6 +48,7 @@ fun BookShelfScreen() {
                 BookShelfUiEvent.OnNavigationToBrowser
             )
         }
+
         else -> {
             ShelfContent(
                 uiState = uiState,
@@ -66,8 +67,8 @@ private fun ShelfContent(
     homeUiState: HomeUiState,
     vm: BookShelfViewModel
 ) {
-    when (homeUiState.shelfLayoutMode) {
-        Constants.List -> ShelfListContent(
+    when (ShelfLayout.fromInt(homeUiState.shelfLayoutMode)) {
+        ShelfLayout.LIST -> ShelfListContent(
             uiState = uiState,
             bookPagingItems = bookPagingItems,
             onItemClick = {
@@ -78,7 +79,7 @@ private fun ShelfContent(
             }
         )
 
-        Constants.Grid -> ShelfGridContent(
+        ShelfLayout.GIRD -> ShelfGridContent(
             uiState = uiState,
             bookPagingItems = bookPagingItems,
             column = homeUiState.shelfLayoutColumn,

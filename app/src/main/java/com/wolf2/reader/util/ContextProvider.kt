@@ -1,4 +1,4 @@
-package com.linxiao.framework.common
+package com.wolf2.reader.util
 
 import android.annotation.SuppressLint
 import android.app.Application

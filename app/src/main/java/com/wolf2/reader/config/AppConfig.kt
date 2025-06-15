@@ -1,23 +1,20 @@
 package com.wolf2.reader.config
 
-import android.preference.PreferenceManager
 import com.dylanc.mmkv.MMKVOwner
-import com.linxiao.framework.common.globalContext
 
 object AppConfig : MMKVOwner(mmapID = "app_settings") {
 
-    val pagerSwitchEffectLD by mmkvInt().asLiveData()
+    val pagerSwitchEffectLD by mmkvInt().asStateFlow()
 
-    val darkModeLD by mmkvBool().asLiveData()
+    val darkModeLD by mmkvBool().asStateFlow()
 
-    val shelfLayoutModeLD by mmkvInt().asLiveData()
+    val shelfLayoutModeLD by mmkvInt().asStateFlow()
 
-    val shelfLayoutColumnLD by mmkvInt(default = 2).asLiveData()
+    val shelfLayoutColumnLD by mmkvInt(default = 2).asStateFlow()
 
-    // 从me.zhanghai.compose.preference库中获取
-    val coverImageExtension: Boolean
-        get() {
-            return PreferenceManager.getDefaultSharedPreferences(globalContext)
-                .getBoolean("cover_image_extension", false)
-        }
+    val themeMode by mmkvInt().asStateFlow()
+
+    val amoled by mmkvBool().asStateFlow()
+
+    val appColor by mmkvInt().asStateFlow()
 }

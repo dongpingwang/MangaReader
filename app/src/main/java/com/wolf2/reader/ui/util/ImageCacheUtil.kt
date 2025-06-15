@@ -1,6 +1,6 @@
 package com.wolf2.reader.ui.util
 
-import com.linxiao.framework.encrypt.MD5Util
+import com.wolf2.reader.util.MD5Util
 import com.wolf2.reader.config.Constants
 import com.wolf2.reader.mode.entity.book.CoverImage
 import java.io.File
@@ -24,7 +24,7 @@ object ImageCacheUtil {
 
     fun getCoverImageDiskPath(uriString: String): String {
         val fileName = MD5Util.getMD5String16(uriString, null)
-        return "${Constants.dirCoverImage}/$fileName"
+        return "${Constants.dirCoverImage}/$fileName.jpg"
     }
 
     fun cacheImage(buffer: ByteArray, displayName: String): Boolean {
@@ -38,5 +38,13 @@ object ImageCacheUtil {
 
     fun getCacheImageDiskPath(displayName: String): String {
         return Constants.dirCacheImage + "/" + displayName + ".jpg"
+    }
+
+    fun deleteCacheDir() {
+        val file = File(Constants.dirRoot)
+        if (!file.exists()) return
+        runCatching {
+            file.deleteRecursively()
+        }.onFailure { it.printStackTrace() }
     }
 }

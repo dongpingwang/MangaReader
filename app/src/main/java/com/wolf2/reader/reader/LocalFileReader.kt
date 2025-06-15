@@ -2,7 +2,7 @@ package com.wolf2.reader.reader
 
 import android.os.Environment
 import androidx.documentfile.provider.DocumentFile
-import com.linxiao.framework.common.globalContext
+import com.wolf2.reader.util.globalContext
 import com.wolf2.reader.mode.entity.book.Book
 import com.wolf2.reader.mode.entity.book.PageContent
 import timber.log.Timber

@@ -1,4 +1,4 @@
-package com.linxiao.framework.encrypt
+package com.wolf2.reader.util
 
 import android.util.Base64
 import java.nio.charset.StandardCharsets

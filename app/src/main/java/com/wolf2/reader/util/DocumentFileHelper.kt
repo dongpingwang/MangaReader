@@ -6,7 +6,6 @@ import android.net.Uri
 import android.os.Environment
 import android.provider.DocumentsContract
 import androidx.documentfile.provider.DocumentFile
-import com.linxiao.framework.common.globalContext
 import com.wolf2.reader.config.supportFileExtends
 
 data class DocumentFileExt(

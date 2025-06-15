@@ -46,5 +46,10 @@
     <string name="settings_cache_dir">图片缓存目录</string>
     <string name="settings_cover_image_extension">书籍封面保存为图片</string>
     <string name="settings_cover_image_extension_summary">开启后，系统图库将显示这些图片</string>
-
+    <string name="settings_theme_mode">颜色模式</string>
+    <string name="settings_dark_amoled_mode">纯黑深色模式</string>
+    <string name="settings_dark_amoled_mode_summary">在AMOLED屏幕上更省电</string>
+    <string name="settings_dynamic_color">自适应</string>
+    <string name="settings_dynamic_color_summary">根据壁纸切换合适的主题（仅Android12+）</string>
+    <string name="settings_color_scheme">配色主题</string>
 </resources>

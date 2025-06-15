@@ -4,14 +4,13 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.wolf2.reader.config.AppConfig
-import com.wolf2.reader.globalViewContext
 import com.wolf2.reader.mode.db.DatabaseHelper
 import com.wolf2.reader.mode.entity.book.Book
 import com.wolf2.reader.navigate
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
@@ -27,8 +26,8 @@ sealed class HomeUiEvent {
 
 data class HomeUiState(
     val curTab: Int = 0,
-    val shelfLayoutMode: Int = AppConfig.shelfLayoutModeLD.value!!,
-    val shelfLayoutColumn: Int = AppConfig.shelfLayoutModeLD.value!!
+    val shelfLayoutMode: Int = AppConfig.shelfLayoutModeLD.value,
+    val shelfLayoutColumn: Int = AppConfig.shelfLayoutModeLD.value
 )
 
 class HomeViewModel : ViewModel() {
@@ -45,23 +44,18 @@ class HomeViewModel : ViewModel() {
     private val _uiState = MutableStateFlow(HomeUiState())
     val uiState = _uiState.asStateFlow()
 
-    private val shelfLayoutModeObserver = object : (Int) -> Unit {
-        override fun invoke(v: Int) {
-            _uiState.update { it.copy(shelfLayoutMode = v) }
-        }
-    }
-
-    private val shelfLayoutColumnObserver = object : (Int) -> Unit {
-        override fun invoke(v: Int) {
-            _uiState.update { it.copy(shelfLayoutColumn = v) }
-        }
-    }
-
     init {
         viewModelScope.launch {
-            launch(Dispatchers.Main) {
-                AppConfig.shelfLayoutModeLD.observeForever(shelfLayoutModeObserver)
-                AppConfig.shelfLayoutColumnLD.observeForever(shelfLayoutColumnObserver)
+            launch {
+                AppConfig.shelfLayoutModeLD.collectLatest { v ->
+                    _uiState.update { it.copy(shelfLayoutMode = v) }
+                }
+            }
+            launch {
+                AppConfig.shelfLayoutColumnLD.collectLatest { v ->
+                    _uiState.update { it.copy(shelfLayoutColumn = v) }
+                }
+
             }
         }
     }
@@ -87,25 +81,15 @@ class HomeViewModel : ViewModel() {
             }
 
             is HomeUiEvent.OnShelfLayoutModeChange -> {
-                AppConfig.shelfLayoutModeLD.postValue(event.mode)
+                AppConfig.shelfLayoutModeLD.value = event.mode
             }
 
             is HomeUiEvent.OnShelfLayoutColumnChange -> {
-                AppConfig.shelfLayoutColumnLD.postValue(event.column)
+                AppConfig.shelfLayoutColumnLD.value = event.column
             }
 
             is HomeUiEvent.OnNavigationToSettings -> {
                 navigate(Routes.SETTINGS)
-            }
-        }
-    }
-
-    override fun onCleared() {
-        super.onCleared()
-        viewModelScope.launch {
-            launch(Dispatchers.Main) {
-                AppConfig.shelfLayoutModeLD.removeObserver(shelfLayoutModeObserver)
-                AppConfig.shelfLayoutColumnLD.removeObserver(shelfLayoutColumnObserver)
             }
         }
     }

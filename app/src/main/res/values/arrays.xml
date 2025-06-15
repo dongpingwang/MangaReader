@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string-array name="read_page_effect">
+    <string-array name="read_page_effects">
         <item>上下</item>
         <item>左右</item>
         <item>仿真</item>
@@ -11,5 +11,20 @@
     <string-array name="shelf_layout_options">
         <item>列表</item>
         <item>网格</item>
+    </string-array>
+
+    <string-array name="theme_modes">
+        <item>跟随系统</item>
+        <item>浅色</item>
+        <item>深色</item>
+    </string-array>
+
+    <string-array name="color_scheme_descriptions">
+        <item>动态</item>
+        <item>紫</item>
+        <item>蓝</item>
+        <item>绿</item>
+        <item>橙</item>
+        <item>红</item>
     </string-array>
 </resources>

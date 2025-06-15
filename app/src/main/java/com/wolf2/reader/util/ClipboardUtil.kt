@@ -1,4 +1,4 @@
-package com.linxiao.framework.common
+package com.wolf2.reader.util
 
 import android.content.ClipData
 import android.content.ClipboardManager

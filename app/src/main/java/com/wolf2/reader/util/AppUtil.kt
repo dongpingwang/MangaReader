@@ -1,7 +1,5 @@
 package com.wolf2.reader.util
 
-import com.linxiao.framework.common.globalContext
-
 
 object AppUtil {
 
@@ -11,6 +9,7 @@ object AppUtil {
 
     fun getVersionName(): String {
         return globalContext.packageManager.getPackageInfo(globalContext.packageName, 0).versionName
+            ?: ""
     }
 
 }

@@ -17,15 +17,15 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.wolf2.reader.R
 import com.wolf2.reader.popBackStack
 import com.wolf2.reader.util.AppUtil
-import com.wolf2.reader.util.BrowserUtil
 import me.zhanghai.compose.preference.ProvidePreferenceLocals
 import me.zhanghai.compose.preference.preference
 import androidx.core.net.toUri
+import com.wolf2.reader.util.SystemAppUtil
 
 @Preview
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SettingAboutScreen() {
+fun AboutScreen() {
     Column {
         TopAppBar(title = {
             Text(text = stringResource(R.string.settings_about))
@@ -73,7 +73,7 @@ fun SettingAboutScreen() {
                         Text(text = sourceUrl)
                     },
                     onClick = {
-                        BrowserUtil.openBrowser(sourceUrl.toUri())
+                        SystemAppUtil.openBrowser(sourceUrl.toUri())
                     }
                 )
             }

@@ -12,7 +12,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.wolf2.reader.R
-import com.wolf2.reader.config.Constants
+import com.wolf2.reader.config.PagerSwitchEffect
 import com.wolf2.reader.ui.common.LoadingIndicator
 import com.wolf2.reader.ui.common.MySnackbar
 import com.wolf2.reader.ui.read.component.CurlPageContent
@@ -38,30 +38,30 @@ fun ReadScreen(bookUuid: String) {
             is LoadResult.Loading -> LoadingIndicator()
             is LoadResult.Error -> ErrorIndicator()
             is LoadResult.Success<*> -> {
-                when (uiState.pagerSwitchEffect) {
-                    Constants.VerticalPage -> VHPagerContent(
+                when (PagerSwitchEffect.fromInt(uiState.pagerSwitchEffect)) {
+                    PagerSwitchEffect.VerticalPage -> VHPagerContent(
                         videModel = viewModel,
                         isVerticalPager = true,
                         uiState = uiState,
                         onImageClick = { showAppBar = !showAppBar }
                     )
 
-                    Constants.HorizontalPage -> VHPagerContent(
+                    PagerSwitchEffect.HorizontalPage -> VHPagerContent(
                         videModel = viewModel,
                         isVerticalPager = false,
                         uiState = uiState,
                         onImageClick = { showAppBar = !showAppBar }
                     )
 
-                    Constants.CurlPage -> CurlPageContent(
+                    PagerSwitchEffect.CurlPage -> CurlPageContent(
                         viewModel = viewModel,
                         uiState = uiState,
                         onImageClick = { showAppBar = !showAppBar }
                     )
 
-                    Constants.VerticalList -> {}
+                    PagerSwitchEffect.VerticalList -> {}
 
-                    Constants.SwipeTinder -> {
+                    PagerSwitchEffect.SwipeTinder -> {
                         SwipeTinderContent(vm = viewModel, uiState = uiState, onImageClick = {
                             showAppBar = !showAppBar
                         })

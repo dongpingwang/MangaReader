@@ -12,6 +12,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -19,13 +20,17 @@ import com.wolf2.reader.R
 import com.wolf2.reader.popBackStack
 import me.zhanghai.compose.preference.ProvidePreferenceLocals
 import com.wolf2.reader.config.Constants
-import me.zhanghai.compose.preference.switchPreference
+import com.wolf2.reader.ui.util.ImageCacheUtil
+import kotlinx.coroutines.launch
 import me.zhanghai.compose.preference.twoTargetIconButtonPreference
 
 @Preview
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SettingDownloadScreen() {
+fun DownloadScreen() {
+    val dirRoot = Constants.dirRoot
+    val scope = rememberCoroutineScope()
+
     Column {
         TopAppBar(title = {
             Text(text = stringResource(R.string.settings_download))
@@ -36,8 +41,6 @@ fun SettingDownloadScreen() {
                 )
             }
         })
-
-        val dirRoot = Constants.dirRoot
 
         ProvidePreferenceLocals {
             LazyColumn(modifier = Modifier.fillMaxSize()) {
@@ -56,22 +59,12 @@ fun SettingDownloadScreen() {
                     },
                     onClick = {},
                     onIconButtonClick = {
-
-                    }
-                )
-
-                switchPreference(
-                    key = "cover_image_extension",
-                    defaultValue = false,
-                    title = {
-                        Text(text = stringResource(R.string.settings_cover_image_extension))
-                    },
-                    summary = {
-                        Text(text = stringResource(R.string.settings_cover_image_extension_summary))
+                        scope.launch {
+                            ImageCacheUtil.deleteCacheDir()
+                        }
                     }
                 )
             }
-
         }
     }
 
