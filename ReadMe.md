@@ -2,6 +2,18 @@
 
 简洁、高性能、Compose、Material Design3 的本地漫画阅读器
 
+## 🖼️ Screenshots
+
+<div style="overflow-x: auto; white-space: nowrap;">
+
+<img src="screenshots/1.png" width="15%" alt=""/>
+<img src="screenshots/2.png" width="15%" alt=""/>
+<img src="screenshots/3.png" width="15%" alt=""/>
+
+</div>
+
+
+
 ## 特性
 - 支持多种格式（epub、mobi、azw3、pdf）导入、Wifi传输
 - 高性能，采用native解析文件
