@@ -66,7 +66,7 @@ class BrowserViewModel() : ViewModel() {
                         val documentFile =
                             DocumentFile.fromSingleUri(globalContext, it) ?: return@fastForEach
                         val book = documentFile.toBook()
-                        LocalFileReader(book).readBook()
+                        LocalFileReader(book).readBook(onlyMetadata = true)
                         newBooks.add(book)
                     }
                     _uiState.update {

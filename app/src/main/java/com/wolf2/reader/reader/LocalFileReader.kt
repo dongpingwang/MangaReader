@@ -13,7 +13,7 @@ class LocalFileReader(private val book: Book) {
     private var epubFileReader: EpubFileReader? = null
     private var mobiFileReader: MobiFileReader? = null
 
-    fun readBook(): Boolean {
+    fun readBook(onlyMetadata: Boolean = false): Boolean {
         val doc = DocumentFile.fromSingleUri(globalContext, book.uri)
         if (doc == null || !doc.exists() || !doc.canRead() || !Environment.isExternalStorageManager()) {
             Timber.e("DocumentFile is not exists")
@@ -22,12 +22,12 @@ class LocalFileReader(private val book: Book) {
         when (doc.type) {
             "application/epub+zip" -> {
                 format = 0
-                epubFileReader = EpubFileReader(book).apply { readEpub() }
+                epubFileReader = EpubFileReader(book).apply { readEpub(onlyMetadata) }
             }
 
             "application/x-mobipocket-ebook", "application/vnd.amazon.mobi8-ebook" -> {
                 format = 1
-                mobiFileReader = MobiFileReader(book).apply { readMobi() }
+                mobiFileReader = MobiFileReader(book).apply { readMobi(onlyMetadata) }
             }
 
             else -> {}

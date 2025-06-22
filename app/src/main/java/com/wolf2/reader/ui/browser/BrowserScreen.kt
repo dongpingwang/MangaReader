@@ -1,7 +1,5 @@
 package com.wolf2.reader.ui.browser
 
-import android.content.Intent
-import android.provider.Settings
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Box
@@ -39,10 +37,10 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.wolf2.reader.R
 import com.wolf2.reader.config.ebookMimeTypes
-import com.wolf2.reader.globalViewContext
 import com.wolf2.reader.ui.common.LoadingIndicator
 import com.wolf2.reader.ui.common.MySnackbar
 import com.wolf2.reader.util.LoadResult
+import com.wolf2.reader.util.SystemAppUtil
 import timber.log.Timber
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -129,13 +127,10 @@ private fun AccessDialog(
     uiState: BrowserUiState,
     onDismissRequest: () -> Unit = {}
 ) {
-    fun startAccessSettings() {
-        globalViewContext?.activity?.startActivity(Intent(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION))
-    }
 
     AlertDialog(onDismissRequest = onDismissRequest, confirmButton = {
         TextButton(onClick = {
-            startAccessSettings()
+            SystemAppUtil.startAccessSettings()
             onDismissRequest()
         }) {
             Text(stringResource(R.string.understand))

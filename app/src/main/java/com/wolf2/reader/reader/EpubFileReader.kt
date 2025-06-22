@@ -29,7 +29,7 @@ class EpubFileReader(private val book: Book) {
         return isFileExists && isInitSuccess
     }
 
-    fun readEpub() {
+    fun readEpub(onlyMetadata: Boolean) {
         if (!isFileExists) return
         traceMillis {
             val path = book.uri.filePathFromFileUri()
@@ -37,14 +37,11 @@ class EpubFileReader(private val book: Book) {
                 Timber.e("BOOK Path is NULL")
                 return@traceMillis
             }
-
-            Timber.d("book uri : ${book.uri}")
-            Timber.d("book path: %s", path)
+            Timber.d("book uri : ${book.uri} ==> $path")
 
             val initStatus = nativeInit(path)
             Timber.d("initStatus: ret = $initStatus")
             isInitSuccess = initStatus == 0
-
             if (!isInitSuccess) {
                 Timber.e("Native Init fail")
                 return@traceMillis
@@ -58,6 +55,9 @@ class EpubFileReader(private val book: Book) {
                 book.title = it.title
                 book.author = it.author
             }
+
+            if (onlyMetadata) return@traceMillis
+
             parseChapters().let { book.chapters = it }
             parseContent().let { book.pageContents = it }
         }
