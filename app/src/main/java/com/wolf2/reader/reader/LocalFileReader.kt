@@ -24,10 +24,10 @@ class LocalFileReader(private val book: Book) {
         }
         if (path.endsWith(".epub")) {
             format = 0
-            epubFileReader = EpubFileReader(book).apply { readEpub(onlyMetadata) }
+            epubFileReader = EpubFileReader.newEpubFileReader(book).apply { readEpub(onlyMetadata) }
         } else if (path.endsWith(".mobi") || path.endsWith(".azw") || path.endsWith(".azw3")) {
             format = 1
-            mobiFileReader = MobiFileReader(book).apply { readMobi(onlyMetadata) }
+            mobiFileReader = MobiFileReader.newMobiFileReader(book).apply { readMobi(onlyMetadata) }
         }
         return true
     }

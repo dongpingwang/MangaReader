@@ -8,7 +8,7 @@
 #define LOGD(...) __android_log_print(ANDROID_LOG_ERROR, TAG, __VA_ARGS__)
 #define LOGE(...) __android_log_print(ANDROID_LOG_ERROR, TAG, __VA_ARGS__)
 
-static jfieldID nativeEPUB3RefPtr = nullptr;
+ jfieldID nativeEPUB3RefPtr = nullptr;
 
 int injectNativeEPUB3RefPtr(JNIEnv *env, jobject thiz, EPUB3Ref epub3Ref) {
     jclass clazz = env->FindClass("com/wolf2/reader/reader/EpubFileReader");
@@ -55,8 +55,8 @@ Java_com_wolf2_reader_reader_EpubFileReader_nativeDestroy(JNIEnv *env, jobject t
     EPUB3Ref epub3Ref = getNativeEPUB3Ref(env, thiz);
     if (epub3Ref) {
         EPUB3Release(epub3Ref);
-        delete epub3Ref;
-        env->SetLongField(thiz, nativeEPUB3RefPtr, 0);
+        //delete epub3Ref;
+        //env->SetLongField(thiz, nativeEPUB3RefPtr, 0);
     }
 }
 

@@ -8,8 +8,8 @@
 #define LOGD(...) __android_log_print(ANDROID_LOG_ERROR, TAG, __VA_ARGS__)
 #define LOGE(...) __android_log_print(ANDROID_LOG_ERROR, TAG, __VA_ARGS__)
 
-static jfieldID nativeMOBIDataPtr = nullptr;
-static jfieldID nativeMOBIRawmlPtr = nullptr;
+jfieldID nativeMOBIDataPtr = nullptr;
+jfieldID nativeMOBIRawmlPtr = nullptr;
 
 int injectNativeMOBIDataPtr(JNIEnv *env, jobject thiz, MOBIData *m) {
     jclass clazz = env->FindClass("com/wolf2/reader/reader/MobiFileReader");
@@ -118,8 +118,8 @@ Java_com_wolf2_reader_reader_MobiFileReader_nativeDestroy(JNIEnv *env, jobject t
     auto *m = getNativeMOBIDataPtr(env, thiz);
     if (m) {
         mobi_free(m);
-        delete m;
-        env->SetLongField(thiz, nativeMOBIDataPtr, 0L);
+        //delete m;
+        //env->SetLongField(thiz, nativeMOBIDataPtr, 0L);
     }
 }
 

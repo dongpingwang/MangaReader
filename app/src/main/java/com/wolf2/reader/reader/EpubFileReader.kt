@@ -17,6 +17,13 @@ class EpubFileReader(private val book: Book) {
         init {
             System.loadLibrary("reader_jni")
         }
+
+        private var reader: EpubFileReader? = null
+
+        fun newEpubFileReader(book: Book): EpubFileReader {
+            reader?.close()
+            return EpubFileReader(book).also { reader = it }
+        }
     }
 
     private val isFileExists by lazy {

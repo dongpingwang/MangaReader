@@ -20,6 +20,13 @@ class MobiFileReader(private val book: Book) {
         init {
             System.loadLibrary("reader_jni")
         }
+
+        private var reader: MobiFileReader? = null
+
+        fun newMobiFileReader(book: Book): MobiFileReader {
+            reader?.close()
+            return MobiFileReader(book).also { reader = it }
+        }
     }
 
     private val isFileExists by lazy {
@@ -126,6 +133,11 @@ class MobiFileReader(private val book: Book) {
     fun getImage(resourceUid: Int): ByteArray? {
         if (!checkCondition()) return null
         return nativeGetResourceData(resourceUid)
+    }
+
+    fun close() {
+        if (!checkCondition()) return
+        nativeDestroy()
     }
 
     private external fun nativeInit(path: String): Int
