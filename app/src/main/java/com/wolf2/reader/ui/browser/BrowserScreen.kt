@@ -40,7 +40,7 @@ import com.wolf2.reader.config.ebookMimeTypes
 import com.wolf2.reader.ui.common.LoadingIndicator
 import com.wolf2.reader.ui.common.MySnackbar
 import com.wolf2.reader.util.LoadResult
-import com.wolf2.reader.util.SystemAppUtil
+import com.wolf2.reader.util.requestFullStorageAccess
 import timber.log.Timber
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -130,8 +130,8 @@ private fun AccessDialog(
 
     AlertDialog(onDismissRequest = onDismissRequest, confirmButton = {
         TextButton(onClick = {
-            SystemAppUtil.startAccessSettings()
             onDismissRequest()
+            requestFullStorageAccess()
         }) {
             Text(stringResource(R.string.understand))
         }

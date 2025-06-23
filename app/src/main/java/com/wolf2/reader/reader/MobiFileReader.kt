@@ -6,7 +6,7 @@ import com.wolf2.reader.mode.entity.book.CoverImage
 import com.wolf2.reader.mode.entity.book.Metadata
 import com.wolf2.reader.mode.entity.book.PageContent
 import com.wolf2.reader.ui.util.ImageCacheUtil
-import com.wolf2.reader.util.filePathFromFileUri
+import com.wolf2.reader.util.storagePath
 import com.wolf2.reader.util.traceMillis
 import org.jsoup.Jsoup
 import timber.log.Timber
@@ -23,7 +23,7 @@ class MobiFileReader(private val book: Book) {
     }
 
     private val isFileExists by lazy {
-        book.uri.filePathFromFileUri() != null
+        book.uri.storagePath() != null
     }
 
     private var isInitSuccess = false
@@ -35,7 +35,7 @@ class MobiFileReader(private val book: Book) {
     fun readMobi(onlyMetadata: Boolean) {
         if (!isFileExists) return
         traceMillis {
-            val path = book.uri.filePathFromFileUri()
+            val path = book.uri.storagePath()
             if (path == null) {
                 Timber.e("BOOK Path is NULL")
                 return@traceMillis

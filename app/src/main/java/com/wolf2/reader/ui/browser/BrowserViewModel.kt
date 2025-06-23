@@ -1,7 +1,6 @@
 package com.wolf2.reader.ui.browser
 
 import android.net.Uri
-import android.os.Environment
 import androidx.compose.ui.util.fastForEach
 import androidx.documentfile.provider.DocumentFile
 import androidx.lifecycle.ViewModel
@@ -15,6 +14,7 @@ import com.wolf2.reader.popBackStack
 import com.wolf2.reader.reader.LocalFileReader
 import com.wolf2.reader.ui.browser.BrowserUiEvent.*
 import com.wolf2.reader.util.LoadResult
+import com.wolf2.reader.util.isExternalStorageManager
 import com.wolf2.reader.util.takePersistableUriPermission
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -83,7 +83,7 @@ class BrowserViewModel() : ViewModel() {
             is OnBackHandle -> popBackStack()
 
             is OnAccessChange -> viewModelScope.launch(Dispatchers.IO) {
-                _uiState.update { it.copy(granted = Environment.isExternalStorageManager()) }
+                _uiState.update { it.copy(granted = isExternalStorageManager()) }
             }
 
             is OnSnackbarDismiss -> viewModelScope.launch(Dispatchers.IO) {

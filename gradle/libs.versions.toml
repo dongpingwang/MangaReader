@@ -25,6 +25,7 @@ mmkvKtx = "2.0.1"
 roomCompilerVersion = "2.7.1"
 roomRuntime = "2.7.1"
 roomKtx = "2.7.1"
+storage = "2.0.0"
 timber = "5.0.1"
 kolinx-binary-compatibility-validator = "0.13.2"
 diffplug-spotless = "6.24.0"
@@ -71,6 +72,7 @@ kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serializa
 lazycolumnscrollbar = { module = "com.github.nanihadesuka:LazyColumnScrollbar", version.ref = "lazycolumnscrollbar" }
 mmkv-ktx = { module = "com.github.DylanCaiCoding:MMKV-KTX", version.ref = "mmkvKtx" }
 room-compiler = { module = "androidx.room:room-compiler", version.ref = "roomCompilerVersion" }
+storage = { module = "com.anggrayudi:storage", version.ref = "storage" }
 timber = { module = "com.jakewharton.timber:timber", version.ref = "timber" }
 zoomable = { module = "net.engawapg.lib:zoomable", version.ref = "zoomable" }
 composePreference = { module = "me.zhanghai.compose.preference:library", version.ref = "compose-preference" }

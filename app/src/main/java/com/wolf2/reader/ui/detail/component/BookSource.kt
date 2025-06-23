@@ -19,7 +19,7 @@ import androidx.documentfile.provider.DocumentFile
 import com.wolf2.reader.R
 import com.wolf2.reader.mode.entity.ReadRecord
 import com.wolf2.reader.mode.entity.book.Book
-import com.wolf2.reader.util.filePathFromFileUri
+import com.wolf2.reader.util.storagePath
 import me.saket.bytesize.binaryBytes
 import kotlin.math.roundToInt
 
@@ -34,7 +34,7 @@ internal fun BookSource(book: Book, readRecord: ReadRecord) {
             .background(MaterialTheme.colorScheme.surfaceDim)
             .padding(8.dp)
     ) {
-        val path = book.uri.filePathFromFileUri()?.removePrefix("/storage/emulated/0/") ?: ""
+        val path = book.uri.storagePath()?.removePrefix("/storage/emulated/0/") ?: ""
 
         Row {
             Text(

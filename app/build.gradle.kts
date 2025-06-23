@@ -114,6 +114,9 @@ dependencies {
     // https://github.com/zhanghai/ComposePreference
     implementation(libs.composePreference)
 
+    // https://github.com/anggrayudi/SimpleStorage
+    implementation (libs.storage)
+
     val composeBom = platform(libs.androidx.compose.bom)
     implementation(composeBom)
     androidTestImplementation(composeBom)
