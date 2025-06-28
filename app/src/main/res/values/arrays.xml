@@ -27,4 +27,10 @@
         <item>橙</item>
         <item>红</item>
     </string-array>
+
+    <string-array name="nav_label_show">
+        <item>总是显示</item>
+        <item>选中时显示</item>
+        <item>不显示</item>
+    </string-array>
 </resources>

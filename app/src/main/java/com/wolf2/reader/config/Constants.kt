@@ -59,3 +59,16 @@ enum class PagerSwitchEffect(private val value: Int) {
         fun PagerSwitchEffect.toInt() = value
     }
 }
+
+enum class NavLabelShow(private val value: Int) {
+    AlwaysShow(0),
+    SelectedShow(1),
+    Hidden(2);
+
+    companion object {
+        fun fromInt(value: Int) =
+            NavLabelShow.entries.firstOrNull { it.value == value } ?: Hidden
+
+        fun NavLabelShow.toInt() = value
+    }
+}

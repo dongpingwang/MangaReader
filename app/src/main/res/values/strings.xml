@@ -64,5 +64,5 @@
     <string name="settings_dynamic_color">自适应</string>
     <string name="settings_dynamic_color_summary">根据壁纸切换合适的主题（仅Android12+）</string>
     <string name="settings_color_scheme">配色主题</string>
-
+    <string name="settings_nav_label_show">导航栏标签</string>
 </resources>

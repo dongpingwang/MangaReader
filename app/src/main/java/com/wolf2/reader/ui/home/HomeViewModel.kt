@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.wolf2.reader.config.AppConfig
+import com.wolf2.reader.config.mmkvEmit
 import com.wolf2.reader.mode.db.DatabaseHelper
 import com.wolf2.reader.mode.entity.book.Book
 import com.wolf2.reader.navigate
@@ -26,8 +27,9 @@ sealed class HomeUiEvent {
 
 data class HomeUiState(
     val curTab: Int = 0,
-    val shelfLayoutMode: Int = AppConfig.shelfLayoutModeLD.value,
-    val shelfLayoutColumn: Int = AppConfig.shelfLayoutModeLD.value
+    val shelfLayoutMode: Int = AppConfig.shelfLayoutMode.value,
+    val shelfLayoutColumn: Int = AppConfig.shelfLayoutMode.value,
+    val navLabelShow: Int = AppConfig.navLabelShow.value
 )
 
 class HomeViewModel : ViewModel() {
@@ -47,15 +49,20 @@ class HomeViewModel : ViewModel() {
     init {
         viewModelScope.launch {
             launch {
-                AppConfig.shelfLayoutModeLD.collectLatest { v ->
+                AppConfig.shelfLayoutMode.collectLatest { v ->
                     _uiState.update { it.copy(shelfLayoutMode = v) }
                 }
             }
             launch {
-                AppConfig.shelfLayoutColumnLD.collectLatest { v ->
+                AppConfig.shelfLayoutColumn.collectLatest { v ->
                     _uiState.update { it.copy(shelfLayoutColumn = v) }
                 }
+            }
 
+            launch {
+                AppConfig.navLabelShow.collectLatest { v ->
+                    _uiState.update { it.copy(navLabelShow = v) }
+                }
             }
         }
     }
@@ -81,11 +88,11 @@ class HomeViewModel : ViewModel() {
             }
 
             is HomeUiEvent.OnShelfLayoutModeChange -> {
-                AppConfig.shelfLayoutModeLD.value = event.mode
+                AppConfig.shelfLayoutMode.mmkvEmit(event.mode)
             }
 
             is HomeUiEvent.OnShelfLayoutColumnChange -> {
-                AppConfig.shelfLayoutColumnLD.value = event.column
+                AppConfig.shelfLayoutColumn.mmkvEmit(event.column)
             }
 
             is HomeUiEvent.OnNavigationToSettings -> {

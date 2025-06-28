@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.wolf2.reader.util.MD5Util
 import com.wolf2.reader.config.AppConfig
+import com.wolf2.reader.config.mmkvEmit
 import com.wolf2.reader.mode.db.DatabaseHelper
 import com.wolf2.reader.mode.entity.ReadRecord
 import com.wolf2.reader.mode.entity.book.Book
@@ -30,8 +31,8 @@ sealed class ReadUiEvent {
 }
 
 data class ReadUiState(
-    val pagerSwitchEffect: Int = AppConfig.pagerSwitchEffectLD.value,
-    val darkMode: Boolean = AppConfig.darkModeLD.value,
+    val pagerSwitchEffect: Int = AppConfig.pagerSwitchEffect.value,
+    val darkMode: Boolean = AppConfig.darkMode.value,
     val readRecord: ReadRecord = ReadRecord(),
     val bookResult: LoadResult<Book> = LoadResult.Loading,
     val snackbar: Boolean? = null
@@ -94,13 +95,13 @@ class ReadViewModel(val bookUuid: String) : ViewModel() {
             }
 
             launch {
-                AppConfig.pagerSwitchEffectLD.collectLatest { v ->
+                AppConfig.pagerSwitchEffect.collectLatest { v ->
                     _uiState.update { it.copy(pagerSwitchEffect = v) }
                 }
             }
 
             launch {
-                AppConfig.darkModeLD.collectLatest { v ->
+                AppConfig.darkMode.collectLatest { v ->
                     _uiState.update { it.copy(darkMode = v) }
                 }
             }
@@ -137,12 +138,12 @@ class ReadViewModel(val bookUuid: String) : ViewModel() {
 
     fun toggleDarkMode() {
         updateRecordOnMemory()
-        AppConfig.darkModeLD.value = AppConfig.darkModeLD.value != true
+        AppConfig.darkMode.mmkvEmit(!AppConfig.darkMode.value)
     }
 
     fun setPagerSwitchEffect(effect: Int) {
         updateRecordOnMemory()
-        AppConfig.pagerSwitchEffectLD.value = effect
+        AppConfig.pagerSwitchEffect.mmkvEmit(effect)
     }
 
     fun cacheImage() {

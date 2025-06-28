@@ -11,10 +11,13 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import com.wolf2.reader.R
+import com.wolf2.reader.config.NavLabelShow
 import com.wolf2.reader.ui.home.HomeUiState
 
 @Composable
 internal fun HomeBottomBar(uiState: HomeUiState, onTabChange: (Int) -> Unit = {}) {
+    val alwaysShowLabel = NavLabelShow.fromInt(uiState.navLabelShow) == NavLabelShow.AlwaysShow
+    val showLabel = NavLabelShow.fromInt(uiState.navLabelShow) != NavLabelShow.Hidden
     NavigationBar {
         var isSelected = uiState.curTab == 0
         NavigationBarItem(
@@ -27,8 +30,9 @@ internal fun HomeBottomBar(uiState: HomeUiState, onTabChange: (Int) -> Unit = {}
                     unselectedIcon = Icons.Outlined.LibraryBooks
                 )
             },
-            alwaysShowLabel = false,
+            alwaysShowLabel = alwaysShowLabel,
             label = {
+                if (!showLabel) return@NavigationBarItem
                 Text(stringResource(R.string.navi_book_shelf))
             })
 
@@ -42,7 +46,9 @@ internal fun HomeBottomBar(uiState: HomeUiState, onTabChange: (Int) -> Unit = {}
                     selectedIcon = Icons.Filled.History,
                     unselectedIcon = Icons.Outlined.History
                 )
-            }, alwaysShowLabel = false, label = {
+            }, alwaysShowLabel = alwaysShowLabel,
+            label = {
+                if (!showLabel) return@NavigationBarItem
                 Text(stringResource(R.string.navi_history))
             })
     }
