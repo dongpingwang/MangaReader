@@ -16,8 +16,6 @@ import com.wolf2.reader.ui.common.LoadingIndicator
 import com.wolf2.reader.ui.detail.component.DetailContent
 import com.wolf2.reader.ui.detail.component.DetailSheetContent
 import com.wolf2.reader.ui.detail.component.DetailTopAppbar
-import com.wolf2.reader.ui.read.ReadUiEvent
-import com.wolf2.reader.ui.read.ReadViewModel
 import com.wolf2.reader.ui.read.component.ErrorIndicator
 import com.wolf2.reader.util.LoadResult
 
@@ -26,7 +24,7 @@ import com.wolf2.reader.util.LoadResult
 fun BookDetailScreen(
     bookUuid: String
 ) {
-    val viewModel: ReadViewModel = viewModel(factory = ReadViewModel.provideFactory(bookUuid))
+    val viewModel: DetailViewModel = viewModel(factory = DetailViewModel.provideFactory(bookUuid))
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val scaffoldState = rememberBottomSheetScaffoldState()
 
@@ -36,7 +34,7 @@ fun BookDetailScreen(
         sheetContent = {
             DetailSheetContent(
                 onNavigationToRead = {
-                    viewModel.onEvent(ReadUiEvent.OnNavigationToRead)
+                    viewModel.onEvent(DetailUiEvent.OnNavigationToRead)
                 },
                 onCopyContent = {},
                 onDeleteReadRecord = {},
@@ -45,7 +43,7 @@ fun BookDetailScreen(
             )
         }, topBar = {
             DetailTopAppbar(onBackHandle = {
-                viewModel.onEvent(ReadUiEvent.OnBackHandle)
+                viewModel.onEvent(DetailUiEvent.OnBackHandle)
             })
         }) { paddingValues ->
 
@@ -61,13 +59,13 @@ fun BookDetailScreen(
                     DetailContent(
                         uiState = uiState,
                         onTitleChange = {
-                            viewModel.onEvent(ReadUiEvent.OnTitleChange(it))
+                            viewModel.onEvent(DetailUiEvent.OnTitleChange(it))
                         },
                         onAuthorChange = {
-                            viewModel.onEvent(ReadUiEvent.OnAuthorChange(it))
+                            viewModel.onEvent(DetailUiEvent.OnAuthorChange(it))
                         },
                         onFavoriteChange = {
-                            viewModel.onEvent(ReadUiEvent.OnFavoriteChange(it))
+                            viewModel.onEvent(DetailUiEvent.OnFavoriteChange(it))
                         })
                 }
             }

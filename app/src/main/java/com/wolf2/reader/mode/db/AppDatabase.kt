@@ -5,10 +5,11 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
-import com.wolf2.reader.convert.RoomTypeConverters
+import com.wolf2.reader.mode.convert.RoomTypeConverters
 import com.wolf2.reader.mode.dao.BookDao
 import com.wolf2.reader.mode.dao.FavoriteBookDao
 import com.wolf2.reader.mode.dao.ReadRecordDao
+import com.wolf2.reader.mode.entity.BookMark
 import com.wolf2.reader.mode.entity.FavoriteBook
 import com.wolf2.reader.mode.entity.ReadRecord
 import com.wolf2.reader.mode.entity.book.Book
@@ -19,7 +20,7 @@ private const val DATABASE_VERSION = 1
 
 @TypeConverters(RoomTypeConverters::class)
 @Database(
-    entities = [Book::class, ReadRecord::class, FavoriteBook::class],
+    entities = [Book::class, ReadRecord::class, FavoriteBook::class, BookMark::class],
     version = DATABASE_VERSION
 )
 private abstract class AppDatabase : RoomDatabase() {

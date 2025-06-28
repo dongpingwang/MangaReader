@@ -12,7 +12,16 @@ class LocalFileReader(private val book: Book) {
     private var epubFileReader: EpubFileReader? = null
     private var mobiFileReader: MobiFileReader? = null
 
-    fun readBook(onlyMetadata: Boolean = false): Boolean {
+    companion object {
+        private var reader: LocalFileReader? = null
+
+        fun withLocalFileReader(book: Book): LocalFileReader {
+            reader?.close()
+            return LocalFileReader(book).also { reader = it }
+        }
+    }
+
+    fun readBook(updateMetadata: Boolean = true, updatePageContent: Boolean = true): Boolean {
         if (!isExternalStorageManager()) {
             Timber.e("no access all files permission")
             return false
@@ -24,10 +33,14 @@ class LocalFileReader(private val book: Book) {
         }
         if (path.endsWith(".epub")) {
             format = 0
-            epubFileReader = EpubFileReader.newEpubFileReader(book).apply { readEpub(onlyMetadata) }
+            epubFileReader = EpubFileReader(book).apply {
+                readEpub(updateMetadata, updatePageContent)
+            }
         } else if (path.endsWith(".mobi") || path.endsWith(".azw") || path.endsWith(".azw3")) {
             format = 1
-            mobiFileReader = MobiFileReader.newMobiFileReader(book).apply { readMobi(onlyMetadata) }
+            mobiFileReader = MobiFileReader(book).apply {
+                readMobi(updateMetadata, updatePageContent)
+            }
         }
         return true
     }
@@ -48,5 +61,10 @@ class LocalFileReader(private val book: Book) {
 
             else -> return null
         }
+    }
+
+    fun close() {
+        epubFileReader?.close()
+        mobiFileReader?.close()
     }
 }

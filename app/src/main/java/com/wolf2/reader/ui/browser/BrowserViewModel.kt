@@ -7,7 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.wolf2.reader.util.globalContext
-import com.wolf2.reader.convert.toBook
+import com.wolf2.reader.reader.toBook
 import com.wolf2.reader.mode.db.DatabaseHelper
 import com.wolf2.reader.mode.entity.book.Book
 import com.wolf2.reader.popBackStack
@@ -66,7 +66,10 @@ class BrowserViewModel() : ViewModel() {
                         val documentFile =
                             DocumentFile.fromSingleUri(globalContext, it) ?: return@fastForEach
                         val book = documentFile.toBook()
-                        LocalFileReader(book).readBook(onlyMetadata = true)
+                        LocalFileReader(book).apply {
+                            readBook(updatePageContent = false)
+                            close()
+                        }
                         newBooks.add(book)
                     }
                     _uiState.update {

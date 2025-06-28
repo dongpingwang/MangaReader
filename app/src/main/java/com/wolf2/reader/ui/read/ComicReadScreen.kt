@@ -15,6 +15,7 @@ import com.wolf2.reader.R
 import com.wolf2.reader.config.PagerSwitchEffect
 import com.wolf2.reader.ui.common.LoadingIndicator
 import com.wolf2.reader.ui.common.MySnackbar
+import com.wolf2.reader.ui.common.OnLifecycleEvent
 import com.wolf2.reader.ui.read.component.CurlPageContent
 import com.wolf2.reader.ui.read.component.ErrorIndicator
 import com.wolf2.reader.ui.read.component.ReadBottomContent
@@ -30,6 +31,10 @@ fun ReadScreen(bookUuid: String) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var showAppBar by remember { mutableStateOf(false) }
     var showSnack = uiState.snackbar == true
+
+    OnLifecycleEvent(onDispose = {
+        viewModel.onEvent(ReadUiEvent.OnDestroy)
+    })
 
     Box(
         modifier = Modifier.fillMaxSize()

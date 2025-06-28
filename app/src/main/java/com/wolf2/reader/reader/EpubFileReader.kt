@@ -10,19 +10,13 @@ import com.wolf2.reader.util.storagePath
 import com.wolf2.reader.util.traceMillis
 import org.jsoup.Jsoup
 import timber.log.Timber
+import java.io.Closeable
 
-class EpubFileReader(private val book: Book) {
+class EpubFileReader(private val book: Book) : Closeable {
 
     companion object {
         init {
             System.loadLibrary("reader_jni")
-        }
-
-        private var reader: EpubFileReader? = null
-
-        fun newEpubFileReader(book: Book): EpubFileReader {
-            reader?.close()
-            return EpubFileReader(book).also { reader = it }
         }
     }
 
@@ -36,7 +30,7 @@ class EpubFileReader(private val book: Book) {
         return isFileExists && isInitSuccess
     }
 
-    fun readEpub(onlyMetadata: Boolean) {
+    fun readEpub(updateMetadata: Boolean, updatePageContent: Boolean) {
         if (!isFileExists) return
         traceMillis {
             val path = book.uri.storagePath()
@@ -54,19 +48,21 @@ class EpubFileReader(private val book: Book) {
                 return@traceMillis
             }
 
-            parseCover()?.let {
-                book.cover = it
-                cacheCoverImage()
-            }
-            parseMetadata()?.let {
-                book.title = it.title
-                book.author = it.author
+            if (updateMetadata) {
+                parseCover()?.let {
+                    book.cover = it
+                    cacheCoverImage()
+                }
+                parseMetadata()?.let {
+                    book.title = it.title
+                    book.author = it.author
+                }
             }
 
-            if (onlyMetadata) return@traceMillis
-
-            parseChapters().let { book.chapters = it }
-            parseContent().let { book.pageContents = it }
+            if (updatePageContent) {
+                parseChapters().let { book.chapters = it }
+                parseContent().let { book.pageContents = it }
+            }
         }
     }
 
@@ -136,8 +132,9 @@ class EpubFileReader(private val book: Book) {
         return nativeGetResourceData(imgHref)
     }
 
-    fun close() {
+    override fun close() {
         if (!checkCondition()) return
+        isInitSuccess = false
         nativeDestroy()
     }
 

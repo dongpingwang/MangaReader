@@ -24,9 +24,14 @@ import me.saket.bytesize.binaryBytes
 import kotlin.math.roundToInt
 
 @Composable
-internal fun BookSource(book: Book, readRecord: ReadRecord) {
-    val processF = readRecord.curPage.toFloat().div(readRecord.pageCount)
-    val process = processF.times(100).roundToInt().coerceIn(0, 100).toString() + "%"
+internal fun BookSource(book: Book, readRecord: ReadRecord?) {
+    var processF = 0F
+    var process = "0%"
+    if (readRecord != null) {
+        processF = readRecord.curPage.toFloat().div(readRecord.pageCount)
+        process = processF.times(100).roundToInt().coerceIn(0, 100).toString() + "%"
+    }
+
     Column(
         modifier = Modifier
             .padding(top = 16.dp)
@@ -67,8 +72,8 @@ internal fun BookSource(book: Book, readRecord: ReadRecord) {
             Text(
                 text = stringResource(
                     R.string.read_progress_chapter_size,
-                    book.pageContents.size,
-                    book.chapters.size
+                    book.extraInfo.pageCount,
+                    book.extraInfo.chapterCount
                 ),
                 modifier = Modifier.padding(start = 8.dp),
                 style = MaterialTheme.typography.bodyMedium

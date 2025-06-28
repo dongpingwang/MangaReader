@@ -1,9 +1,10 @@
-package com.wolf2.reader.convert
+package com.wolf2.reader.mode.convert
 
 import android.net.Uri
+import androidx.core.net.toUri
 import androidx.room.TypeConverter
 import com.wolf2.reader.mode.entity.book.CoverImage
-import androidx.core.net.toUri
+import com.wolf2.reader.mode.entity.book.ExtraInfo
 import kotlinx.serialization.json.Json
 
 class RoomTypeConverters {
@@ -26,6 +27,16 @@ class RoomTypeConverters {
     @TypeConverter
     fun uriFromRoom(value: String): Uri {
         return value.toUri()
+    }
+
+    @TypeConverter
+    fun extraInfoToRoom(extraInfo: ExtraInfo): String {
+        return Json.encodeToString(extraInfo)
+    }
+
+    @TypeConverter
+    fun extraInfoFromRoom(value: String): ExtraInfo {
+        return Json.decodeFromString<ExtraInfo>(value)
     }
 
 }

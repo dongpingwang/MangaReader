@@ -10,8 +10,9 @@ import com.wolf2.reader.util.storagePath
 import com.wolf2.reader.util.traceMillis
 import org.jsoup.Jsoup
 import timber.log.Timber
+import java.io.Closeable
 
-class MobiFileReader(private val book: Book) {
+class MobiFileReader(private val book: Book) : Closeable {
 
     private var nativeMOBIDataPtr: Long = 0L
     private var nativeMOBIRawmlPtr: Long = 0L
@@ -19,13 +20,6 @@ class MobiFileReader(private val book: Book) {
     companion object {
         init {
             System.loadLibrary("reader_jni")
-        }
-
-        private var reader: MobiFileReader? = null
-
-        fun newMobiFileReader(book: Book): MobiFileReader {
-            reader?.close()
-            return MobiFileReader(book).also { reader = it }
         }
     }
 
@@ -39,7 +33,7 @@ class MobiFileReader(private val book: Book) {
         return isFileExists && isInitSuccess
     }
 
-    fun readMobi(onlyMetadata: Boolean) {
+    fun readMobi(updateMetadata: Boolean, updatePageContent: Boolean) {
         if (!isFileExists) return
         traceMillis {
             val path = book.uri.storagePath()
@@ -57,19 +51,22 @@ class MobiFileReader(private val book: Book) {
                 Timber.e("Native Init fail")
                 return@traceMillis
             }
-            parseCover()?.let {
-                book.cover = it
-                cacheCoverImage()
-            }
-            parseMetadata()?.let {
-                book.title = it.title
-                book.author = it.author
+
+            if (updateMetadata) {
+                parseCover()?.let {
+                    book.cover = it
+                    cacheCoverImage()
+                }
+                parseMetadata()?.let {
+                    book.title = it.title
+                    book.author = it.author
+                }
             }
 
-            if (onlyMetadata) return@traceMillis
-
-//            parseChapters().let { book.chapters = it }
-            parseContent().let { book.pageContents = it }
+            if (updatePageContent) {
+//                parseChapters().let { book.chapters = it }
+                parseContent().let { book.pageContents = it }
+            }
         }
     }
 
@@ -135,8 +132,9 @@ class MobiFileReader(private val book: Book) {
         return nativeGetResourceData(resourceUid)
     }
 
-    fun close() {
+    override fun close() {
         if (!checkCondition()) return
+        isInitSuccess = false
         nativeDestroy()
     }
 

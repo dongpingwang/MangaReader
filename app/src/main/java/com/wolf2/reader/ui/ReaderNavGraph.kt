@@ -5,7 +5,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
@@ -21,6 +20,7 @@ import com.wolf2.reader.config.AppConfig
 import com.wolf2.reader.config.AppTheme
 import com.wolf2.reader.globalViewContext
 import com.wolf2.reader.ui.browser.BrowserScreen
+import com.wolf2.reader.ui.common.OnLifecycleEvent
 import com.wolf2.reader.ui.detail.BookDetailScreen
 import com.wolf2.reader.ui.home.HomeScreen
 import com.wolf2.reader.ui.home.Routes
@@ -115,9 +115,10 @@ fun ReaderNavGraph() {
             }
         }
 
-        DisposableEffect(Unit) {
-            onDispose { globalViewContext = null }
-        }
+
+        OnLifecycleEvent(onDispose = {
+            globalViewContext = null
+        })
     }
 
 }
