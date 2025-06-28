@@ -21,7 +21,6 @@ import com.wolf2.reader.util.AppUtil
 import me.zhanghai.compose.preference.ProvidePreferenceLocals
 import me.zhanghai.compose.preference.preference
 import androidx.core.net.toUri
-import com.wolf2.reader.util.SystemAppUtil
 
 @Preview
 @OptIn(ExperimentalMaterial3Api::class)
@@ -78,11 +77,10 @@ fun AboutScreen() {
                         )
                     },
                     onClick = {
-                        SystemAppUtil.openBrowser(sourceUrl.toUri())
+                        AppUtil.openBrowser(sourceUrl.toUri())
                     }
                 )
             }
-
         }
     }
 

@@ -24,6 +24,7 @@ import com.wolf2.reader.ui.common.OnLifecycleEvent
 import com.wolf2.reader.ui.detail.BookDetailScreen
 import com.wolf2.reader.ui.home.HomeScreen
 import com.wolf2.reader.ui.home.Routes
+import com.wolf2.reader.ui.preview.ImagePreviewScreen
 import com.wolf2.reader.ui.read.ChapterScreen
 import com.wolf2.reader.ui.read.ReadScreen
 import com.wolf2.reader.ui.search.SearchScreen
@@ -96,6 +97,16 @@ fun ReaderNavGraph() {
 
             composable(Routes.BROWSER_BOOK) {
                 BrowserScreen()
+            }
+
+            composable(
+                route = "${Routes.IMAGE_PREVIEW}/{imgName}",
+                arguments = listOf(navArgument("imgName") {
+                    type = NavType.StringType
+                }),
+            ) { backStackEntry ->
+                val imgName = backStackEntry.arguments?.getString("imgName") ?: return@composable
+                ImagePreviewScreen(imgName = imgName)
             }
 
             composable(Routes.SETTINGS) {

@@ -1,5 +1,8 @@
 package com.wolf2.reader.ui.read
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
@@ -14,9 +17,11 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.wolf2.reader.R
 import com.wolf2.reader.config.PagerSwitchEffect
+import com.wolf2.reader.currentRoute
 import com.wolf2.reader.ui.common.LoadingIndicator
 import com.wolf2.reader.ui.common.MySnackbar
 import com.wolf2.reader.ui.common.OnLifecycleEvent
+import com.wolf2.reader.ui.home.Routes
 import com.wolf2.reader.ui.read.component.CurlPageContent
 import com.wolf2.reader.ui.read.component.ErrorIndicator
 import com.wolf2.reader.ui.read.component.ReadBottomContent
@@ -36,6 +41,7 @@ fun ReadScreen(bookUuid: String) {
     var showMenuDrop by remember { mutableStateOf(false) }
 
     OnLifecycleEvent(onDispose = {
+        if (currentRoute()?.contains(Routes.IMAGE_PREVIEW) == true) return@OnLifecycleEvent
         viewModel.onEvent(ReadUiEvent.OnDestroy)
     })
 
@@ -78,12 +84,24 @@ fun ReadScreen(bookUuid: String) {
             }
         }
 
-        if (showAppBar) {
+        AnimatedVisibility(
+            showAppBar,
+            enter = fadeIn(),
+            exit = fadeOut(),
+        ) {
             ReadTopAppBar(onBackHandle = {
                 viewModel.onEvent(ReadUiEvent.OnBackHandle)
             }, onShowDrop = {
                 showMenuDrop = true
             })
+        }
+
+        AnimatedVisibility(
+            showAppBar,
+            enter = fadeIn(),
+            exit = fadeOut(),
+            modifier = Modifier.align(Alignment.BottomStart)
+        ) {
             ReadBottomContent(viewModel, uiState)
         }
 

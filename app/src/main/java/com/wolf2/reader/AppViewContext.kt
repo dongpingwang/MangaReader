@@ -21,3 +21,7 @@ val popBackStack: () -> Unit = {
 val navigate: (String) -> Unit = {
     globalViewContext?.navController?.navigate(route = it)
 }
+
+fun currentRoute(): String? {
+    return globalViewContext?.navController?.currentDestination?.route
+}

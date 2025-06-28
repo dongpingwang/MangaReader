@@ -12,12 +12,8 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.outlined.BookmarkBorder
-import androidx.compose.material.icons.outlined.ContentCopy
-import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.FormatListBulleted
 import androidx.compose.material.icons.outlined.GridView
-import androidx.compose.material.icons.outlined.Share
-import androidx.compose.material.icons.outlined.Shortcut
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
@@ -129,12 +125,6 @@ private fun SblDropMenu(
             onClick = {
                 onCopyContent()
                 onDismissRequest()
-            },
-            leadingIcon = {
-                Icon(
-                    Icons.Outlined.ContentCopy,
-                    contentDescription = null
-                )
             }
         )
         DropdownMenuItem(
@@ -142,12 +132,6 @@ private fun SblDropMenu(
             onClick = {
                 onDeleteReadRecord()
                 onDismissRequest()
-            },
-            leadingIcon = {
-                Icon(
-                    Icons.Outlined.Delete,
-                    contentDescription = null
-                )
             }
         )
         DropdownMenuItem(
@@ -155,12 +139,6 @@ private fun SblDropMenu(
             onClick = {
                 onShareBookFile()
                 onDismissRequest()
-            },
-            leadingIcon = {
-                Icon(
-                    Icons.Outlined.Share,
-                    contentDescription = null
-                )
             }
         )
 
@@ -169,12 +147,6 @@ private fun SblDropMenu(
             onClick = {
                 onCreateShortcut()
                 onDismissRequest()
-            },
-            leadingIcon = {
-                Icon(
-                    Icons.Outlined.Shortcut,
-                    contentDescription = null
-                )
             }
         )
     }

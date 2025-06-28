@@ -10,11 +10,12 @@ import com.wolf2.reader.mode.db.DatabaseHelper
 import com.wolf2.reader.mode.entity.ReadRecord
 import com.wolf2.reader.mode.entity.book.Book
 import com.wolf2.reader.mode.entity.book.PageContent
+import com.wolf2.reader.navigate
 import com.wolf2.reader.popBackStack
 import com.wolf2.reader.reader.LocalFileReader
+import com.wolf2.reader.ui.home.Routes
 import com.wolf2.reader.ui.util.ImageCacheUtil
 import com.wolf2.reader.util.LoadResult
-import com.wolf2.reader.util.SystemAppUtil
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -59,7 +60,7 @@ class ReadViewModel(val bookUuid: String) : ViewModel() {
     private var fileReader: LocalFileReader? = null
     private var existsReadRecord = false
     private lateinit var readRecord: ReadRecord
-    private var cacheImagePath: String? = null
+    private var cacheImgName: String? = null
 
     init {
         viewModelScope.launch {
@@ -156,7 +157,7 @@ class ReadViewModel(val bookUuid: String) : ViewModel() {
             val ret = if (buffer == null) false else ImageCacheUtil.cacheImage(buffer, displayName)
             Timber.d("cacheImage: ret = $ret")
             if (!ret) return@launch
-            cacheImagePath = ImageCacheUtil.getCacheImageDiskPath(displayName)
+            cacheImgName = displayName
             updateRecordOnMemory()
             _uiState.update { it.copy(snackbar = true) }
         }
@@ -175,7 +176,7 @@ class ReadViewModel(val bookUuid: String) : ViewModel() {
             is ReadUiEvent.OnDisplayCacheImage -> {
                 updateRecordOnMemory()
                 _uiState.update { it.copy(snackbar = null) }
-                cacheImagePath?.let { SystemAppUtil.openGallery(it) }
+                cacheImgName?.let { navigate("${Routes.IMAGE_PREVIEW}/$it") }
             }
 
             is ReadUiEvent.OnBackHandle -> popBackStack()

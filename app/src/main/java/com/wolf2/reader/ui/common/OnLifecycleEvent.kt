@@ -5,12 +5,6 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
-import timber.log.Timber
-
-
-fun Lifecycle.Event.isOnDestroy(): Boolean {
-    return this == Lifecycle.Event.ON_DESTROY
-}
 
 
 @Composable
@@ -19,7 +13,6 @@ fun OnLifecycleEvent(onEvent: (event: Lifecycle.Event) -> Unit = {}, onDispose: 
 
     DisposableEffect(lifecycleOwner) {
         val observer = LifecycleEventObserver { _, event ->
-            Timber.d("onEvent==>$event")
             onEvent(event)
         }
 

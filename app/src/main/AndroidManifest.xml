@@ -35,6 +35,11 @@
             android:launchMode="singleTask"
             android:theme="@style/Theme.ComicReader"/>
 
+
+        <activity
+            android:name="androidx.compose.ui.tooling.PreviewActivity"
+            tools:node="remove" />
+
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.fileprovider"
