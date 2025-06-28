@@ -10,22 +10,16 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import com.wolf2.reader.popBackStack
-import com.wolf2.reader.ui.read.ReadViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-internal fun BoxScope.ReadTopAppBar(readViewModel: ReadViewModel) {
-    var showMenuDrop by remember { mutableStateOf(false) }
+internal fun ReadTopAppBar(
+    onBackHandle: () -> Unit,
+    onShowDrop: () -> Unit
+) {
 
     TopAppBar(title = {}, navigationIcon = {
-        IconButton(onClick = {
-            popBackStack()
-        }) {
+        IconButton(onClick = onBackHandle) {
             Icon(imageVector = Icons.Outlined.ArrowBack, contentDescription = null)
         }
     }, actions = {
@@ -37,14 +31,10 @@ internal fun BoxScope.ReadTopAppBar(readViewModel: ReadViewModel) {
             )
         }
 
-        IconButton(onClick = { showMenuDrop = true }) {
+        IconButton(onClick = onShowDrop) {
             Icon(
                 imageVector = Icons.Outlined.MoreVert, contentDescription = null
             )
         }
     })
-
-    ReadDropMenu(readViewModel = readViewModel, showMenuDrop = showMenuDrop) {
-        showMenuDrop = false
-    }
 }

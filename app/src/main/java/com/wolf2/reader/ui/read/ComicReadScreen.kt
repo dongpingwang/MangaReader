@@ -7,6 +7,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -19,6 +20,7 @@ import com.wolf2.reader.ui.common.OnLifecycleEvent
 import com.wolf2.reader.ui.read.component.CurlPageContent
 import com.wolf2.reader.ui.read.component.ErrorIndicator
 import com.wolf2.reader.ui.read.component.ReadBottomContent
+import com.wolf2.reader.ui.read.component.ReadDropMenu
 import com.wolf2.reader.ui.read.component.ReadTopAppBar
 import com.wolf2.reader.ui.read.component.VHPagerContent
 import com.wolf2.reader.ui.read.component.SwipeTinderContent
@@ -31,6 +33,7 @@ fun ReadScreen(bookUuid: String) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var showAppBar by remember { mutableStateOf(false) }
     var showSnack = uiState.snackbar == true
+    var showMenuDrop by remember { mutableStateOf(false) }
 
     OnLifecycleEvent(onDispose = {
         viewModel.onEvent(ReadUiEvent.OnDestroy)
@@ -76,7 +79,11 @@ fun ReadScreen(bookUuid: String) {
         }
 
         if (showAppBar) {
-            ReadTopAppBar(viewModel)
+            ReadTopAppBar(onBackHandle = {
+                viewModel.onEvent(ReadUiEvent.OnBackHandle)
+            }, onShowDrop = {
+                showMenuDrop = true
+            })
             ReadBottomContent(viewModel, uiState)
         }
 
@@ -91,6 +98,14 @@ fun ReadScreen(bookUuid: String) {
                 dismissed = {
                     viewModel.onEvent(ReadUiEvent.OnSnackbarDismiss)
                 })
+        }
+
+        if (showMenuDrop) {
+            Box(modifier = Modifier.align(Alignment.TopEnd)) {
+                ReadDropMenu(readViewModel = viewModel, onDismissRequest = {
+                    showMenuDrop = false
+                })
+            }
         }
     }
 }
