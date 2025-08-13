@@ -17,3 +17,9 @@
 - 增加CrashHandler
 - 预研接入：PdfiumAndroid、measure等开源库
 - 移除无用的开源库[libs.versions]；优化APK体积
+
+## v0.4.0-20250615
+- 增加历史更新记录
+- 增加ReadMe
+- 初步增加设置界面（主题）
+- 优化配置逻辑
