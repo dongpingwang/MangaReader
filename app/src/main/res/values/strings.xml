@@ -16,6 +16,7 @@
     <string name="bookmark_remove">删除书签</string>
     <string name="read_mode">阅读模式</string>
     <string name="jump_page">跳转到</string>
+    <string name="hint_page_range">页码范围0-%d</string>
 
     <string name="display_image_cache">查看</string>
     <string name="pick_book_success">书籍添加成功</string>

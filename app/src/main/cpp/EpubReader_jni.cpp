@@ -56,7 +56,7 @@ Java_com_wolf2_reader_reader_EpubFileReader_nativeDestroy(JNIEnv *env, jobject t
     if (epub3Ref) {
         EPUB3Release(epub3Ref);
         //delete epub3Ref;
-        //env->SetLongField(thiz, nativeEPUB3RefPtr, 0);
+        env->SetLongField(thiz, nativeEPUB3RefPtr, 0);
     }
 }
 

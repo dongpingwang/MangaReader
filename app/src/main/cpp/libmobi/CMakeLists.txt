@@ -57,6 +57,7 @@ endif (USE_XMLWRITER)
 
 
 add_library(mobi SHARED ${mobi_SOURCES})
+target_link_libraries(mobi PUBLIC android log)
 
 
 #set_target_properties(mobi PROPERTIES

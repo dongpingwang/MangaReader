@@ -22,6 +22,7 @@ import com.wolf2.reader.ui.common.OnLifecycleEvent
 import com.wolf2.reader.ui.home.Routes
 import com.wolf2.reader.ui.read.component.CurlPageContent
 import com.wolf2.reader.ui.common.ErrorIndicator
+import com.wolf2.reader.ui.read.component.JumpPageDialog
 import com.wolf2.reader.ui.read.component.MoreActionSheet
 import com.wolf2.reader.ui.read.component.ReadBottomBar
 import com.wolf2.reader.ui.read.component.ReadTopAppBar
@@ -120,7 +121,7 @@ fun ReadScreen(bookUuid: String) {
                 onDismissRequest = { showMoreSheet = false },
                 onSavePicture = { viewModel.onEvent(ReadUiEvent.OnCacheImage) },
                 onBookMarkToggle = { viewModel.onEvent(ReadUiEvent.OnBookMarkToggle) },
-                onJumpPage = {},
+                onJumpPage = { showJumpDialog = true },
                 onPageSwitchEffectChange = {
                     viewModel.onEvent(
                         ReadUiEvent.OnPageSwitchEffectChange(
@@ -134,7 +135,13 @@ fun ReadScreen(bookUuid: String) {
             MySnackbar(uiState.snackbar!!)
         }
         if (showJumpDialog) {
-
+            val book = (uiState.bookResult as LoadResult.Success).data
+            JumpPageDialog(book.pageContents.size,
+                onConfirmRequest = {
+                    viewModel.onEvent(ReadUiEvent.OnPageChange(it))
+                }, onDismissRequest = {
+                    showJumpDialog = false
+                })
         }
     }
 }

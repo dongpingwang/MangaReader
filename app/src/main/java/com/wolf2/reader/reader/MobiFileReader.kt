@@ -1,5 +1,6 @@
 package com.wolf2.reader.reader
 
+import androidx.compose.ui.util.fastForEachIndexed
 import com.wolf2.reader.mode.entity.book.Book
 import com.wolf2.reader.mode.entity.book.Chapter
 import com.wolf2.reader.mode.entity.book.CoverImage
@@ -7,6 +8,7 @@ import com.wolf2.reader.mode.entity.book.ExtraInfo
 import com.wolf2.reader.mode.entity.book.Metadata
 import com.wolf2.reader.mode.entity.book.PageContent
 import com.wolf2.reader.ui.util.ImageCacheUtil
+import com.wolf2.reader.util.contains
 import com.wolf2.reader.util.storagePath
 import com.wolf2.reader.util.traceMillis
 import org.jsoup.Jsoup
@@ -14,9 +16,6 @@ import timber.log.Timber
 import java.io.Closeable
 
 class MobiFileReader(private val book: Book) : Closeable {
-
-    private var nativeMOBIDataPtr: Long = 0L
-    private var nativeMOBIRawmlPtr: Long = 0L
 
     companion object {
         init {
@@ -61,15 +60,19 @@ class MobiFileReader(private val book: Book) : Closeable {
 
             if (updatePageContent) {
                 val extraInfo = ExtraInfo()
-//                 parseChapters().let {
-//                     book.chapters = it
-//                     extraInfo.chapterCount = it.size
-//                 }
+                parseChapters().let {
+                    book.chapters = it
+                    extraInfo.chapterCount = it.size
+                }
                 parseContent().let {
                     book.pageContents = it
                     extraInfo.pageCount = it.size
                 }
                 book.extraInfo = extraInfo
+
+                parseChaptersRange(book.chapters, book.pageContents.size).let {
+                    book.chapters = it
+                }
             }
         }
     }
@@ -112,6 +115,63 @@ class MobiFileReader(private val book: Book) : Closeable {
         }
     }
 
+    private fun parseChaptersRange(chapters: List<Chapter>, pageCount: Int): List<Chapter> {
+        // 只有1个或者没有目录，当作没有目录
+        if (chapters.size <= 1) return chapters
+        val parent = chapters.filter { it.level == 0 }
+        val child = chapters.filter { it.level == 1 }
+        // 只有一级目录
+        if (child.isEmpty()) {
+            return parent.updateParentChapter(pageCount)
+        }
+        parent.updateParentChapter(pageCount)
+        child.updateChildChapter(parent, pageCount)
+        val merge = mergeChapter(parent, child)
+        return merge
+    }
+
+    private fun List<Chapter>.updateParentChapter(pageCount: Int): List<Chapter> {
+        this.fastForEachIndexed { i, c ->
+            val cur = c
+            if (i == this.size - 1) {
+                cur.pageIndexRange = IntRange(cur.posfid, pageCount - 1)
+            } else {
+                val next = this[i + 1]
+                cur.pageIndexRange = IntRange(cur.posfid, next.posfid - 1)
+            }
+        }
+        return this
+    }
+
+    private fun List<Chapter>.updateChildChapter(
+        parent: List<Chapter>,
+        pageCount: Int
+    ): List<Chapter> {
+        this.fastForEachIndexed { i, c ->
+            val cur = c
+            if (i == this.size - 1) {
+                cur.pageIndexRange = IntRange(cur.posfid, pageCount - 1)
+            } else {
+                val next = this[i + 1]
+                cur.pageIndexRange = IntRange(cur.posfid, next.posfid - 1)
+            }
+            cur.parent = parent.find { it.pageIndexRange.contains(cur.pageIndexRange) }
+        }
+        return this
+    }
+
+    private fun mergeChapter(parent: List<Chapter>, child: List<Chapter>): List<Chapter> {
+        val merge = mutableListOf<Chapter>()
+        parent.fastForEachIndexed { i, p ->
+            val range = IntRange(p.pageIndexRange.first, p.pageIndexRange.last)
+            // 一级目录更新成1页
+            p.pageIndexRange = IntRange(range.first, range.first)
+            merge.add(p)
+            merge.addAll(child.filter { range.contains(it.pageIndexRange) })
+        }
+        return merge
+    }
+
     fun markupUid2resourceUid(markupUid: Int): Int? {
         if (!checkCondition()) return null
         val data = nativeGetMarkupData(markupUid) ?: return null
@@ -141,6 +201,11 @@ class MobiFileReader(private val book: Book) : Closeable {
         isInitSuccess = false
         nativeDestroy()
     }
+
+
+    private var nativeMOBIDataPtr: Long = 0L
+
+    private var nativeMOBIRawmlPtr: Long = 0L
 
     private external fun nativeInit(path: String): Int
 

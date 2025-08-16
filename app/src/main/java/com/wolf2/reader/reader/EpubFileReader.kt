@@ -73,10 +73,6 @@ class EpubFileReader(private val book: Book) : Closeable {
                 }
             }
         }
-
-        book.chapters.forEach{
-            Timber.d("chapter:  $it ")
-        }
     }
 
     private fun parseCover(): CoverImage? {
@@ -106,10 +102,9 @@ class EpubFileReader(private val book: Book) : Closeable {
 
     private fun parseChapters(): List<Chapter> {
         if (!checkCondition()) return emptyList()
-        val chapters = nativeGetChapter()
-        Timber.d("chapter size: ${chapters?.size}")
-        if (chapters == null) return emptyList()
-        return chapters
+        return (nativeGetChapter() ?: emptyList()).also {
+            Timber.d("Chapter Size: ${it.size}")
+        }
     }
 
     private fun parseContent(): List<PageContent> {
@@ -120,10 +115,30 @@ class EpubFileReader(private val book: Book) : Closeable {
     }
 
     private fun parseChaptersRange(chapters: List<Chapter>, pageCount: Int): List<Chapter> {
-        chapters.fastForEachIndexed { i, c ->
-            c.pageIndexRange = chapters.getPageRange(i, pageCount)
+        return chapters.updateParentChapter(pageCount)
+    }
+
+    private fun List<Chapter>.updateParentChapter(pageCount: Int): List<Chapter> {
+        this.fastForEachIndexed { i, c ->
+            val cur = c
+            if (i == this.size - 1) {
+                val start = matchPageId(this[i].pageHref)
+                val end = pageCount - 1
+                cur.pageIndexRange = IntRange(start, end)
+            } else {
+                val start = matchPageId(this[i].pageHref)
+                val end = matchPageId(this[i + 1].pageHref) - 1
+                cur.pageIndexRange = IntRange(start, end)
+            }
         }
-        return chapters
+        return this
+    }
+
+    // Text/part0000.xhtml --> 0
+    private fun matchPageId(href: String, defValue: Int = 0): Int {
+        return runCatching {
+            "(\\d+)".toRegex().find(href)?.value?.toInt()
+        }.onFailure { it.printStackTrace() }.getOrNull() ?: defValue
     }
 
     fun pageHref2ImageHref(pageHref: String): String? {

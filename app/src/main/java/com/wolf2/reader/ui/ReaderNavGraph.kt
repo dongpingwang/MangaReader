@@ -25,7 +25,6 @@ import com.wolf2.reader.ui.detail.BookDetailScreen
 import com.wolf2.reader.ui.home.HomeScreen
 import com.wolf2.reader.ui.home.Routes
 import com.wolf2.reader.ui.preview.ImagePreviewScreen
-import com.wolf2.reader.ui.read.ChapterScreen
 import com.wolf2.reader.ui.read.ReadScreen
 import com.wolf2.reader.ui.search.SearchScreen
 import com.wolf2.reader.ui.setting.AboutScreen
@@ -85,15 +84,6 @@ fun ReaderNavGraph() {
                 val bookUuid = backStackEntry.arguments?.getString("bookUuid") ?: return@composable
                 ReadScreen(bookUuid = bookUuid)
             }
-            composable(
-                route = "${Routes.READ_CHAPTER}/{bookUuid}",
-                arguments = listOf(navArgument("bookUuid") {
-                    type = NavType.StringType
-                })
-            ) { backStackEntry ->
-                val bookUuid = backStackEntry.arguments?.getString("bookUuid") ?: return@composable
-                ChapterScreen(bookUuid = bookUuid)
-            }
 
             composable(Routes.BROWSER_BOOK) {
                 BrowserScreen()
@@ -125,7 +115,6 @@ fun ReaderNavGraph() {
                 AboutScreen()
             }
         }
-
 
         OnLifecycleEvent(onDispose = {
             globalViewContext = null

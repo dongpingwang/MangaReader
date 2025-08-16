@@ -615,7 +615,13 @@ extern "C"
     MOBI_EXPORT MOBI_RET mobi_drm_encrypt(MOBIData *m);
 
     MOBI_EXPORT MOBI_RET mobi_write_file(FILE *file, MOBIData *m);
-    /** @} */ // end of mobi_export group
+
+    MOBI_EXPORT char * mobi_get_cncx_string_utf8(const MOBIPdbRecord *cncx_record, const uint32_t cncx_offset, MOBIEncoding cncx_encoding);
+    MOBI_EXPORT char * mobi_get_cncx_string(const MOBIPdbRecord *cncx_record, const uint32_t cncx_offset);
+    MOBI_EXPORT char * mobi_get_cncx_string_flat(const MOBIPdbRecord *cncx_record, const uint32_t cncx_offset, const size_t length);
+    MOBI_EXPORT MOBI_RET mobi_get_indxentry_tagvalue(uint32_t *tagvalue, const MOBIIndexEntry *entry, const unsigned tag_arr[]);
+
+/** @} */ // end of mobi_export group
     
 #ifdef __cplusplus
 }

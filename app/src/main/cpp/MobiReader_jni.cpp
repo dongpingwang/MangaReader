@@ -2,6 +2,8 @@
 #include <string>
 #include <android/log.h>
 #include "libmobi/mobi.h"
+#include "libmobi/index.h"
+#include "libmobi/parse_rawml.h"
 
 #define TAG "NativeMobiReaderJNI"
 #define LOGI(...) __android_log_print(ANDROID_LOG_INFO, TAG, __VA_ARGS__)
@@ -97,10 +99,16 @@ JNIEXPORT void JNICALL
 Java_com_wolf2_reader_reader_MobiFileReader_nativeDestroy(JNIEnv *env, jobject thiz) {
     LOGI("--------nativeDestroy--------");
     auto *m = getNativeMOBIDataPtr(env, thiz);
+    auto *rawml = getNativeMOBIRawmlPtr(env, thiz);
     if (m) {
         mobi_free(m);
         //delete m;
-        //env->SetLongField(thiz, nativeMOBIDataPtr, 0L);
+        env->SetLongField(thiz, nativeMOBIDataPtr, 0L);
+    }
+    if (rawml) {
+        mobi_free_rawml(rawml);
+        //delete rawml;
+        env->SetLongField(thiz, nativeMOBIRawmlPtr, 0L);
     }
 }
 
@@ -264,8 +272,79 @@ Java_com_wolf2_reader_reader_MobiFileReader_nativeGetMarkupData(JNIEnv *env, job
 }
 
 
+jobject
+createChapter(JNIEnv *env, jobject thiz, char *title, uint32_t level, uint32_t posfid) {
+    jclass cls = env->FindClass("com/wolf2/reader/mode/entity/book/Chapter");
+    if (cls == nullptr) {
+        return nullptr;
+    }
+    jmethodID constructor = env->GetMethodID(cls, "<init>",
+                                             "(Ljava/lang/String;II)V");
+    if (constructor == nullptr) {
+        env->DeleteLocalRef(cls);
+        return nullptr;
+    }
+    jstring titleStr = env->NewStringUTF(title);
+    if (titleStr == nullptr) {
+        env->DeleteLocalRef(cls);
+        return nullptr;
+    }
+    jobject chapter = env->NewObject(cls, constructor, titleStr, (jint) level, (jint) posfid);
+    env->DeleteLocalRef(titleStr);
+    env->DeleteLocalRef(cls);
+    return chapter;
+}
+
 extern "C"
 JNIEXPORT jobject JNICALL
 Java_com_wolf2_reader_reader_MobiFileReader_nativeGetChapter(JNIEnv *env, jobject thiz) {
+    jclass arrayListClz = env->FindClass("java/util/ArrayList");
+    if (arrayListClz == nullptr) {
+        return nullptr;
+    }
+    jmethodID constructor = env->GetMethodID(arrayListClz, "<init>", "()V");
+    jobject arrayList = env->NewObject(arrayListClz, constructor);
+    if (arrayList == nullptr) {
+        return nullptr;
+    }
+    jmethodID addMethod = env->GetMethodID(arrayListClz, "add", "(Ljava/lang/Object;)Z");
+    if (addMethod == nullptr) {
+        return nullptr;
+    }
 
+    MOBIRawml *rawml = getNativeMOBIRawmlPtr(env, thiz);
+    if (rawml == nullptr) {
+        return nullptr;
+    }
+    MOBIIndx *ncx = rawml->ncx;
+    size_t tocCount = ncx->entries_count;
+    bool kf8 = mobi_is_rawml_kf8(rawml);
+    LOGI("tocCount:  %zu", tocCount);
+    LOGI("kf8:  %d", kf8);
+    // 参考opf.c#mobi_build_ncx
+    for (int i = 0; i < tocCount; ++i) {
+        const MOBIIndexEntry *ncx_entry = &ncx->entries[i];
+
+        uint32_t cncx_offset;
+        mobi_get_indxentry_tagvalue(&cncx_offset, ncx_entry, INDX_TAG_NCX_TEXT_CNCX);
+        const MOBIPdbRecord *cncx_record = rawml->ncx->cncx_record;
+        char *text = mobi_get_cncx_string_utf8(cncx_record, cncx_offset, rawml->ncx->encoding);
+        uint32_t posfid;
+        uint32_t level;
+        if (kf8) {
+            mobi_get_indxentry_tagvalue(&posfid, ncx_entry, INDX_TAG_NCX_POSFID);
+        } else {
+            uint32_t filepos;
+            mobi_get_indxentry_tagvalue(&filepos, ncx_entry, INDX_TAG_NCX_FILEPOS);
+            posfid = filepos;
+        }
+        mobi_get_indxentry_tagvalue(&level, ncx_entry, INDX_TAG_NCX_LEVEL);
+
+        //LOGI("TXT:%s, level: %d, posfid: %d", text, level, posfid);
+        jobject chapter = createChapter(env, thiz, text, level, posfid);
+        env->CallBooleanMethod(arrayList, addMethod, chapter);
+        env->DeleteLocalRef(chapter);
+    }
+    return arrayList;
 }
+
