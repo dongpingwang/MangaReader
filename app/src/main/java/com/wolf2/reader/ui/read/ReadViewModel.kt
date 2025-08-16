@@ -16,6 +16,8 @@ import com.wolf2.reader.mode.entity.book.PageContent
 import com.wolf2.reader.navigate
 import com.wolf2.reader.popBackStack
 import com.wolf2.reader.reader.CachedReader
+import com.wolf2.reader.reader.numbers
+import com.wolf2.reader.reader.percent
 import com.wolf2.reader.ui.common.SnackbarModel
 import com.wolf2.reader.ui.home.Routes
 import com.wolf2.reader.ui.util.ImageCacheUtil
@@ -157,7 +159,7 @@ class ReadViewModel(val bookUuid: String) : ViewModel() {
 
     private fun getCurChapterTriple(): Triple<Int, Chapter, List<Chapter>>? {
         val chapters = (_uiState.value.bookResult as LoadResult.Success<Book>).data.chapters
-        if (chapters.isEmpty()) return null
+        if (chapters.size <= 1) return null
         val curPage = getCurPage()
         var chapterIndex = 0
         for ((i, c) in chapters.withIndex()) {
@@ -176,6 +178,29 @@ class ReadViewModel(val bookUuid: String) : ViewModel() {
             return IntRange(0, book.pageContents.size - 1)
         }
         return triple.second.pageIndexRange
+    }
+
+    fun getChapterTitle(): String {
+        val triple = getCurChapterTriple()
+        val book = (_uiState.value.bookResult as LoadResult.Success<Book>).data
+        if (triple == null) {
+            return book.title
+        }
+        return triple.second.title
+    }
+
+    fun getChapterProgress(): String {
+        val triple = getCurChapterTriple()
+        if (triple == null) {
+            val percent = readRecord.percent()
+            val numbers = readRecord.numbers()
+            return "$numbers $percent"
+        }
+        val range = triple.second.pageIndexRange
+        val progress = getCurPage()
+        val percent = range.percent(progress)
+        val numbers = range.numbers(progress)
+        return "$numbers $percent"
     }
 
     fun isCurPageBookMarked(): Boolean {

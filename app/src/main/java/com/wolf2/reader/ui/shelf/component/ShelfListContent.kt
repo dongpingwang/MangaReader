@@ -31,10 +31,10 @@ import androidx.paging.compose.itemKey
 import coil.compose.AsyncImage
 import com.wolf2.reader.mode.entity.ReadRecord
 import com.wolf2.reader.mode.entity.book.Book
+import com.wolf2.reader.reader.percent
 import com.wolf2.reader.ui.shelf.BookShelfUiState
 import com.wolf2.reader.ui.theme.Typography
 import my.nanihadesuka.compose.LazyColumnScrollbar
-import kotlin.math.roundToInt
 
 @Composable
 fun ShelfListContent(
@@ -109,14 +109,7 @@ private fun ListItem(
                     .align(Alignment.BottomEnd),
                 contentAlignment = Alignment.Center
             ) {
-                val process = when {
-                    readRecord == null -> 0
-                    else -> {
-                        readRecord.curPage.toFloat().div(readRecord.pageCount).times(100)
-                            .roundToInt()
-                            .coerceIn(0, 100)
-                    }
-                }.toString() + "%"
+                val process = readRecord.percent()
                 Text(
                     text = process,
                     color = MaterialTheme.colorScheme.surface,

@@ -91,6 +91,8 @@ fun ReadScreen(bookUuid: String) {
             exit = fadeOut(),
         ) {
             ReadTopAppBar(
+                chapterTitle = viewModel.getChapterTitle(),
+                progressDesc = viewModel.getChapterProgress(),
                 onBackHandle = {
                     viewModel.onEvent(ReadUiEvent.OnBackHandle)
                 })
