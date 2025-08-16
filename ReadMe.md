@@ -12,6 +12,9 @@
 
 </div>
 
+Here's a video:
+- https://www.bilibili.com/video/BV1UnYezkEjx/
+
 
 
 ## 特性
