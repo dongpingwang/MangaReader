@@ -1,5 +1,7 @@
 package com.wolf2.reader.ui.read
 
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -16,18 +18,21 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.wolf2.reader.config.PagerSwitchEffect
 import com.wolf2.reader.currentRoute
+import com.wolf2.reader.mode.entity.book.Book
+import com.wolf2.reader.mode.entity.book.PageContent
 import com.wolf2.reader.ui.common.MyLoadingIndicator
 import com.wolf2.reader.ui.common.MySnackbar
 import com.wolf2.reader.ui.common.OnLifecycleEvent
 import com.wolf2.reader.ui.home.Routes
-import com.wolf2.reader.ui.read.component.CurlPageContent
+import com.wolf2.reader.ui.read.component.CurlPager
 import com.wolf2.reader.ui.common.ErrorIndicator
 import com.wolf2.reader.ui.read.component.JumpPageDialog
 import com.wolf2.reader.ui.read.component.MoreActionSheet
+import com.wolf2.reader.ui.read.component.RVPager
 import com.wolf2.reader.ui.read.component.ReadBottomBar
 import com.wolf2.reader.ui.read.component.ReadTopAppBar
-import com.wolf2.reader.ui.read.component.VHPagerContent
-import com.wolf2.reader.ui.read.component.SwipeTinderContent
+import com.wolf2.reader.ui.read.component.VHPager
+import com.wolf2.reader.ui.read.component.TinderPager
 import com.wolf2.reader.util.LoadResult
 
 @Composable
@@ -46,6 +51,27 @@ fun ReadScreen(bookUuid: String) {
         viewModel.onEvent(ReadUiEvent.OnDestroy)
     })
 
+    fun toggleBarsVisibility() {
+        showAppBar = !showAppBar
+    }
+
+    fun updateReadRecord(pageInt: Int, updateImmediately: Boolean) {
+        viewModel.onEvent(ReadUiEvent.OnPageChange(pageInt, updateImmediately))
+    }
+
+    fun loadBuffer(pageContent: PageContent): ByteArray? {
+        return viewModel.getImageBuffer(pageContent)
+    }
+
+    fun loadImage(pageContent: PageContent): Bitmap {
+        val buffer = loadBuffer(pageContent)
+        return BitmapFactory.decodeByteArray(
+            viewModel.getImageBuffer(pageContent),
+            0,
+            buffer?.size ?: 0
+        )
+    }
+
     Box(
         modifier = Modifier.fillMaxSize()
     ) {
@@ -53,33 +79,57 @@ fun ReadScreen(bookUuid: String) {
             is LoadResult.Loading -> MyLoadingIndicator()
             is LoadResult.Error -> ErrorIndicator()
             is LoadResult.Success<*> -> {
-                when (PagerSwitchEffect.fromInt(uiState.pagerSwitchEffect)) {
-                    PagerSwitchEffect.VerticalPage -> VHPagerContent(
-                        videModel = viewModel,
-                        isVerticalPager = true,
-                        uiState = uiState,
-                        onImageClick = { showAppBar = !showAppBar },
-                    )
+                val book = (uiState.bookResult as LoadResult.Success<Book>).data
+                val pagerEffect: PagerSwitchEffect =
+                    PagerSwitchEffect.fromInt(uiState.pagerSwitchEffect)
+                when (pagerEffect) {
+                    PagerSwitchEffect.VerticalPage, PagerSwitchEffect.HorizontalPage -> VHPager(
+                        isVerticalPager = pagerEffect == PagerSwitchEffect.VerticalPage,
+                        curPage = uiState.curPage,
+                        pageContents = book.pageContents,
+                        onLoadBuffer = {
+                            loadBuffer(it)
+                        }, onImageClick = {
+                            toggleBarsVisibility()
+                        }, onPageChange = {
+                            updateReadRecord(it, false)
+                        })
 
-                    PagerSwitchEffect.HorizontalPage -> VHPagerContent(
-                        videModel = viewModel,
-                        isVerticalPager = false,
-                        uiState = uiState,
-                        onImageClick = { showAppBar = !showAppBar },
-                    )
+                    PagerSwitchEffect.CurlPage -> CurlPager(
+                        curPage = uiState.curPage,
+                        pageContents = book.pageContents,
+                        onLoadImage = {
+                            loadImage(it)
+                        }, onImageClick = {
+                            toggleBarsVisibility()
+                        }, onPageChange = {
+                            updateReadRecord(it, false)
+                        })
 
-                    PagerSwitchEffect.CurlPage -> CurlPageContent(
-                        viewModel = viewModel,
-                        uiState = uiState,
-                        onImageClick = { showAppBar = !showAppBar }
-                    )
 
-                    PagerSwitchEffect.VerticalList -> {}
+                    PagerSwitchEffect.VerticalList -> {
+                        RVPager(
+                            curPage = uiState.curPage,
+                            pageContents = book.pageContents,
+                            onLoadImage = {
+                                loadImage(it)
+                            }, onImageClick = {
+                                toggleBarsVisibility()
+                            }, onPageChange = {
+                                updateReadRecord(it, false)
+                            })
+                    }
 
                     PagerSwitchEffect.SwipeTinder -> {
-                        SwipeTinderContent(vm = viewModel, uiState = uiState, onImageClick = {
-                            showAppBar = !showAppBar
-                        })
+                        TinderPager(curPage = uiState.curPage,
+                            pageContents = book.pageContents,
+                            onLoadImage = {
+                                loadImage(it)
+                            }, onImageClick = {
+                                toggleBarsVisibility()
+                            }, onPageChange = {
+                                updateReadRecord(it, false)
+                            })
                     }
                 }
             }
@@ -108,7 +158,7 @@ fun ReadScreen(bookUuid: String) {
                 curPage = curPage,
                 chapterRange = viewModel.getCurChapterPageRange(),
                 onPrevChapter = { viewModel.onEvent(ReadUiEvent.OnPrevChapter) },
-                onProgressChange = { viewModel.onEvent(ReadUiEvent.OnPageChange(it)) },
+                onProgressChange = { updateReadRecord(it, true) },
                 onNextChapter = { viewModel.onEvent(ReadUiEvent.OnNextChapter) },
                 onShowChapter = {},
                 onMoreActionClick = {
@@ -140,7 +190,7 @@ fun ReadScreen(bookUuid: String) {
             val book = (uiState.bookResult as LoadResult.Success).data
             JumpPageDialog(book.pageContents.size,
                 onConfirmRequest = {
-                    viewModel.onEvent(ReadUiEvent.OnPageChange(it))
+                    updateReadRecord(it, true)
                 }, onDismissRequest = {
                     showJumpDialog = false
                 })

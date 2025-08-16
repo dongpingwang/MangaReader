@@ -41,7 +41,7 @@ sealed class ReadUiEvent {
     data class OnPageSwitchEffectChange(val effect: Int) : ReadUiEvent()
     data object OnPrevChapter : ReadUiEvent()
     data object OnNextChapter : ReadUiEvent()
-    data class OnPageChange(val pageInt: Int) : ReadUiEvent()
+    data class OnPageChange(val pageInt: Int, val updateImmediately: Boolean) : ReadUiEvent()
 
 }
 
@@ -291,7 +291,7 @@ class ReadViewModel(val bookUuid: String) : ViewModel() {
 
             is ReadUiEvent.OnNextChapter -> nextChapter()
 
-            is ReadUiEvent.OnPageChange -> updateReadRecord(event.pageInt, true)
+            is ReadUiEvent.OnPageChange -> updateReadRecord(event.pageInt, event.updateImmediately)
         }
     }
 
