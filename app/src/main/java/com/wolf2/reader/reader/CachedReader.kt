@@ -5,6 +5,7 @@ import com.wolf2.reader.mode.entity.book.PageContent
 import com.wolf2.reader.util.isExternalStorageManager
 import com.wolf2.reader.util.storagePath
 import timber.log.Timber
+import java.io.File
 
 class CachedReader private constructor(private val from: Book) {
 
@@ -40,6 +41,10 @@ class CachedReader private constructor(private val from: Book) {
         }
         val path = from.uri.storagePath()
         if (path == null) {
+            Timber.e("book file path is null")
+            return false
+        }
+        if (!File(path).exists()) {
             Timber.e("book file is not exists")
             return false
         }

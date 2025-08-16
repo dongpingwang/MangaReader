@@ -24,18 +24,13 @@ class MobiFileReader(private val book: Book) : Closeable {
         }
     }
 
-    private val isFileExists by lazy {
-        book.uri.storagePath() != null
-    }
-
     private var isInitSuccess = false
 
     private fun checkCondition(): Boolean {
-        return isFileExists && isInitSuccess
+        return isInitSuccess
     }
 
     fun readMobi(updateMetadata: Boolean, updatePageContent: Boolean) {
-        if (!isFileExists) return
         traceMillis {
             val path = book.uri.storagePath()
             if (path == null) {
