@@ -8,7 +8,10 @@ val ebookMimeTypes by lazy {
             when (it) {
                 ".epub" -> add("application/epub+zip")
                 ".mobi" -> add("application/x-mobipocket-ebook")
-                ".azw3" -> add("application/vnd.amazon.mobi8-ebook")
+                ".azw3" -> {
+                    add("application/vnd.amazon.mobi8-ebook")
+                    add("application/octet-stream")
+                }
             }
         }
     }

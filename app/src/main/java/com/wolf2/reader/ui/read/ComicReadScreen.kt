@@ -6,10 +6,12 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -36,6 +38,8 @@ fun ReadScreen(bookUuid: String) {
     var showAppBar by remember { mutableStateOf(false) }
     var showMoreSheet by remember { mutableStateOf(false) }
     val showSnackbar = uiState.snackbar != null
+    var showJumpDialog by remember { mutableStateOf(false) }
+    val curPage by viewModel.curPageFlow.collectAsStateWithLifecycle()
 
     OnLifecycleEvent(onDispose = {
         if (currentRoute()?.contains(Routes.IMAGE_PREVIEW) == true) return@OnLifecycleEvent
@@ -99,7 +103,13 @@ fun ReadScreen(bookUuid: String) {
             exit = fadeOut(),
             modifier = Modifier.align(Alignment.BottomStart)
         ) {
-            ReadBottomBar(viewModel, uiState,
+            ReadBottomBar(
+                curPage = curPage,
+                chapterRange = viewModel.getCurChapterPageRange(),
+                onPrevChapter = { viewModel.onEvent(ReadUiEvent.OnPrevChapter) },
+                onProgressChange = { viewModel.onEvent(ReadUiEvent.OnPageChange(it)) },
+                onNextChapter = { viewModel.onEvent(ReadUiEvent.OnNextChapter) },
+                onShowChapter = {},
                 onMoreActionClick = {
                     showMoreSheet = true
                 })
@@ -112,11 +122,21 @@ fun ReadScreen(bookUuid: String) {
                 onDismissRequest = { showMoreSheet = false },
                 onSavePicture = { viewModel.onEvent(ReadUiEvent.OnCacheImage) },
                 onBookMarkToggle = { viewModel.onEvent(ReadUiEvent.OnBookMarkToggle) },
-                onPageSwitchEffectChange = {viewModel.onEvent(ReadUiEvent.OnPageSwitchEffectChange(it))}
+                onJumpPage = {},
+                onPageSwitchEffectChange = {
+                    viewModel.onEvent(
+                        ReadUiEvent.OnPageSwitchEffectChange(
+                            it
+                        )
+                    )
+                }
             )
         }
         if (showSnackbar) {
             MySnackbar(uiState.snackbar!!)
+        }
+        if (showJumpDialog) {
+
         }
     }
 }

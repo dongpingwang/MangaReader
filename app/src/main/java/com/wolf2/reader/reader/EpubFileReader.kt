@@ -1,5 +1,6 @@
 package com.wolf2.reader.reader
 
+import androidx.compose.ui.util.fastForEachIndexed
 import com.wolf2.reader.mode.entity.book.Book
 import com.wolf2.reader.mode.entity.book.Chapter
 import com.wolf2.reader.mode.entity.book.CoverImage
@@ -66,7 +67,15 @@ class EpubFileReader(private val book: Book) : Closeable {
                     extraInfo.pageCount = it.size
                 }
                 book.extraInfo = extraInfo
+
+                parseChaptersRange(book.chapters, book.pageContents.size).let {
+                    book.chapters = it
+                }
             }
+        }
+
+        book.chapters.forEach{
+            Timber.d("chapter:  $it ")
         }
     }
 
@@ -97,9 +106,10 @@ class EpubFileReader(private val book: Book) : Closeable {
 
     private fun parseChapters(): List<Chapter> {
         if (!checkCondition()) return emptyList()
-        return (nativeGetChapter() ?: emptyList()).also {
-            Timber.d("Chapter Size: ${it.size}")
-        }
+        val chapters = nativeGetChapter()
+        Timber.d("chapter size: ${chapters?.size}")
+        if (chapters == null) return emptyList()
+        return chapters
     }
 
     private fun parseContent(): List<PageContent> {
@@ -107,6 +117,13 @@ class EpubFileReader(private val book: Book) : Closeable {
         return (nativeGetPageContents() ?: emptyList()).also {
             Timber.d("PageContent Size: ${it.size}")
         }
+    }
+
+    private fun parseChaptersRange(chapters: List<Chapter>, pageCount: Int): List<Chapter> {
+        chapters.fastForEachIndexed { i, c ->
+            c.pageIndexRange = chapters.getPageRange(i, pageCount)
+        }
+        return chapters
     }
 
     fun pageHref2ImageHref(pageHref: String): String? {

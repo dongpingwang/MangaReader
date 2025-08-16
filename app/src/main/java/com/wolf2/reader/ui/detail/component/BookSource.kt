@@ -16,6 +16,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.documentfile.provider.DocumentFile
+import com.anggrayudi.storage.file.DocumentFileCompat
 import com.wolf2.reader.R
 import com.wolf2.reader.mode.entity.ReadRecord
 import com.wolf2.reader.mode.entity.book.Book
@@ -53,7 +54,7 @@ fun BookSource(book: Book, readRecord: ReadRecord?) {
             )
         }
 
-        val size = DocumentFile.fromSingleUri(LocalContext.current, book.uri)
+        val size = DocumentFileCompat.fromUri(LocalContext.current, book.uri)
             ?.length()?.binaryBytes.toString()
         Row(modifier = Modifier.padding(top = 8.dp)) {
             Text(text = stringResource(R.string.size), style = MaterialTheme.typography.bodyMedium)

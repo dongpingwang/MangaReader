@@ -2,10 +2,11 @@ package com.wolf2.reader.ui.browser
 
 import android.net.Uri
 import androidx.compose.ui.util.fastForEach
-import androidx.documentfile.provider.DocumentFile
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.anggrayudi.storage.file.DocumentFileCompat
+import com.anggrayudi.storage.file.mimeType
 import com.wolf2.reader.util.globalContext
 import com.wolf2.reader.reader.toBook
 import com.wolf2.reader.mode.db.DatabaseHelper
@@ -64,7 +65,7 @@ class BrowserViewModel() : ViewModel() {
                         val exists = DatabaseHelper.bookDao().queryByUri(it) != null
                         if (exists == true) return@fastForEach
                         val documentFile =
-                            DocumentFile.fromSingleUri(globalContext, it) ?: return@fastForEach
+                            DocumentFileCompat.fromUri(globalContext, it) ?: return@fastForEach
                         val book = documentFile.toBook()
                         CachedReader.newLocalFileReader(book).apply {
                             readBook(updatePageContent = false)

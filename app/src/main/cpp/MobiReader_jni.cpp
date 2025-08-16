@@ -49,25 +49,6 @@ MOBIRawml *getNativeMOBIRawmlPtr(JNIEnv *env, jobject thiz) {
     return rawml;
 }
 
-static int write_file(const unsigned char *buffer, const size_t len, const char *path) {
-    errno = 0;
-    FILE *file = fopen(path, "wb");
-    if (file == NULL) {
-        int errsv = errno;
-        LOGE("Could not open file for writing: %s (%s)\n", path, strerror(errsv));
-        return -1;
-    }
-    size_t n = fwrite(buffer, 1, len, file);
-    if (n != len) {
-        int errsv = errno;
-        LOGE("Error writing to file: %s (%s)\n", path, strerror(errsv));
-        fclose(file);
-        return -1;
-    }
-    fclose(file);
-    return 0;
-}
-
 extern "C"
 JNIEXPORT jint JNICALL
 Java_com_wolf2_reader_reader_MobiFileReader_nativeInit(JNIEnv *env, jobject thiz, jstring path) {
@@ -283,4 +264,8 @@ Java_com_wolf2_reader_reader_MobiFileReader_nativeGetMarkupData(JNIEnv *env, job
 }
 
 
+extern "C"
+JNIEXPORT jobject JNICALL
+Java_com_wolf2_reader_reader_MobiFileReader_nativeGetChapter(JNIEnv *env, jobject thiz) {
 
+}

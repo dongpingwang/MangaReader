@@ -11,6 +11,7 @@ import com.wolf2.reader.mode.db.DatabaseHelper
 import com.wolf2.reader.mode.entity.BookMark
 import com.wolf2.reader.mode.entity.ReadRecord
 import com.wolf2.reader.mode.entity.book.Book
+import com.wolf2.reader.mode.entity.book.Chapter
 import com.wolf2.reader.mode.entity.book.PageContent
 import com.wolf2.reader.navigate
 import com.wolf2.reader.popBackStack
@@ -36,6 +37,10 @@ sealed class ReadUiEvent {
     data object OnDestroy : ReadUiEvent()
     data object OnCacheImage : ReadUiEvent()
     data class OnPageSwitchEffectChange(val effect: Int) : ReadUiEvent()
+    data object OnPrevChapter : ReadUiEvent()
+    data object OnNextChapter : ReadUiEvent()
+    data class OnPageChange(val pageInt: Int) : ReadUiEvent()
+
 }
 
 data class ReadUiState(
@@ -65,6 +70,9 @@ class ReadViewModel(val bookUuid: String) : ViewModel() {
     private var _uiState = MutableStateFlow(ReadUiState())
     val uiState = _uiState.asStateFlow()
 
+    private val _curPageFlow = MutableStateFlow(0)
+    val curPageFlow = _curPageFlow.asStateFlow()
+
     private var fileReader: CachedReader? = null
     private var existsReadRecord = false
     private lateinit var readRecord: ReadRecord
@@ -87,8 +95,9 @@ class ReadViewModel(val bookUuid: String) : ViewModel() {
                     return@launch
                 }
                 readRecord = DatabaseHelper.readRecordDao().getReadRecord(bookUuid)
-                    ?.also {
+                    ?.also { r ->
                         existsReadRecord = true
+                        _curPageFlow.update { r.curPage }
                     }
                     ?: ReadRecord(
                         bookUuid = book.uuid,
@@ -126,16 +135,17 @@ class ReadViewModel(val bookUuid: String) : ViewModel() {
                 curPage = curPage,
                 lastReadTimeMillis = System.currentTimeMillis()
             )
+            // 减少更新UI，防止闪烁
+            readRecord = newRecord
+            _curPageFlow.update { curPage }
+            if (updateImmediately) {
+                _uiState.update { it.copy(readRecord = newRecord) }
+            }
             if (existsReadRecord) {
                 DatabaseHelper.readRecordDao().update(newRecord)
             } else {
                 existsReadRecord = true
                 DatabaseHelper.readRecordDao().insert(newRecord)
-            }
-            // 不更新UI，防止闪烁
-            readRecord = newRecord
-            if (updateImmediately) {
-                _uiState.update { it.copy(readRecord = newRecord) }
             }
         }
     }
@@ -143,6 +153,29 @@ class ReadViewModel(val bookUuid: String) : ViewModel() {
 
     fun getCurPage(): Int {
         return readRecord.curPage
+    }
+
+    private fun getCurChapterTriple(): Triple<Int, Chapter, List<Chapter>>? {
+        val chapters = (_uiState.value.bookResult as LoadResult.Success<Book>).data.chapters
+        if (chapters.isEmpty()) return null
+        val curPage = getCurPage()
+        var chapterIndex = 0
+        for ((i, c) in chapters.withIndex()) {
+            if (c.pageIndexRange.contains(curPage)) {
+                chapterIndex = i
+                break
+            }
+        }
+        return Triple(chapterIndex, chapters[chapterIndex], chapters)
+    }
+
+    fun getCurChapterPageRange(): IntRange {
+        val triple = getCurChapterTriple()
+        val book = (_uiState.value.bookResult as LoadResult.Success<Book>).data
+        if (triple == null) {
+            return IntRange(0, book.pageContents.size - 1)
+        }
+        return triple.second.pageIndexRange
     }
 
     fun isCurPageBookMarked(): Boolean {
@@ -190,6 +223,29 @@ class ReadViewModel(val bookUuid: String) : ViewModel() {
         }
     }
 
+    private fun prevChapter() {
+        val triple = getCurChapterTriple()
+        val chapterIndex = triple?.first ?: return
+        if (chapterIndex <= 0) {
+            Timber.d("no previous chapter")
+            return
+        }
+        val pageIndex = triple.third[chapterIndex - 1].pageIndexRange.first
+        updateReadRecord(pageIndex, true)
+    }
+
+    private fun nextChapter() {
+        val triple = getCurChapterTriple()
+        val chapterIndex = triple?.first ?: return
+        val chapters = triple.third
+        if (chapterIndex >= chapters.size - 1) {
+            Timber.d("no next chapter")
+            return
+        }
+        val pageIndex = chapters[chapterIndex + 1].pageIndexRange.first
+        updateReadRecord(pageIndex, true)
+    }
+
     fun onEvent(event: ReadUiEvent) {
         when (event) {
             is ReadUiEvent.OnSnackbarDismiss -> _uiState.update { it.copy(snackbar = null) }
@@ -205,6 +261,12 @@ class ReadViewModel(val bookUuid: String) : ViewModel() {
             is ReadUiEvent.OnCacheImage -> cacheImage()
 
             is ReadUiEvent.OnPageSwitchEffectChange -> setPagerSwitchEffect(event.effect)
+
+            is ReadUiEvent.OnPrevChapter -> prevChapter()
+
+            is ReadUiEvent.OnNextChapter -> nextChapter()
+
+            is ReadUiEvent.OnPageChange -> updateReadRecord(event.pageInt, true)
         }
     }
 

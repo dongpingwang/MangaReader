@@ -9,4 +9,9 @@ add_library(EPUB3Processor SHARED
         EPUB3.h
         EPUB3.c)
 
-target_link_libraries(EPUB3Processor minizip zlib LibXml2::LibXml2)
+target_link_libraries(EPUB3Processor
+        minizip
+        zlib
+        LibXml2::LibXml2
+        android
+        log)

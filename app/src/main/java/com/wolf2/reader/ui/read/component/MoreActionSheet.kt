@@ -8,6 +8,7 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Bookmark
 import androidx.compose.material.icons.outlined.BookmarkBorder
+import androidx.compose.material.icons.outlined.Numbers
 import androidx.compose.material.icons.outlined.Save
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.ButtonGroupDefaults
@@ -42,6 +43,7 @@ fun MoreActionSheet(
     onDismissRequest: () -> Unit = {},
     onSavePicture: () -> Unit = {},
     onBookMarkToggle: () -> Unit = {},
+    onJumpPage: () -> Unit = {},
     onPageSwitchEffectChange: (Int) -> Unit = {},
     onNavToSettings: () -> Unit = {}
 ) {
@@ -67,6 +69,15 @@ fun MoreActionSheet(
         }, modifier = Modifier.clickable {
             markedStatus = !markedStatus
             onBookMarkToggle()
+        })
+
+        ListItem(headlineContent = {
+            Text(stringResource(R.string.jump_page))
+        }, leadingContent = {
+            Icon(imageVector = Icons.Outlined.Numbers, null)
+        }, modifier = Modifier.clickable {
+            onDismissRequest()
+            onJumpPage()
         })
 
         Text(

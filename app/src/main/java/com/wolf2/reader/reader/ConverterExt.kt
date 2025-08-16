@@ -12,15 +12,15 @@ fun DocumentFile.toBook(): Book {
     )
 }
 
-fun List<Chapter>.getPageRange(chapterIndex: Int, pageCount: Int): Pair<Int, Int> {
+fun List<Chapter>.getPageRange(chapterIndex: Int, pageCount: Int): IntRange {
     if (chapterIndex == this.size - 1) {
         val start = matchPageId(this[chapterIndex].pageHref)
         val end = pageCount - 1
-        return start to end
+        return IntRange(start, end)
     } else {
         val start = matchPageId(this[chapterIndex].pageHref)
-        val end = matchPageId(this[chapterIndex + 1].pageHref)
-        return start to end
+        val end = matchPageId(this[chapterIndex + 1].pageHref) - 1
+        return IntRange(start, end)
     }
 }
 
