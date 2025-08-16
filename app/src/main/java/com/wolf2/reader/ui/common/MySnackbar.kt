@@ -15,6 +15,26 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 
+data class SnackbarModel(
+    val message: String,
+    val actionLabel: String? = null,
+    val withDismissAction: Boolean = false,
+    val duration: SnackbarDuration = SnackbarDuration.Short,
+    val actionPerformed: () -> Unit = {},
+    val dismissed: () -> Unit = {}
+)
+
+@Composable
+fun MySnackbar(model: SnackbarModel) {
+    MySnackbar(
+        message = model.message,
+        actionLabel = model.actionLabel,
+        withDismissAction = model.withDismissAction,
+        duration = model.duration,
+        actionPerformed = model.actionPerformed
+    )
+}
+
 @Composable
 fun MySnackbar(
     message: String,

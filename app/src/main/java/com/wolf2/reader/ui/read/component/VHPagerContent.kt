@@ -22,7 +22,8 @@ internal fun VHPagerContent(
     videModel: ReadViewModel,
     isVerticalPager: Boolean,
     uiState: ReadUiState,
-    onImageClick: () -> Unit = {}
+    onImageClick: () -> Unit = {},
+    onPageChange: (Int) -> Unit = {}
 ) {
     val book = (uiState.bookResult as LoadResult.Success<Book>).data
     val pagerState =
@@ -35,6 +36,7 @@ internal fun VHPagerContent(
     }
     LaunchedEffect(pagerState) {
         snapshotFlow { pagerState.settledPage }.collect {
+            onPageChange(it)
             videModel.updateReadRecord(it)
         }
     }

@@ -3,21 +3,28 @@ package com.wolf2.reader.ui.detail
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.material3.BottomSheetScaffold
+import androidx.compose.material3.rememberStandardBottomSheetState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.rememberBottomSheetScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.wolf2.reader.currentRoute
 import com.wolf2.reader.ui.common.LoadingIndicator
+import com.wolf2.reader.ui.common.OnLifecycleEvent
 import com.wolf2.reader.ui.detail.component.DetailContent
 import com.wolf2.reader.ui.detail.component.DetailSheetContent
 import com.wolf2.reader.ui.detail.component.DetailTopAppbar
+import com.wolf2.reader.ui.home.Routes
 import com.wolf2.reader.ui.read.component.ErrorIndicator
 import com.wolf2.reader.util.LoadResult
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -26,7 +33,14 @@ fun BookDetailScreen(
 ) {
     val viewModel: DetailViewModel = viewModel(factory = DetailViewModel.provideFactory(bookUuid))
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val scaffoldState = rememberBottomSheetScaffoldState()
+    val bottomSheetState = rememberStandardBottomSheetState()
+    val scaffoldState = rememberBottomSheetScaffoldState(bottomSheetState)
+    val scope = rememberCoroutineScope()
+
+    OnLifecycleEvent(onDispose = {
+        if (currentRoute()?.contains(Routes.READ) == true) return@OnLifecycleEvent
+        viewModel.onEvent(DetailUiEvent.OnDestroy)
+    })
 
     BottomSheetScaffold(
         sheetPeekHeight = 102.dp,
@@ -35,17 +49,28 @@ fun BookDetailScreen(
             DetailSheetContent(
                 onNavigationToRead = {
                     viewModel.onEvent(DetailUiEvent.OnNavigationToRead)
+                    if (scaffoldState.bottomSheetState.hasExpandedState) {
+                        scope.launch {
+                            bottomSheetState.partialExpand()
+                        }
+                    }
                 },
-                onCopyContent = {},
-                onDeleteReadRecord = {},
-                onShareBookFile = {},
-                onCreateShortcut = {}
+                onCopyContent = {
+                    viewModel.onEvent(DetailUiEvent.OnCopyContent)
+                },
+                onDeleteReadRecord = {
+                    viewModel.onEvent(DetailUiEvent.OnDeleteReadRecord)
+                },
+                onShareBookFile = {
+                    viewModel.onEvent(DetailUiEvent.OnShareBookFile)
+                }
             )
         }, topBar = {
             DetailTopAppbar(onBackHandle = {
                 viewModel.onEvent(DetailUiEvent.OnBackHandle)
             })
-        }) { paddingValues ->
+        }, modifier = Modifier.systemBarsPadding()
+    ) { paddingValues ->
 
         Box(
             modifier = Modifier

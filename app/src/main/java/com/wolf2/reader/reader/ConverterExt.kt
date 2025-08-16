@@ -16,11 +16,11 @@ fun List<Chapter>.getPageRange(chapterIndex: Int, pageCount: Int): Pair<Int, Int
     if (chapterIndex == this.size - 1) {
         val start = matchPageId(this[chapterIndex].pageHref)
         val end = pageCount - 1
-        return start.to(end)
+        return start to end
     } else {
         val start = matchPageId(this[chapterIndex].pageHref)
         val end = matchPageId(this[chapterIndex + 1].pageHref)
-        return start.to(end)
+        return start to end
     }
 }
 
@@ -29,4 +29,21 @@ private fun matchPageId(href: String, defValue: Int = 0): Int {
     return runCatching {
         "(\\d+)".toRegex().find(href)?.value?.toInt()
     }.onFailure { it.printStackTrace() }.getOrNull() ?: defValue
+}
+
+fun copyBook(from: Book, to: Book) {
+    if (from.uuid != to.uuid) return
+    if (from == to) return
+    to.apply {
+        uuid = from.uuid
+        uri = from.uri
+        title = from.title
+        author = from.author
+        mimeType = from.mimeType
+        cover = from.cover
+        chapters = from.chapters
+        pageContents = from.pageContents
+        lastAddedTimeMillis = from.lastAddedTimeMillis
+        extraInfo = from.extraInfo
+    }
 }

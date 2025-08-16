@@ -7,17 +7,23 @@ import com.wolf2.reader.mode.db.DatabaseHelper
 import com.wolf2.reader.mode.entity.FavoriteBook
 import com.wolf2.reader.mode.entity.ReadRecord
 import com.wolf2.reader.mode.entity.book.Book
-import com.wolf2.reader.mode.entity.book.ExtraInfo
 import com.wolf2.reader.navigate
 import com.wolf2.reader.popBackStack
-import com.wolf2.reader.reader.LocalFileReader
+import com.wolf2.reader.reader.CachedReader
 import com.wolf2.reader.ui.home.Routes
+import com.wolf2.reader.util.AppUtil
+import com.wolf2.reader.util.ClipboardUtil
 import com.wolf2.reader.util.LoadResult
+import com.wolf2.reader.util.storagePath
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.put
+import org.json.JSONObject
 import timber.log.Timber
 
 sealed class DetailUiEvent {
@@ -26,14 +32,16 @@ sealed class DetailUiEvent {
     data class OnTitleChange(val title: String) : DetailUiEvent()
     data class OnAuthorChange(val author: String) : DetailUiEvent()
     data object OnNavigationToRead : DetailUiEvent()
-    data object DeleteReadRecord : DetailUiEvent()
+    data object OnDeleteReadRecord : DetailUiEvent()
+    data object OnShareBookFile : DetailUiEvent()
+    data object OnCopyContent : DetailUiEvent()
+    data object OnDestroy : DetailUiEvent()
 }
 
 data class DetailUiState(
     val bookResult: LoadResult<Book> = LoadResult.Loading,
     val favorite: Boolean = false,
-    val readRecord: ReadRecord? = null,
-    val snackbar: Boolean? = null
+    val readRecord: ReadRecord? = null
 )
 
 class DetailViewModel(val bookUuid: String) : ViewModel() {
@@ -51,44 +59,65 @@ class DetailViewModel(val bookUuid: String) : ViewModel() {
     private var _uiState = MutableStateFlow(DetailUiState())
     val uiState = _uiState.asStateFlow()
 
+    private var fileReader: CachedReader? = null
+
     init {
         viewModelScope.launch {
             launch(Dispatchers.IO) {
-                val book = DatabaseHelper.bookDao().queryByUuid(bookUuid)
-                if (book == null) {
-                    Timber.e("book from db is null")
-                    _uiState.update { it.copy(bookResult = LoadResult.Error(Throwable())) }
-                    return@launch
-                }
-                val readRecord = DatabaseHelper.readRecordDao().getReadRecord(bookUuid)
-                // TODO 看要不要放在添加书籍时来解析
-                if (book.extraInfo.pageCount <= 0) {
-                    LocalFileReader(book).apply {
-                        readBook(updateMetadata = false)
-                        close()
-                    }
-                    book.extraInfo = ExtraInfo(
-                        pageCount = book.pageContents.size,
-                        chapterCount = book.chapters.size
-                    )
-                    DatabaseHelper.bookDao().update(book)
-                }
+                queryBookData()
+                readBookFile()
+            }
 
-                val favorite = DatabaseHelper.favoriteBookDao().getFavoriteBook(bookUuid) != null
-                _uiState.update {
-                    it.copy(
-                        bookResult = LoadResult.Success(book),
-                        readRecord = readRecord,
-                        favorite = favorite
-                    )
+            launch(Dispatchers.IO) {
+                DatabaseHelper.bookDao().observeLatestReadBook().collectLatest {
+                    onReadRecordChanged()
                 }
             }
         }
     }
 
+
+    private fun queryBookData() {
+        val book = DatabaseHelper.bookDao().queryByUuid(bookUuid)
+        if (book == null) {
+            Timber.e("book from db is null")
+            _uiState.update { it.copy(bookResult = LoadResult.Error(Throwable())) }
+            return
+        }
+        val readRecord = DatabaseHelper.readRecordDao().getReadRecord(bookUuid)
+        val favorite = DatabaseHelper.favoriteBookDao().getFavoriteBook(bookUuid) != null
+        _uiState.update {
+            it.copy(
+                bookResult = LoadResult.Success(book),
+                readRecord = readRecord,
+                favorite = favorite
+            )
+        }
+    }
+
+    private fun onReadRecordChanged() {
+        val readRecord = DatabaseHelper.readRecordDao().getReadRecord(bookUuid)
+        _uiState.update { it.copy(readRecord = readRecord) }
+    }
+
+    private fun readBookFile() {
+        val book = (_uiState.value.bookResult as LoadResult.Success<Book>).data
+        val needUpdate = book.extraInfo.pageCount <= 0
+        val reader = CachedReader.withLocalFileReader(book)
+        fileReader = reader
+        if (!reader.readBook(updateMetadata = false)) {
+            Timber.e("readBook fail")
+            _uiState.update { it.copy(bookResult = LoadResult.Error(Throwable())) }
+            return
+        }
+        if (needUpdate) {
+            DatabaseHelper.bookDao().update(book)
+        }
+        _uiState.update { it.copy(bookResult = LoadResult.Success(book)) }
+    }
+
     fun onEvent(event: DetailUiEvent) {
         when (event) {
-
             is DetailUiEvent.OnBackHandle -> popBackStack()
 
             is DetailUiEvent.OnFavoriteChange -> {
@@ -103,7 +132,7 @@ class DetailViewModel(val bookUuid: String) : ViewModel() {
             }
 
             is DetailUiEvent.OnTitleChange, is DetailUiEvent.OnAuthorChange -> {
-                val book = (uiState.value.bookResult as LoadResult.Success<Book>).data
+                val book = (_uiState.value.bookResult as LoadResult.Success<Book>).data
                 if (event is DetailUiEvent.OnTitleChange) {
                     book.title = event.title
                 }
@@ -119,11 +148,37 @@ class DetailViewModel(val bookUuid: String) : ViewModel() {
                 navigate("${Routes.READ}/${bookUuid}")
             }
 
-            is DetailUiEvent.DeleteReadRecord -> {
+            is DetailUiEvent.OnDeleteReadRecord -> {
                 val readRecord = _uiState.value.readRecord ?: return
                 viewModelScope.launch(Dispatchers.IO) {
                     DatabaseHelper.readRecordDao().delete(readRecord)
                 }
+            }
+
+            is DetailUiEvent.OnShareBookFile -> {
+                val book = (_uiState.value.bookResult as LoadResult.Success<Book>).data
+                val filePath = book.uri.storagePath()
+                requireNotNull(filePath)
+                AppUtil.shareFile(filePath, book.mimeType)
+            }
+
+            is DetailUiEvent.OnCopyContent -> {
+                val book = (_uiState.value.bookResult as LoadResult.Success<Book>).data
+                val readRecord = _uiState.value.readRecord
+                val json = buildJsonObject {
+                    put("书籍路径", book.uri.storagePath())
+                    put("作者", book.author)
+                    put(
+                        "阅读进度",
+                        if (readRecord == null) "None" else "${readRecord.curPage}/${readRecord.pageCount}"
+                    )
+                }.toString()
+                val content = JSONObject(json).toString(2).replace("\\", "")
+                ClipboardUtil.writeTo(content)
+            }
+
+            is DetailUiEvent.OnDestroy -> {
+                fileReader?.close()
             }
         }
     }

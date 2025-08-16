@@ -3,19 +3,23 @@ package com.wolf2.reader.ui.read
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.wolf2.reader.R
 import com.wolf2.reader.util.MD5Util
 import com.wolf2.reader.config.AppConfig
 import com.wolf2.reader.config.mmkvEmit
 import com.wolf2.reader.mode.db.DatabaseHelper
+import com.wolf2.reader.mode.entity.BookMark
 import com.wolf2.reader.mode.entity.ReadRecord
 import com.wolf2.reader.mode.entity.book.Book
 import com.wolf2.reader.mode.entity.book.PageContent
 import com.wolf2.reader.navigate
 import com.wolf2.reader.popBackStack
-import com.wolf2.reader.reader.LocalFileReader
+import com.wolf2.reader.reader.CachedReader
+import com.wolf2.reader.ui.common.SnackbarModel
 import com.wolf2.reader.ui.home.Routes
 import com.wolf2.reader.ui.util.ImageCacheUtil
 import com.wolf2.reader.util.LoadResult
+import com.wolf2.reader.util.globalContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -28,6 +32,7 @@ sealed class ReadUiEvent {
     data object OnSnackbarDismiss : ReadUiEvent()
     data object OnDisplayCacheImage : ReadUiEvent()
     data object OnBackHandle : ReadUiEvent()
+    data object onBookMarkToggle : ReadUiEvent()
     data object OnDestroy : ReadUiEvent()
 }
 
@@ -35,8 +40,9 @@ data class ReadUiState(
     val pagerSwitchEffect: Int = AppConfig.pagerSwitchEffect.value,
     val darkMode: Boolean = AppConfig.darkMode.value,
     val readRecord: ReadRecord = ReadRecord(),
+    val bookMarks: MutableList<BookMark> = mutableListOf(),
     val bookResult: LoadResult<Book> = LoadResult.Loading,
-    val snackbar: Boolean? = null
+    val snackbar: SnackbarModel? = null
 ) {
     val curPage: Int
         get() = readRecord.curPage
@@ -57,7 +63,7 @@ class ReadViewModel(val bookUuid: String) : ViewModel() {
     private var _uiState = MutableStateFlow(ReadUiState())
     val uiState = _uiState.asStateFlow()
 
-    private var fileReader: LocalFileReader? = null
+    private var fileReader: CachedReader? = null
     private var existsReadRecord = false
     private lateinit var readRecord: ReadRecord
     private var cacheImgName: String? = null
@@ -71,9 +77,9 @@ class ReadViewModel(val bookUuid: String) : ViewModel() {
                     _uiState.update { it.copy(bookResult = LoadResult.Error(Throwable())) }
                     return@launch
                 }
-                val reader = LocalFileReader.withLocalFileReader(book)
+                val reader = CachedReader.obtainLocalFileReader(book)
                 fileReader = reader
-                if (!reader.readBook(updateMetadata = false)) {
+                if (!reader.copyOrRead(to = book, updateMetadata = false)) {
                     Timber.e("readBook fail")
                     _uiState.update { it.copy(bookResult = LoadResult.Error(Throwable())) }
                     return@launch
@@ -84,12 +90,14 @@ class ReadViewModel(val bookUuid: String) : ViewModel() {
                     }
                     ?: ReadRecord(
                         bookUuid = book.uuid,
-                        pageCount = book.pageContents.size,
+                        pageCount = book.extraInfo.pageCount,
                         lastReadTimeMillis = System.currentTimeMillis()
                     )
+                val bookMarks = DatabaseHelper.bookMarkDao().queryByBookUuid(bookUuid).toMutableList()
                 _uiState.update {
                     it.copy(
                         bookResult = LoadResult.Success(book),
+                        bookMarks = bookMarks,
                         readRecord = readRecord
                     )
                 }
@@ -159,7 +167,7 @@ class ReadViewModel(val bookUuid: String) : ViewModel() {
             if (!ret) return@launch
             cacheImgName = displayName
             updateRecordOnMemory()
-            _uiState.update { it.copy(snackbar = true) }
+            _uiState.update { it.copy(snackbar = cacheImageSnackbar) }
         }
     }
 
@@ -169,9 +177,7 @@ class ReadViewModel(val bookUuid: String) : ViewModel() {
 
     fun onEvent(event: ReadUiEvent) {
         when (event) {
-            is ReadUiEvent.OnSnackbarDismiss -> {
-                _uiState.update { it.copy(snackbar = null) }
-            }
+            is ReadUiEvent.OnSnackbarDismiss -> _uiState.update { it.copy(snackbar = null) }
 
             is ReadUiEvent.OnDisplayCacheImage -> {
                 updateRecordOnMemory()
@@ -181,7 +187,33 @@ class ReadViewModel(val bookUuid: String) : ViewModel() {
 
             is ReadUiEvent.OnBackHandle -> popBackStack()
 
+            is ReadUiEvent.onBookMarkToggle -> {
+                viewModelScope.launch(Dispatchers.IO) {
+                    val bookMarks = _uiState.value.bookMarks
+                    val findMark = bookMarks.find { it.pageIndex == getCurPage() }
+                    if (findMark != null) {
+                        bookMarks.remove(findMark)
+                        DatabaseHelper.bookMarkDao().delete(findMark)
+                    } else {
+                        val mark = BookMark(bookUuid = bookUuid, pageIndex = getCurPage())
+                        bookMarks.add(mark)
+                        DatabaseHelper.bookMarkDao().insert(mark)
+                    }
+                    // TODO 界面刷新会看起来闪一下
+                    _uiState.update { it.copy(bookMarks = bookMarks, readRecord = readRecord) }
+                }
+            }
+
             is ReadUiEvent.OnDestroy -> fileReader?.close()
         }
     }
+
+    private val cacheImageSnackbar =
+        SnackbarModel(
+            message = globalContext.resources.getString(R.string.image_cache_success),
+            actionLabel = globalContext.resources.getString(R.string.display_image_cache),
+            withDismissAction = true,
+            actionPerformed = { onEvent(ReadUiEvent.OnDisplayCacheImage) },
+            dismissed = { onEvent(ReadUiEvent.OnSnackbarDismiss) }
+        )
 }

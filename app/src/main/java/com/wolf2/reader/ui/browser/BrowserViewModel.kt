@@ -11,7 +11,7 @@ import com.wolf2.reader.reader.toBook
 import com.wolf2.reader.mode.db.DatabaseHelper
 import com.wolf2.reader.mode.entity.book.Book
 import com.wolf2.reader.popBackStack
-import com.wolf2.reader.reader.LocalFileReader
+import com.wolf2.reader.reader.CachedReader
 import com.wolf2.reader.ui.browser.BrowserUiEvent.*
 import com.wolf2.reader.util.LoadResult
 import com.wolf2.reader.util.isExternalStorageManager
@@ -66,7 +66,7 @@ class BrowserViewModel() : ViewModel() {
                         val documentFile =
                             DocumentFile.fromSingleUri(globalContext, it) ?: return@fastForEach
                         val book = documentFile.toBook()
-                        LocalFileReader(book).apply {
+                        CachedReader.newLocalFileReader(book).apply {
                             readBook(updatePageContent = false)
                             close()
                         }

@@ -3,6 +3,7 @@ package com.wolf2.reader.reader
 import com.wolf2.reader.mode.entity.book.Book
 import com.wolf2.reader.mode.entity.book.Chapter
 import com.wolf2.reader.mode.entity.book.CoverImage
+import com.wolf2.reader.mode.entity.book.ExtraInfo
 import com.wolf2.reader.mode.entity.book.Metadata
 import com.wolf2.reader.mode.entity.book.PageContent
 import com.wolf2.reader.ui.util.ImageCacheUtil
@@ -60,8 +61,16 @@ class EpubFileReader(private val book: Book) : Closeable {
             }
 
             if (updatePageContent) {
-                parseChapters().let { book.chapters = it }
-                parseContent().let { book.pageContents = it }
+                val extraInfo = ExtraInfo()
+                parseChapters().let {
+                    book.chapters = it
+                    extraInfo.chapterCount = it.size
+                }
+                parseContent().let {
+                    book.pageContents = it
+                    extraInfo.pageCount = it.size
+                }
+                book.extraInfo = extraInfo
             }
         }
     }

@@ -12,10 +12,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.wolf2.reader.R
 import com.wolf2.reader.config.PagerSwitchEffect
 import com.wolf2.reader.currentRoute
 import com.wolf2.reader.ui.common.LoadingIndicator
@@ -30,6 +28,7 @@ import com.wolf2.reader.ui.read.component.ReadTopAppBar
 import com.wolf2.reader.ui.read.component.VHPagerContent
 import com.wolf2.reader.ui.read.component.SwipeTinderContent
 import com.wolf2.reader.util.LoadResult
+import timber.log.Timber
 
 @Composable
 fun ReadScreen(bookUuid: String) {
@@ -37,11 +36,16 @@ fun ReadScreen(bookUuid: String) {
     val viewModel: ReadViewModel = viewModel(factory = ReadViewModel.provideFactory(bookUuid))
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var showAppBar by remember { mutableStateOf(false) }
-    var showSnack = uiState.snackbar == true
     var showMenuDrop by remember { mutableStateOf(false) }
+
+    var marked by remember { mutableStateOf(false) }
+    fun refreshMarkStatus(curPage: Int = viewModel.getCurPage()) {
+        marked = uiState.bookMarks.find { it.pageIndex == curPage } != null
+    }
 
     OnLifecycleEvent(onDispose = {
         if (currentRoute()?.contains(Routes.IMAGE_PREVIEW) == true) return@OnLifecycleEvent
+        if (currentRoute()?.contains(Routes.BOOK_DETAIL) == true) return@OnLifecycleEvent
         viewModel.onEvent(ReadUiEvent.OnDestroy)
     })
 
@@ -52,19 +56,25 @@ fun ReadScreen(bookUuid: String) {
             is LoadResult.Loading -> LoadingIndicator()
             is LoadResult.Error -> ErrorIndicator()
             is LoadResult.Success<*> -> {
+                refreshMarkStatus(uiState.readRecord.curPage)
                 when (PagerSwitchEffect.fromInt(uiState.pagerSwitchEffect)) {
                     PagerSwitchEffect.VerticalPage -> VHPagerContent(
                         videModel = viewModel,
                         isVerticalPager = true,
                         uiState = uiState,
-                        onImageClick = { showAppBar = !showAppBar }
+                        onImageClick = { showAppBar = !showAppBar },
+                        onPageChange = {
+                            Timber.d(">>>onPageChange")
+                            refreshMarkStatus(it)
+                        }
                     )
 
                     PagerSwitchEffect.HorizontalPage -> VHPagerContent(
                         videModel = viewModel,
                         isVerticalPager = false,
                         uiState = uiState,
-                        onImageClick = { showAppBar = !showAppBar }
+                        onImageClick = { showAppBar = !showAppBar },
+                        onPageChange = { refreshMarkStatus(it) }
                     )
 
                     PagerSwitchEffect.CurlPage -> CurlPageContent(
@@ -89,11 +99,18 @@ fun ReadScreen(bookUuid: String) {
             enter = fadeIn(),
             exit = fadeOut(),
         ) {
-            ReadTopAppBar(onBackHandle = {
-                viewModel.onEvent(ReadUiEvent.OnBackHandle)
-            }, onShowDrop = {
-                showMenuDrop = true
-            })
+            ReadTopAppBar(
+                marked = marked,
+                onBackHandle = {
+                    viewModel.onEvent(ReadUiEvent.OnBackHandle)
+                }, onBookMarkToggle = {
+                    viewModel.onEvent(ReadUiEvent.onBookMarkToggle)
+                    // TODO 这里手动更新标题栏书签图标状态，不然Visibility变化才更新
+                    marked = !marked
+                },
+                onShowDrop = {
+                    showMenuDrop = true
+                })
         }
 
         AnimatedVisibility(
@@ -105,19 +122,9 @@ fun ReadScreen(bookUuid: String) {
             ReadBottomContent(viewModel, uiState)
         }
 
-        if (showSnack) {
-            MySnackbar(
-                message = stringResource(R.string.image_cache_success),
-                actionLabel = stringResource(R.string.display_image_cache),
-                withDismissAction = true,
-                actionPerformed = {
-                    viewModel.onEvent(ReadUiEvent.OnDisplayCacheImage)
-                },
-                dismissed = {
-                    viewModel.onEvent(ReadUiEvent.OnSnackbarDismiss)
-                })
+        uiState.snackbar?.let {
+            MySnackbar(it)
         }
-
         if (showMenuDrop) {
             Box(modifier = Modifier.align(Alignment.TopEnd)) {
                 ReadDropMenu(readViewModel = viewModel, onDismissRequest = {

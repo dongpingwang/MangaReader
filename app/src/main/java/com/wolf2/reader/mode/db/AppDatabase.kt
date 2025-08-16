@@ -7,6 +7,7 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.wolf2.reader.mode.convert.RoomTypeConverters
 import com.wolf2.reader.mode.dao.BookDao
+import com.wolf2.reader.mode.dao.BookMarkDao
 import com.wolf2.reader.mode.dao.FavoriteBookDao
 import com.wolf2.reader.mode.dao.ReadRecordDao
 import com.wolf2.reader.mode.entity.BookMark
@@ -27,6 +28,7 @@ private abstract class AppDatabase : RoomDatabase() {
     abstract fun bookDao(): BookDao
     abstract fun readRecordDao(): ReadRecordDao
     abstract fun favoriteDao(): FavoriteBookDao
+    abstract fun bookMarkDao(): BookMarkDao
 }
 
 object DatabaseHelper {
@@ -62,5 +64,9 @@ object DatabaseHelper {
 
     fun favoriteBookDao(): FavoriteBookDao {
         return appDatabase().favoriteDao()
+    }
+
+    fun bookMarkDao(): BookMarkDao {
+        return appDatabase().bookMarkDao()
     }
 }

@@ -41,7 +41,6 @@ fun DetailSheetContent(
     onCopyContent: () -> Unit,
     onDeleteReadRecord: () -> Unit,
     onShareBookFile: () -> Unit,
-    onCreateShortcut: () -> Unit,
 ) {
     Column(
         modifier = Modifier
@@ -101,7 +100,6 @@ fun DetailSheetContent(
                         onCopyContent = onCopyContent,
                         onDeleteReadRecord = onDeleteReadRecord,
                         onShareBookFile = onShareBookFile,
-                        onCreateShortcut = onCreateShortcut,
                         onDismissRequest = {
                             checked = false
                         })
@@ -116,7 +114,6 @@ private fun SblDropMenu(
     onCopyContent: () -> Unit,
     onDeleteReadRecord: () -> Unit,
     onShareBookFile: () -> Unit,
-    onCreateShortcut: () -> Unit,
     onDismissRequest: () -> Unit
 ) {
     CascadeDropdownMenu(expanded = true, onDismissRequest = onDismissRequest) {
@@ -138,14 +135,6 @@ private fun SblDropMenu(
             text = { Text(text = stringResource(R.string.sbl_menu_share)) },
             onClick = {
                 onShareBookFile()
-                onDismissRequest()
-            }
-        )
-
-        DropdownMenuItem(
-            text = { Text(text = stringResource(R.string.sbl_menu_shortcut)) },
-            onClick = {
-                onCreateShortcut()
                 onDismissRequest()
             }
         )
