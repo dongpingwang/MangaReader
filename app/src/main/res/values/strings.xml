@@ -22,8 +22,6 @@
     <string name="error_book_file_not_found">请检查书籍文件路径或者文件查看权限</string>
     <string name="confirm">确定</string>
     <string name="picker_book">浏览书籍</string>
-    <string name="dialog_access_file_msg">由于系统存储限制，请授予阅读器查看文件权限~</string>
-    <string name="understand">明白</string>
     <string name="sort_asc">正序</string>
     <string name="sort_desc">反序</string>
 
