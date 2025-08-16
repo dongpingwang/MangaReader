@@ -1,7 +1,10 @@
 package com.wolf2.reader.ui.read.component
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -16,6 +19,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
+import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
@@ -80,34 +84,43 @@ fun MoreActionSheet(
             onJumpPage()
         })
 
-        Text(
-            stringResource(R.string.read_mode),
-            modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
-            style = MaterialTheme.typography.bodySmall,
-        )
-        val pageEffects = LocalContext.current.resources.getStringArray(R.array.read_page_effects)
-        var selectedIndex by remember { mutableIntStateOf(pageSwitchEffect) }
-
-        LazyRow(
-            Modifier.padding(horizontal = 24.dp, vertical = 4.dp),
-            horizontalArrangement = Arrangement.spacedBy(ButtonGroupDefaults.ConnectedSpaceBetween),
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(ListItemDefaults.containerColor)
         ) {
-            itemsIndexed(pageEffects) { index, label ->
-                ToggleButton(
-                    checked = selectedIndex == index,
-                    onCheckedChange = {
-                        selectedIndex = index
-                        onPageSwitchEffectChange(index)
-                    },
-                    modifier = Modifier.semantics { role = Role.RadioButton },
-                    shapes =
-                    when (index) {
-                        0 -> ButtonGroupDefaults.connectedLeadingButtonShapes()
-                        pageEffects.lastIndex -> ButtonGroupDefaults.connectedTrailingButtonShapes()
-                        else -> ButtonGroupDefaults.connectedMiddleButtonShapes()
+            Text(
+                stringResource(R.string.read_mode),
+                modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
+                style = MaterialTheme.typography.bodySmall,
+            )
+            val pageEffects =
+                LocalContext.current.resources.getStringArray(R.array.read_page_effects)
+            var selectedIndex by remember { mutableIntStateOf(pageSwitchEffect) }
+
+            LazyRow(
+                Modifier.padding(horizontal = 24.dp, vertical = 4.dp),
+                horizontalArrangement = Arrangement.spacedBy(ButtonGroupDefaults.ConnectedSpaceBetween),
+            ) {
+                itemsIndexed(pageEffects) { index, label ->
+                    ToggleButton(
+                        checked = selectedIndex == index,
+                        onCheckedChange = {
+                            selectedIndex = index
+                            onPageSwitchEffectChange(index)
+                        },
+                        modifier = Modifier
+                            .semantics { role = Role.RadioButton }
+                            .padding(horizontal = 2.dp),
+                        shapes =
+                        when (index) {
+                            0 -> ButtonGroupDefaults.connectedLeadingButtonShapes()
+                            pageEffects.lastIndex -> ButtonGroupDefaults.connectedTrailingButtonShapes()
+                            else -> ButtonGroupDefaults.connectedMiddleButtonShapes()
+                        }
+                    ) {
+                        Text(label, modifier = Modifier.padding(horizontal = 4.dp, vertical = 2.dp))
                     }
-                ) {
-                    Text(label, modifier = Modifier.padding(horizontal = 4.dp, vertical = 2.dp))
                 }
             }
         }
