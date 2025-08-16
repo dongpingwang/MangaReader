@@ -16,7 +16,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.wolf2.reader.currentRoute
-import com.wolf2.reader.ui.common.LoadingIndicator
+import com.wolf2.reader.ui.common.MyLoadingIndicator
 import com.wolf2.reader.ui.common.OnLifecycleEvent
 import com.wolf2.reader.ui.detail.component.DetailContent
 import com.wolf2.reader.ui.detail.component.DetailSheetContent
@@ -78,7 +78,7 @@ fun BookDetailScreen(
                 .padding(horizontal = 16.dp)
         ) {
             when (uiState.bookResult) {
-                is LoadResult.Loading -> LoadingIndicator()
+                is LoadResult.Loading -> MyLoadingIndicator()
                 is LoadResult.Error -> ErrorIndicator()
                 is LoadResult.Success<*> -> {
                     DetailContent(

@@ -26,7 +26,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.wolf2.reader.R
 import com.wolf2.reader.config.ebookMimeTypes
-import com.wolf2.reader.ui.common.LoadingIndicator
+import com.wolf2.reader.ui.common.MyLoadingIndicator
 import com.wolf2.reader.ui.common.MySnackbar
 import com.wolf2.reader.util.LoadResult
 import com.wolf2.reader.util.requestFullStorageAccess
@@ -97,7 +97,7 @@ private fun BrowserTopAppBar(
 @Composable
 private fun PickerFilesIndicator(viewModel: BrowserViewModel, uiState: BrowserUiState) {
     if (uiState.pickFileStatus == LoadResult.Loading) {
-        LoadingIndicator()
+        MyLoadingIndicator()
     }
     if (uiState.snackbar == true) {
         MySnackbar(

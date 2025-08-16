@@ -6,19 +6,17 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.wolf2.reader.config.PagerSwitchEffect
 import com.wolf2.reader.currentRoute
-import com.wolf2.reader.ui.common.LoadingIndicator
+import com.wolf2.reader.ui.common.MyLoadingIndicator
 import com.wolf2.reader.ui.common.MySnackbar
 import com.wolf2.reader.ui.common.OnLifecycleEvent
 import com.wolf2.reader.ui.home.Routes
@@ -51,7 +49,7 @@ fun ReadScreen(bookUuid: String) {
         modifier = Modifier.fillMaxSize()
     ) {
         when (uiState.bookResult) {
-            is LoadResult.Loading -> LoadingIndicator()
+            is LoadResult.Loading -> MyLoadingIndicator()
             is LoadResult.Error -> ErrorIndicator()
             is LoadResult.Success<*> -> {
                 when (PagerSwitchEffect.fromInt(uiState.pagerSwitchEffect)) {
