@@ -1,7 +1,12 @@
 package com.wolf2.reader.ui.read.component
 
+import android.content.res.Configuration
 import android.graphics.Bitmap
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -9,8 +14,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.snapshotFlow
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalConfiguration
 import com.wolf2.reader.mode.entity.book.PageContent
 import kotlinx.coroutines.launch
 import net.engawapg.lib.zoomable.rememberZoomState
@@ -29,6 +37,11 @@ fun RVPager(
     scope.launch {
         listState.scrollToItem(curPage)
     }
+    val configuration = LocalConfiguration.current
+    val isPortrait = configuration.orientation == Configuration.ORIENTATION_PORTRAIT
+    val contentScale = if (isPortrait) ContentScale.FillWidth else ContentScale.FillHeight
+
+
     LaunchedEffect(listState) {
         snapshotFlow { listState.firstVisibleItemIndex }.collect {
             onPageChange(it)
@@ -36,14 +49,18 @@ fun RVPager(
     }
     LazyColumn(state = listState) {
         items(pageContents) {
+
             PageImage(
                 bitmap = onLoadImage(it).asImageBitmap(),
+                contentScale = contentScale,
                 modifier = Modifier
                     .fillMaxSize()
                     .zoomable(zoomState = rememberZoomState(), onTap = { onImageClick() })
             )
-        }
-    }
 
+        }
+
+    }
 }
+
 

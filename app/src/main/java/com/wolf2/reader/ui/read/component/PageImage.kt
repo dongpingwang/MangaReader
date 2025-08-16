@@ -1,18 +1,26 @@
 package com.wolf2.reader.ui.read.component
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import coil.compose.AsyncImage
 
 @Composable
-fun PageAsyncImage(model: Any?, modifier: Modifier = Modifier) {
+fun PageAsyncImage(
+    model: Any?,
+    contentScale: ContentScale = ContentScale.Fit,
+    modifier: Modifier = Modifier
+) {
     AsyncImage(
         model = model,
-        contentScale = ContentScale.Fit,
+        contentScale = contentScale,
         filterQuality = FilterQuality.High,
         contentDescription = null,
         modifier = modifier
@@ -20,10 +28,14 @@ fun PageAsyncImage(model: Any?, modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun PageImage(bitmap: ImageBitmap, modifier: Modifier = Modifier) {
+fun PageImage(
+    bitmap: ImageBitmap,
+    contentScale: ContentScale = ContentScale.Fit,
+    modifier: Modifier = Modifier
+) {
     Image(
         bitmap = bitmap,
-        contentScale = ContentScale.Fit,
+        contentScale = contentScale,
         filterQuality = FilterQuality.High,
         contentDescription = null,
         modifier = modifier
