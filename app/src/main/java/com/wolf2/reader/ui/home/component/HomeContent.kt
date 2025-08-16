@@ -8,7 +8,7 @@ import com.wolf2.reader.ui.history.HistoryScreen
 import com.wolf2.reader.ui.shelf.BookShelfScreen
 
 @Composable
-internal fun ColumnScope.HomeContent(curTab: Int) {
+fun ColumnScope.HomeContent(curTab: Int) {
     Box(modifier = Modifier.weight(1F)) {
         when (curTab) {
             0 -> BookShelfScreen()

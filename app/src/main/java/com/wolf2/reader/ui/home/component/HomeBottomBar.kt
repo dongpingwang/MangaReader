@@ -15,7 +15,7 @@ import com.wolf2.reader.config.NavLabelShow
 import com.wolf2.reader.ui.home.HomeUiState
 
 @Composable
-internal fun HomeBottomBar(uiState: HomeUiState, onTabChange: (Int) -> Unit = {}) {
+fun HomeBottomBar(uiState: HomeUiState, onTabChange: (Int) -> Unit = {}) {
     val alwaysShowLabel = NavLabelShow.fromInt(uiState.navLabelShow) == NavLabelShow.AlwaysShow
     val showLabel = NavLabelShow.fromInt(uiState.navLabelShow) != NavLabelShow.Hidden
     NavigationBar {

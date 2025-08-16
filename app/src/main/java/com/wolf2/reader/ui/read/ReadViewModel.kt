@@ -32,8 +32,10 @@ sealed class ReadUiEvent {
     data object OnSnackbarDismiss : ReadUiEvent()
     data object OnDisplayCacheImage : ReadUiEvent()
     data object OnBackHandle : ReadUiEvent()
-    data object onBookMarkToggle : ReadUiEvent()
+    data object OnBookMarkToggle : ReadUiEvent()
     data object OnDestroy : ReadUiEvent()
+    data object OnCacheImage : ReadUiEvent()
+    data class OnPageSwitchEffectChange(val effect: Int) : ReadUiEvent()
 }
 
 data class ReadUiState(
@@ -93,7 +95,8 @@ class ReadViewModel(val bookUuid: String) : ViewModel() {
                         pageCount = book.extraInfo.pageCount,
                         lastReadTimeMillis = System.currentTimeMillis()
                     )
-                val bookMarks = DatabaseHelper.bookMarkDao().queryByBookUuid(bookUuid).toMutableList()
+                val bookMarks =
+                    DatabaseHelper.bookMarkDao().queryByBookUuid(bookUuid).toMutableList()
                 _uiState.update {
                     it.copy(
                         bookResult = LoadResult.Success(book),
@@ -137,25 +140,22 @@ class ReadViewModel(val bookUuid: String) : ViewModel() {
         }
     }
 
-    fun updateRecordOnMemory() {
-        _uiState.update { it.copy(readRecord = readRecord) }
-    }
 
     fun getCurPage(): Int {
         return readRecord.curPage
     }
 
-    fun toggleDarkMode() {
-        updateRecordOnMemory()
-        AppConfig.darkMode.mmkvEmit(!AppConfig.darkMode.value)
+    fun isCurPageBookMarked(): Boolean {
+        val marked = _uiState.value.bookMarks.find { getCurPage() == it.pageIndex } != null
+        return marked
     }
 
-    fun setPagerSwitchEffect(effect: Int) {
-        updateRecordOnMemory()
+    private fun setPagerSwitchEffect(effect: Int) {
+        _uiState.update { it.copy(readRecord = readRecord) }
         AppConfig.pagerSwitchEffect.mmkvEmit(effect)
     }
 
-    fun cacheImage() {
+    private fun cacheImage() {
         viewModelScope.launch(Dispatchers.IO) {
             val book = (_uiState.value.bookResult as LoadResult.Success<Book>).data
             val pageContent = book.pageContents[getCurPage()]
@@ -166,8 +166,7 @@ class ReadViewModel(val bookUuid: String) : ViewModel() {
             Timber.d("cacheImage: ret = $ret")
             if (!ret) return@launch
             cacheImgName = displayName
-            updateRecordOnMemory()
-            _uiState.update { it.copy(snackbar = cacheImageSnackbar) }
+            _uiState.update { it.copy(snackbar = cacheImageSnackbar, readRecord = readRecord) }
         }
     }
 
@@ -175,36 +174,37 @@ class ReadViewModel(val bookUuid: String) : ViewModel() {
         return fileReader?.getImageBuffer(page)
     }
 
+    private fun toggleBookMark() {
+        viewModelScope.launch(Dispatchers.IO) {
+            val bookMarks = _uiState.value.bookMarks
+            val findMark = bookMarks.find { it.pageIndex == getCurPage() }
+            if (findMark != null) {
+                bookMarks.remove(findMark)
+                DatabaseHelper.bookMarkDao().delete(findMark)
+            } else {
+                val mark = BookMark(bookUuid = bookUuid, pageIndex = getCurPage())
+                bookMarks.add(mark)
+                DatabaseHelper.bookMarkDao().insert(mark)
+            }
+            _uiState.update { it.copy(bookMarks = bookMarks, readRecord = readRecord) }
+        }
+    }
+
     fun onEvent(event: ReadUiEvent) {
         when (event) {
             is ReadUiEvent.OnSnackbarDismiss -> _uiState.update { it.copy(snackbar = null) }
 
-            is ReadUiEvent.OnDisplayCacheImage -> {
-                updateRecordOnMemory()
-                _uiState.update { it.copy(snackbar = null) }
-                cacheImgName?.let { navigate("${Routes.IMAGE_PREVIEW}/$it") }
-            }
+            is ReadUiEvent.OnDisplayCacheImage -> cacheImgName?.let { navigate("${Routes.IMAGE_PREVIEW}/$it") }
 
             is ReadUiEvent.OnBackHandle -> popBackStack()
 
-            is ReadUiEvent.onBookMarkToggle -> {
-                viewModelScope.launch(Dispatchers.IO) {
-                    val bookMarks = _uiState.value.bookMarks
-                    val findMark = bookMarks.find { it.pageIndex == getCurPage() }
-                    if (findMark != null) {
-                        bookMarks.remove(findMark)
-                        DatabaseHelper.bookMarkDao().delete(findMark)
-                    } else {
-                        val mark = BookMark(bookUuid = bookUuid, pageIndex = getCurPage())
-                        bookMarks.add(mark)
-                        DatabaseHelper.bookMarkDao().insert(mark)
-                    }
-                    // TODO 界面刷新会看起来闪一下
-                    _uiState.update { it.copy(bookMarks = bookMarks, readRecord = readRecord) }
-                }
-            }
+            is ReadUiEvent.OnBookMarkToggle -> toggleBookMark()
 
             is ReadUiEvent.OnDestroy -> fileReader?.close()
+
+            is ReadUiEvent.OnCacheImage -> cacheImage()
+
+            is ReadUiEvent.OnPageSwitchEffectChange -> setPagerSwitchEffect(event.effect)
         }
     }
 
@@ -213,7 +213,10 @@ class ReadViewModel(val bookUuid: String) : ViewModel() {
             message = globalContext.resources.getString(R.string.image_cache_success),
             actionLabel = globalContext.resources.getString(R.string.display_image_cache),
             withDismissAction = true,
-            actionPerformed = { onEvent(ReadUiEvent.OnDisplayCacheImage) },
+            actionPerformed = {
+                onEvent(ReadUiEvent.OnSnackbarDismiss)
+                onEvent(ReadUiEvent.OnDisplayCacheImage)
+            },
             dismissed = { onEvent(ReadUiEvent.OnSnackbarDismiss) }
         )
 }

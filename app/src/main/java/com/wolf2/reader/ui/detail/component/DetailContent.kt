@@ -7,7 +7,7 @@ import com.wolf2.reader.ui.detail.DetailUiState
 import com.wolf2.reader.util.LoadResult
 
 @Composable
-internal fun DetailContent(
+fun DetailContent(
     uiState: DetailUiState,
     onTitleChange: (String) -> Unit = {},
     onAuthorChange: (String) -> Unit = {},

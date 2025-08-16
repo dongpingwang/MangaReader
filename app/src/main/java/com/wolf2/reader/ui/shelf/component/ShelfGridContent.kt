@@ -34,7 +34,7 @@ import my.nanihadesuka.compose.LazyVerticalGridScrollbar
 import kotlin.math.roundToInt
 
 @Composable
-internal fun ShelfGridContent(
+fun ShelfGridContent(
     uiState: BookShelfUiState,
     bookPagingItems: LazyPagingItems<Book>,
     column: Int,

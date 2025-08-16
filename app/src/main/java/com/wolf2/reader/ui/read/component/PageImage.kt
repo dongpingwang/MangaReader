@@ -9,7 +9,7 @@ import androidx.compose.ui.layout.ContentScale
 import coil.compose.AsyncImage
 
 @Composable
-internal fun PageAsyncImage(model: Any?, modifier: Modifier = Modifier) {
+fun PageAsyncImage(model: Any?, modifier: Modifier = Modifier) {
     AsyncImage(
         model = model,
         contentScale = ContentScale.Fit,
@@ -20,7 +20,7 @@ internal fun PageAsyncImage(model: Any?, modifier: Modifier = Modifier) {
 }
 
 @Composable
-internal fun PageImage(bitmap: ImageBitmap, modifier: Modifier = Modifier) {
+fun PageImage(bitmap: ImageBitmap, modifier: Modifier = Modifier) {
     Image(
         bitmap = bitmap,
         contentScale = ContentScale.Fit,

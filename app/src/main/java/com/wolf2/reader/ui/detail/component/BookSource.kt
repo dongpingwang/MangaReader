@@ -24,7 +24,7 @@ import me.saket.bytesize.binaryBytes
 import kotlin.math.roundToInt
 
 @Composable
-internal fun BookSource(book: Book, readRecord: ReadRecord?) {
+fun BookSource(book: Book, readRecord: ReadRecord?) {
     var processF = 0F
     var process = "0%"
     if (readRecord != null) {

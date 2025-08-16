@@ -36,7 +36,7 @@ import com.wolf2.reader.R
 import com.wolf2.reader.mode.entity.book.Book
 
 @Composable
-internal fun BookMetadata(
+fun BookMetadata(
     book: Book,
     favorite: Boolean,
     onTitleChange: (String) -> Unit = {},

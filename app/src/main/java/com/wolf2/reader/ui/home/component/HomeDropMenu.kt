@@ -17,7 +17,7 @@ import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 
 @Composable
-internal fun HomeDropMenu(
+fun HomeDropMenu(
     onNavigationToBrowser: () -> Unit = {},
     onNavigationToWifiTransfer: () -> Unit = {},
     onShowLayoutDialog: () -> Unit = {},

@@ -14,7 +14,7 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 
 @Composable
-internal fun AnimatedIcon(
+fun AnimatedIcon(
     selected: Boolean,
     selectedIcon: ImageVector,
     unselectedIcon: ImageVector,
@@ -39,7 +39,7 @@ internal fun AnimatedIcon(
 }
 
 @Composable
-internal fun AnimatedIcon(
+fun AnimatedIcon(
     selected: Boolean,
     selectedIcon: Painter,
     unselectedIcon: Painter,

@@ -15,7 +15,7 @@ import com.wolf2.reader.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-internal fun HomeTopAppBar(
+fun HomeTopAppBar(
     curPageIndex: Int,
     onNavigationToSearch: () -> Unit = {},
     onShowSortDialog: () -> Unit = {},

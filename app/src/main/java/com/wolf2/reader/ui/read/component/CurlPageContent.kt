@@ -2,6 +2,7 @@ package com.wolf2.reader.ui.read.component
 
 import android.graphics.BitmapFactory
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -18,8 +19,6 @@ import eu.wewox.pagecurl.ExperimentalPageCurlApi
 import eu.wewox.pagecurl.page.PageCurl
 import eu.wewox.pagecurl.page.rememberPageCurlState
 import kotlinx.coroutines.launch
-import net.engawapg.lib.zoomable.rememberZoomState
-import net.engawapg.lib.zoomable.zoomable
 
 @OptIn(ExperimentalPageCurlApi::class)
 @Composable
@@ -51,6 +50,7 @@ fun CurlPageContent(
         }
     }
 
+    // TODO 点击事件与Zoomable冲突
     PageCurl(count = book.pageContents.size, state = pageState) {
         val content = book.pageContents[it]
         val buffer = viewModel.getImageBuffer(content)
@@ -60,9 +60,9 @@ fun CurlPageContent(
             modifier = Modifier
                 .fillMaxSize()
                 .background(background)
-                .zoomable(zoomState = rememberZoomState(), onTap = {
+                .clickable {
                     onImageClick()
-                })
+                }
         )
     }
 }

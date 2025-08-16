@@ -22,7 +22,7 @@ import com.wolf2.reader.ui.detail.component.DetailContent
 import com.wolf2.reader.ui.detail.component.DetailSheetContent
 import com.wolf2.reader.ui.detail.component.DetailTopAppbar
 import com.wolf2.reader.ui.home.Routes
-import com.wolf2.reader.ui.read.component.ErrorIndicator
+import com.wolf2.reader.ui.common.ErrorIndicator
 import com.wolf2.reader.util.LoadResult
 import kotlinx.coroutines.launch
 

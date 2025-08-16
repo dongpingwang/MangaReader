@@ -10,15 +10,17 @@
     <string name="shelf_layout_mode">视图选项</string>
     <string name="shelf_grid_column">网格大小</string>
     <string name="menu_settings">设置</string>
-    <string name="menu_download_image">保存图片</string>
+    <string name="save_image">保存图片</string>
     <string name="image_cache_success">图片保存成功</string>
+    <string name="bookmark_add">添加书签</string>
+    <string name="bookmark_remove">删除书签</string>
+    <string name="read_mode">阅读模式</string>
+
     <string name="display_image_cache">查看</string>
     <string name="pick_book_success">书籍添加成功</string>
     <string name="to_book_shelf">查看</string>
     <string name="error_book_file_not_found">请检查书籍文件路径或者文件查看权限</string>
     <string name="confirm">确定</string>
-    <string name="jump_the_page">跳到到页面</string>
-    <string name="hint_page_range">页码范围1-%d</string>
     <string name="picker_book">浏览书籍</string>
     <string name="dialog_access_file_msg">由于系统存储限制，请授予阅读器查看文件权限~</string>
     <string name="understand">明白</string>

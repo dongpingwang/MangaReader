@@ -18,7 +18,7 @@ import net.engawapg.lib.zoomable.rememberZoomState
 import net.engawapg.lib.zoomable.zoomable
 
 @Composable
-internal fun VHPagerContent(
+fun VHPagerContent(
     videModel: ReadViewModel,
     isVerticalPager: Boolean,
     uiState: ReadUiState,

@@ -20,7 +20,7 @@ import androidx.compose.ui.res.stringResource
 import com.wolf2.reader.R
 
 @Composable
-internal fun ShelfLayoutModeDialog(
+fun ShelfLayoutModeDialog(
     layoutMode: Int,
     layoutColumn: Int,
     onDismissRequest: () -> Unit = {},

@@ -21,27 +21,21 @@ import com.wolf2.reader.ui.common.MySnackbar
 import com.wolf2.reader.ui.common.OnLifecycleEvent
 import com.wolf2.reader.ui.home.Routes
 import com.wolf2.reader.ui.read.component.CurlPageContent
-import com.wolf2.reader.ui.read.component.ErrorIndicator
-import com.wolf2.reader.ui.read.component.ReadBottomContent
-import com.wolf2.reader.ui.read.component.ReadDropMenu
+import com.wolf2.reader.ui.common.ErrorIndicator
+import com.wolf2.reader.ui.read.component.MoreActionSheet
+import com.wolf2.reader.ui.read.component.ReadBottomBar
 import com.wolf2.reader.ui.read.component.ReadTopAppBar
 import com.wolf2.reader.ui.read.component.VHPagerContent
 import com.wolf2.reader.ui.read.component.SwipeTinderContent
 import com.wolf2.reader.util.LoadResult
-import timber.log.Timber
 
 @Composable
 fun ReadScreen(bookUuid: String) {
-
     val viewModel: ReadViewModel = viewModel(factory = ReadViewModel.provideFactory(bookUuid))
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var showAppBar by remember { mutableStateOf(false) }
-    var showMenuDrop by remember { mutableStateOf(false) }
-
-    var marked by remember { mutableStateOf(false) }
-    fun refreshMarkStatus(curPage: Int = viewModel.getCurPage()) {
-        marked = uiState.bookMarks.find { it.pageIndex == curPage } != null
-    }
+    var showMoreSheet by remember { mutableStateOf(false) }
+    val showSnackbar = uiState.snackbar != null
 
     OnLifecycleEvent(onDispose = {
         if (currentRoute()?.contains(Routes.IMAGE_PREVIEW) == true) return@OnLifecycleEvent
@@ -56,17 +50,12 @@ fun ReadScreen(bookUuid: String) {
             is LoadResult.Loading -> LoadingIndicator()
             is LoadResult.Error -> ErrorIndicator()
             is LoadResult.Success<*> -> {
-                refreshMarkStatus(uiState.readRecord.curPage)
                 when (PagerSwitchEffect.fromInt(uiState.pagerSwitchEffect)) {
                     PagerSwitchEffect.VerticalPage -> VHPagerContent(
                         videModel = viewModel,
                         isVerticalPager = true,
                         uiState = uiState,
                         onImageClick = { showAppBar = !showAppBar },
-                        onPageChange = {
-                            Timber.d(">>>onPageChange")
-                            refreshMarkStatus(it)
-                        }
                     )
 
                     PagerSwitchEffect.HorizontalPage -> VHPagerContent(
@@ -74,7 +63,6 @@ fun ReadScreen(bookUuid: String) {
                         isVerticalPager = false,
                         uiState = uiState,
                         onImageClick = { showAppBar = !showAppBar },
-                        onPageChange = { refreshMarkStatus(it) }
                     )
 
                     PagerSwitchEffect.CurlPage -> CurlPageContent(
@@ -100,16 +88,8 @@ fun ReadScreen(bookUuid: String) {
             exit = fadeOut(),
         ) {
             ReadTopAppBar(
-                marked = marked,
                 onBackHandle = {
                     viewModel.onEvent(ReadUiEvent.OnBackHandle)
-                }, onBookMarkToggle = {
-                    viewModel.onEvent(ReadUiEvent.onBookMarkToggle)
-                    // TODO 这里手动更新标题栏书签图标状态，不然Visibility变化才更新
-                    marked = !marked
-                },
-                onShowDrop = {
-                    showMenuDrop = true
                 })
         }
 
@@ -119,18 +99,24 @@ fun ReadScreen(bookUuid: String) {
             exit = fadeOut(),
             modifier = Modifier.align(Alignment.BottomStart)
         ) {
-            ReadBottomContent(viewModel, uiState)
+            ReadBottomBar(viewModel, uiState,
+                onMoreActionClick = {
+                    showMoreSheet = true
+                })
         }
 
-        uiState.snackbar?.let {
-            MySnackbar(it)
+        if (showMoreSheet) {
+            MoreActionSheet(
+                marked = viewModel.isCurPageBookMarked(),
+                pageSwitchEffect = uiState.pagerSwitchEffect,
+                onDismissRequest = { showMoreSheet = false },
+                onSavePicture = { viewModel.onEvent(ReadUiEvent.OnCacheImage) },
+                onBookMarkToggle = { viewModel.onEvent(ReadUiEvent.OnBookMarkToggle) },
+                onPageSwitchEffectChange = {viewModel.onEvent(ReadUiEvent.OnPageSwitchEffectChange(it))}
+            )
         }
-        if (showMenuDrop) {
-            Box(modifier = Modifier.align(Alignment.TopEnd)) {
-                ReadDropMenu(readViewModel = viewModel, onDismissRequest = {
-                    showMenuDrop = false
-                })
-            }
+        if (showSnackbar) {
+            MySnackbar(uiState.snackbar!!)
         }
     }
 }

@@ -30,7 +30,7 @@ import com.yangdai.opennote.presentation.theme.DarkPurpleColors
 
 
 @Composable
-internal fun SelectableColorPlatte(
+fun SelectableColorPlatte(
     modifier: Modifier = Modifier,
     selected: Boolean = false,
     colorScheme: ColorScheme = DarkPurpleColors,

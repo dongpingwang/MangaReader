@@ -1,4 +1,4 @@
-package com.wolf2.reader.ui.read.component
+package com.wolf2.reader.ui.common
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
@@ -16,7 +16,7 @@ import androidx.compose.ui.unit.dp
 import com.wolf2.reader.R
 
 @Composable
-internal fun ErrorIndicator() {
+fun ErrorIndicator() {
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Image(imageVector = Icons.Outlined.SentimentDissatisfied, contentDescription = null)

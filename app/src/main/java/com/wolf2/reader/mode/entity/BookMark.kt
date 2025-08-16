@@ -14,6 +14,8 @@ data class BookMark(
     var bookUuid: String = "", // 书籍uuid
     @ColumnInfo(name = "pageIndex")
     var pageIndex: Int = 0, // 书签位置页面，从0开始
+    @ColumnInfo(name = "chapterName")
+    var chapterName: String = "",// 章节名称
     @ColumnInfo(name = "lastAddedTimeMillis")
     var lastAddedTimeMillis: Long = System.currentTimeMillis() // 最后添加时间
 )
