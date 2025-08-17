@@ -297,8 +297,8 @@ class ReadViewModel(val bookUuid: String) : ViewModel() {
 
     private val cacheImageSnackbar =
         SnackbarModel(
-            message = globalContext.resources.getString(R.string.image_cache_success),
-            actionLabel = globalContext.resources.getString(R.string.display_image_cache),
+            message = globalContext.getString(R.string.image_cache_success),
+            actionLabel = globalContext.getString(R.string.display_image_cache),
             withDismissAction = true,
             actionPerformed = {
                 onEvent(ReadUiEvent.OnSnackbarDismiss)

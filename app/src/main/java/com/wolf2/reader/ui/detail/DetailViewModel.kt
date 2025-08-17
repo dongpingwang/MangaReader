@@ -3,6 +3,7 @@ package com.wolf2.reader.ui.detail
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.wolf2.reader.R
 import com.wolf2.reader.mode.db.DatabaseHelper
 import com.wolf2.reader.mode.entity.FavoriteBook
 import com.wolf2.reader.mode.entity.ReadRecord
@@ -14,6 +15,7 @@ import com.wolf2.reader.ui.home.Routes
 import com.wolf2.reader.util.AppUtil
 import com.wolf2.reader.util.ClipboardUtil
 import com.wolf2.reader.util.LoadResult
+import com.wolf2.reader.util.globalContext
 import com.wolf2.reader.util.storagePath
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -76,7 +78,6 @@ class DetailViewModel(val bookUuid: String) : ViewModel() {
         }
     }
 
-
     private fun queryBookData() {
         val book = DatabaseHelper.bookDao().queryByUuid(bookUuid)
         if (book == null) {
@@ -120,66 +121,77 @@ class DetailViewModel(val bookUuid: String) : ViewModel() {
         when (event) {
             is DetailUiEvent.OnBackHandle -> popBackStack()
 
-            is DetailUiEvent.OnFavoriteChange -> {
-                viewModelScope.launch(Dispatchers.IO) {
-                    val favorite = FavoriteBook(bookUuid)
-                    if (event.favorite) {
-                        DatabaseHelper.favoriteBookDao().insert(favorite)
-                    } else {
-                        DatabaseHelper.favoriteBookDao().delete(favorite)
-                    }
-                }
-            }
+            is DetailUiEvent.OnFavoriteChange -> updateFavorite(event.favorite)
 
-            is DetailUiEvent.OnTitleChange, is DetailUiEvent.OnAuthorChange -> {
-                val book = (_uiState.value.bookResult as LoadResult.Success<Book>).data
-                if (event is DetailUiEvent.OnTitleChange) {
-                    book.title = event.title
-                }
-                if (event is DetailUiEvent.OnAuthorChange) {
-                    book.author = event.author
-                }
-                viewModelScope.launch(Dispatchers.IO) {
-                    DatabaseHelper.bookDao().update(book)
-                }
-            }
+            is DetailUiEvent.OnTitleChange -> updateTitle(event.title)
 
-            is DetailUiEvent.OnNavigationToRead -> {
-                navigate("${Routes.READ}/${bookUuid}")
-            }
+            is DetailUiEvent.OnAuthorChange -> updateAuthor(event.author)
 
-            is DetailUiEvent.OnDeleteReadRecord -> {
-                val readRecord = _uiState.value.readRecord ?: return
-                viewModelScope.launch(Dispatchers.IO) {
-                    DatabaseHelper.readRecordDao().delete(readRecord)
-                }
-            }
+            is DetailUiEvent.OnNavigationToRead -> navigate("${Routes.READ}/${bookUuid}")
 
-            is DetailUiEvent.OnShareBookFile -> {
-                val book = (_uiState.value.bookResult as LoadResult.Success<Book>).data
-                val filePath = book.uri.storagePath()
-                requireNotNull(filePath)
-                AppUtil.shareFile(filePath, book.mimeType)
-            }
+            is DetailUiEvent.OnDeleteReadRecord -> deleteReadRecord()
 
-            is DetailUiEvent.OnCopyContent -> {
-                val book = (_uiState.value.bookResult as LoadResult.Success<Book>).data
-                val readRecord = _uiState.value.readRecord
-                val json = buildJsonObject {
-                    put("书籍路径", book.uri.storagePath())
-                    put("作者", book.author)
-                    put(
-                        "阅读进度",
-                        if (readRecord == null) "None" else "${readRecord.curPage}/${readRecord.pageCount}"
-                    )
-                }.toString()
-                val content = JSONObject(json).toString(2).replace("\\", "")
-                ClipboardUtil.writeTo(content)
-            }
+            is DetailUiEvent.OnShareBookFile -> shareBook()
 
-            is DetailUiEvent.OnDestroy -> {
-                fileReader?.close()
+            is DetailUiEvent.OnCopyContent -> copyContent()
+
+            is DetailUiEvent.OnDestroy -> fileReader?.close()
+        }
+    }
+
+    private fun updateFavorite(isFavorite: Boolean) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val data = FavoriteBook(bookUuid)
+            if (isFavorite) {
+                DatabaseHelper.favoriteBookDao().insert(data)
+            } else {
+                DatabaseHelper.favoriteBookDao().delete(data)
             }
         }
+    }
+
+    private fun updateTitle(title: String) {
+        val book = (_uiState.value.bookResult as LoadResult.Success<Book>).data
+        book.title = title
+        viewModelScope.launch(Dispatchers.IO) {
+            DatabaseHelper.bookDao().update(book)
+        }
+    }
+
+    private fun updateAuthor(author: String) {
+        val book = (_uiState.value.bookResult as LoadResult.Success<Book>).data
+        book.author = author
+        viewModelScope.launch(Dispatchers.IO) {
+            DatabaseHelper.bookDao().update(book)
+        }
+    }
+
+    private fun deleteReadRecord() {
+        val readRecord = _uiState.value.readRecord ?: return
+        viewModelScope.launch(Dispatchers.IO) {
+            DatabaseHelper.readRecordDao().delete(readRecord)
+        }
+    }
+
+    private fun shareBook() {
+        val book = (_uiState.value.bookResult as LoadResult.Success<Book>).data
+        val filePath = book.uri.storagePath()
+        requireNotNull(filePath)
+        AppUtil.shareFile(filePath, book.mimeType)
+    }
+
+    private fun copyContent() {
+        val book = (_uiState.value.bookResult as LoadResult.Success<Book>).data
+        val readRecord = _uiState.value.readRecord
+        val json = buildJsonObject {
+            put(globalContext.getString(R.string.source), book.uri.storagePath())
+            put(globalContext.getString(R.string.author), book.author)
+            put(
+                globalContext.getString(R.string.read_progress),
+                if (readRecord == null) "None" else "${readRecord.curPage}/${readRecord.pageCount}"
+            )
+        }.toString()
+        val content = JSONObject(json).toString(2).replace("\\", "")
+        ClipboardUtil.writeTo(content)
     }
 }

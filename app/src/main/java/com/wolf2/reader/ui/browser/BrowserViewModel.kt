@@ -6,7 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.anggrayudi.storage.file.DocumentFileCompat
-import com.anggrayudi.storage.file.mimeType
+import com.wolf2.reader.R
 import com.wolf2.reader.util.globalContext
 import com.wolf2.reader.reader.toBook
 import com.wolf2.reader.mode.db.DatabaseHelper
@@ -14,6 +14,7 @@ import com.wolf2.reader.mode.entity.book.Book
 import com.wolf2.reader.popBackStack
 import com.wolf2.reader.reader.CachedReader
 import com.wolf2.reader.ui.browser.BrowserUiEvent.*
+import com.wolf2.reader.ui.common.SnackbarModel
 import com.wolf2.reader.util.LoadResult
 import com.wolf2.reader.util.isExternalStorageManager
 import com.wolf2.reader.util.takePersistableUriPermission
@@ -33,7 +34,7 @@ sealed class BrowserUiEvent {
 data class BrowserUiState(
     val granted: Boolean = false,
     val pickFileStatus: LoadResult<Unit> = LoadResult.Success(Unit),
-    val snackbar: Boolean? = null
+    val snackbar: SnackbarModel? = null
 )
 
 class BrowserViewModel() : ViewModel() {
@@ -56,33 +57,7 @@ class BrowserViewModel() : ViewModel() {
 
     fun onEvent(event: BrowserUiEvent) {
         when (event) {
-            is OnPickFiles -> {
-                viewModelScope.launch(Dispatchers.IO) {
-                    _uiState.update { it.copy(pickFileStatus = LoadResult.Loading) }
-                    val newBooks = mutableListOf<Book>()
-                    event.uris.fastForEach {
-                        it.takePersistableUriPermission()
-                        val exists = DatabaseHelper.bookDao().queryByUri(it) != null
-                        if (exists == true) return@fastForEach
-                        val documentFile =
-                            DocumentFileCompat.fromUri(globalContext, it) ?: return@fastForEach
-                        val book = documentFile.toBook()
-                        CachedReader.newLocalFileReader(book).apply {
-                            readBook(updatePageContent = false)
-                            close()
-                        }
-                        newBooks.add(book)
-                    }
-                    _uiState.update {
-                        it.copy(
-                            pickFileStatus = LoadResult.Success(Unit),
-                            snackbar = true
-                        )
-                    }
-                    if (newBooks.isEmpty()) return@launch
-                    DatabaseHelper.bookDao().insertAll(newBooks)
-                }
-            }
+            is OnPickFiles -> pickFiles(event.uris)
 
             is OnBackHandle -> popBackStack()
 
@@ -95,5 +70,46 @@ class BrowserViewModel() : ViewModel() {
             }
         }
     }
+
+    private fun pickFiles(uris: List<Uri>) {
+        viewModelScope.launch(Dispatchers.IO) {
+            _uiState.update { it.copy(pickFileStatus = LoadResult.Loading) }
+            val newBooks = mutableListOf<Book>()
+            uris.fastForEach {
+                it.takePersistableUriPermission()
+                val exists = DatabaseHelper.bookDao().queryByUri(it) != null
+                if (exists == true) return@fastForEach
+                val documentFile =
+                    DocumentFileCompat.fromUri(globalContext, it) ?: return@fastForEach
+                val book = documentFile.toBook()
+                CachedReader.newLocalFileReader(book).apply {
+                    readBook(updatePageContent = false)
+                    close()
+                }
+                newBooks.add(book)
+            }
+            _uiState.update {
+                it.copy(
+                    pickFileStatus = LoadResult.Success(Unit),
+                    snackbar = backSnackbar
+                )
+            }
+            if (newBooks.isEmpty()) return@launch
+            DatabaseHelper.bookDao().insertAll(newBooks)
+        }
+    }
+
+
+    private val backSnackbar =
+        SnackbarModel(
+            message = globalContext.getString(R.string.pick_book_success),
+            actionLabel = globalContext.getString(R.string.to_book_shelf),
+            withDismissAction = true,
+            actionPerformed = {
+                onEvent(OnSnackbarDismiss)
+                onEvent(OnBackHandle)
+            },
+            dismissed = { onEvent(OnSnackbarDismiss) }
+        )
 
 }

@@ -27,7 +27,6 @@
     <string name="sort_asc">正序</string>
     <string name="sort_desc">反序</string>
 
-    <string name="page_switch_effect">翻页动画</string>
     <string name="fab_continue_read">继续阅读</string>
     <string name="collected">已收藏</string>
     <string name="collect_book">收藏此漫画</string>
@@ -41,6 +40,7 @@
     <string name="page_count">页数</string>
     <string name="read_progress_chapter_size">%d页，%d章</string>
     <string name="read_progress">阅读进度</string>
+    <string name="author">作者</string>
 
     <string name="settings_appearance">外观</string>
     <string name="settings_appearance_summary">颜色模式，视图选项，语言</string>

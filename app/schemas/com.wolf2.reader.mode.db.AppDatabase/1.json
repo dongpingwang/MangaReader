@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "bd265304c8f6fadae8d571f788bf554c",
+    "identityHash": "55a84cd9b8e432bc31ac95adde9c0123",
     "entities": [
       {
         "tableName": "Book",
@@ -146,7 +146,7 @@
       },
       {
         "tableName": "BookMark",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`_uuid` TEXT NOT NULL, `bookUuid` TEXT NOT NULL, `pageIndex` INTEGER NOT NULL, `lastAddedTimeMillis` INTEGER NOT NULL, PRIMARY KEY(`_uuid`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`_uuid` TEXT NOT NULL, `bookUuid` TEXT NOT NULL, `pageIndex` INTEGER NOT NULL, `chapterName` TEXT NOT NULL, `lastAddedTimeMillis` INTEGER NOT NULL, PRIMARY KEY(`_uuid`))",
         "fields": [
           {
             "fieldPath": "_uuid",
@@ -167,6 +167,12 @@
             "notNull": true
           },
           {
+            "fieldPath": "chapterName",
+            "columnName": "chapterName",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
             "fieldPath": "lastAddedTimeMillis",
             "columnName": "lastAddedTimeMillis",
             "affinity": "INTEGER",
@@ -183,7 +189,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'bd265304c8f6fadae8d571f788bf554c')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '55a84cd9b8e432bc31ac95adde9c0123')"
     ]
   }
 }
