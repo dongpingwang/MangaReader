@@ -10,12 +10,12 @@ plugins {
 
 android {
     namespace = "com.wolf2.reader"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.wolf2.reader"
         minSdk = 24
-        targetSdk = 35
+        targetSdk = 36
         versionCode = 9
         versionName = "v0.5.3-20250816"
 
@@ -151,10 +151,4 @@ dependencies {
     annotationProcessor(libs.room.compiler)
 
     androidTestImplementation(composeBom)
-    androidTestImplementation(libs.androidx.test.core)
-    androidTestImplementation(libs.androidx.test.runner)
-    androidTestImplementation(libs.androidx.test.espresso.core)
-    androidTestImplementation(libs.androidx.compose.ui.test)
-    debugImplementation(libs.androidx.compose.ui.tooling)
-    debugImplementation(libs.androidx.compose.ui.test.manifest)
 }
