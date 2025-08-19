@@ -37,7 +37,6 @@ sealed class DetailUiEvent {
     data object OnDeleteReadRecord : DetailUiEvent()
     data object OnShareBookFile : DetailUiEvent()
     data object OnCopyContent : DetailUiEvent()
-    data object OnDestroy : DetailUiEvent()
 }
 
 data class DetailUiState(
@@ -76,6 +75,12 @@ class DetailViewModel(val bookUuid: String) : ViewModel() {
                 }
             }
         }
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        fileReader?.close()
+
     }
 
     private fun queryBookData() {
@@ -127,15 +132,13 @@ class DetailViewModel(val bookUuid: String) : ViewModel() {
 
             is DetailUiEvent.OnAuthorChange -> updateAuthor(event.author)
 
-            is DetailUiEvent.OnNavigationToRead -> navigate("${Routes.READ}/${bookUuid}")
+            is DetailUiEvent.OnNavigationToRead -> navigate("${Routes.READ}/${bookUuid}/${Routes.BOOK_DETAIL}")
 
             is DetailUiEvent.OnDeleteReadRecord -> deleteReadRecord()
 
             is DetailUiEvent.OnShareBookFile -> shareBook()
 
             is DetailUiEvent.OnCopyContent -> copyContent()
-
-            is DetailUiEvent.OnDestroy -> fileReader?.close()
         }
     }
 

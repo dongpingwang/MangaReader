@@ -84,7 +84,7 @@ class HomeViewModel : ViewModel() {
             }
 
             is HomeUiEvent.OnNavigationToRead -> {
-                navigate("${Routes.READ}/${event.bookUuid}")
+                navigate("${Routes.READ}/${event.bookUuid}/${Routes.HOME}")
             }
 
             is HomeUiEvent.OnShelfLayoutModeChange -> {

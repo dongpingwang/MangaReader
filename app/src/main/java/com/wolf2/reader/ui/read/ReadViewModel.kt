@@ -36,7 +36,6 @@ sealed class ReadUiEvent {
     data object OnDisplayCacheImage : ReadUiEvent()
     data object OnBackHandle : ReadUiEvent()
     data object OnBookMarkToggle : ReadUiEvent()
-    data object OnDestroy : ReadUiEvent()
     data object OnCacheImage : ReadUiEvent()
     data class OnPageSwitchEffectChange(val effect: Int) : ReadUiEvent()
     data object OnPrevChapter : ReadUiEvent()
@@ -57,14 +56,14 @@ data class ReadUiState(
         get() = readRecord.curPage
 }
 
-class ReadViewModel(val bookUuid: String) : ViewModel() {
+class ReadViewModel(val bookUuid: String, val from: String) : ViewModel() {
 
     companion object {
         @Suppress("UNCHECKED_CAST")
-        fun provideFactory(bookUuid: String): ViewModelProvider.Factory =
+        fun provideFactory(bookUuid: String, from: String): ViewModelProvider.Factory =
             object : ViewModelProvider.Factory {
                 override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                    return ReadViewModel(bookUuid) as T
+                    return ReadViewModel(bookUuid, from) as T
                 }
             }
     }
@@ -128,6 +127,13 @@ class ReadViewModel(val bookUuid: String) : ViewModel() {
                     _uiState.update { it.copy(darkMode = v) }
                 }
             }
+        }
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        if (from != Routes.BOOK_DETAIL) {
+            fileReader?.close()
         }
     }
 
@@ -280,8 +286,6 @@ class ReadViewModel(val bookUuid: String) : ViewModel() {
             is ReadUiEvent.OnBackHandle -> popBackStack()
 
             is ReadUiEvent.OnBookMarkToggle -> toggleBookMark()
-
-            is ReadUiEvent.OnDestroy -> fileReader?.close()
 
             is ReadUiEvent.OnCacheImage -> cacheImage()
 

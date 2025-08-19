@@ -15,13 +15,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.wolf2.reader.currentRoute
 import com.wolf2.reader.ui.common.MyLoadingIndicator
-import com.wolf2.reader.ui.common.OnLifecycleEvent
 import com.wolf2.reader.ui.detail.component.DetailContent
 import com.wolf2.reader.ui.detail.component.DetailSheetContent
 import com.wolf2.reader.ui.detail.component.DetailTopAppbar
-import com.wolf2.reader.ui.home.Routes
 import com.wolf2.reader.ui.common.ErrorIndicator
 import com.wolf2.reader.util.LoadResult
 import kotlinx.coroutines.launch
@@ -36,11 +33,6 @@ fun BookDetailScreen(
     val bottomSheetState = rememberStandardBottomSheetState()
     val scaffoldState = rememberBottomSheetScaffoldState(bottomSheetState)
     val scope = rememberCoroutineScope()
-
-    OnLifecycleEvent(onDispose = {
-        if (currentRoute()?.contains(Routes.READ) == true) return@OnLifecycleEvent
-        viewModel.onEvent(DetailUiEvent.OnDestroy)
-    })
 
     BottomSheetScaffold(
         sheetPeekHeight = 102.dp,

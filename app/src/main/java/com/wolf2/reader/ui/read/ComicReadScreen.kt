@@ -17,13 +17,10 @@ import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.wolf2.reader.config.PagerSwitchEffect
-import com.wolf2.reader.currentRoute
 import com.wolf2.reader.mode.entity.book.Book
 import com.wolf2.reader.mode.entity.book.PageContent
 import com.wolf2.reader.ui.common.MyLoadingIndicator
 import com.wolf2.reader.ui.common.MySnackbar
-import com.wolf2.reader.ui.common.OnLifecycleEvent
-import com.wolf2.reader.ui.home.Routes
 import com.wolf2.reader.ui.read.component.CurlPager
 import com.wolf2.reader.ui.common.ErrorIndicator
 import com.wolf2.reader.ui.read.component.JumpPageDialog
@@ -36,20 +33,14 @@ import com.wolf2.reader.ui.read.component.TinderPager
 import com.wolf2.reader.util.LoadResult
 
 @Composable
-fun ReadScreen(bookUuid: String) {
-    val viewModel: ReadViewModel = viewModel(factory = ReadViewModel.provideFactory(bookUuid))
+fun ReadScreen(bookUuid: String, from: String) {
+    val viewModel: ReadViewModel = viewModel(factory = ReadViewModel.provideFactory(bookUuid, from))
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var showAppBar by remember { mutableStateOf(false) }
     var showMoreSheet by remember { mutableStateOf(false) }
     val showSnackbar = uiState.snackbar != null
     var showJumpDialog by remember { mutableStateOf(false) }
     val curPage by viewModel.curPageFlow.collectAsStateWithLifecycle()
-
-    OnLifecycleEvent(onDispose = {
-        if (currentRoute()?.contains(Routes.IMAGE_PREVIEW) == true) return@OnLifecycleEvent
-        if (currentRoute()?.contains(Routes.BOOK_DETAIL) == true) return@OnLifecycleEvent
-        viewModel.onEvent(ReadUiEvent.OnDestroy)
-    })
 
     fun toggleBarsVisibility() {
         showAppBar = !showAppBar
