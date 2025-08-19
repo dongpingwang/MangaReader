@@ -67,7 +67,9 @@ fun SettingScreen() {
                     )
                 }, summary = {
                     Text(text = stringResource(R.string.settings_reader_summary))
-                }, onClick = {})
+                }, onClick = {
+                    navigate(Routes.SETTINGS_READER)
+                })
 
                 preference(key = "download", title = {
                     Text(text = stringResource(R.string.settings_download))

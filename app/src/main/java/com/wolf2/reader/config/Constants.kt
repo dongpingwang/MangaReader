@@ -72,3 +72,15 @@ enum class NavLabelShow(private val value: Int) {
         fun NavLabelShow.toInt() = value
     }
 }
+
+enum class ChapterDisplay(private val value: Int) {
+    Chapter(0),
+    Total(1);
+
+    companion object {
+        fun fromInt(value: Int) =
+            ChapterDisplay.entries.firstOrNull { it.value == value } ?: Chapter
+
+        fun ChapterDisplay.toInt() = value
+    }
+}

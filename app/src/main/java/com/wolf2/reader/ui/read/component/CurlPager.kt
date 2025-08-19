@@ -1,6 +1,7 @@
 package com.wolf2.reader.ui.read.component
 
 import android.graphics.Bitmap
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
@@ -8,6 +9,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import com.wolf2.reader.mode.entity.book.PageContent
 import eu.wewox.pagecurl.ExperimentalPageCurlApi
@@ -18,15 +20,16 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalPageCurlApi::class)
 @Composable
 fun CurlPager(
+    isDarkMode: Boolean,
     curPage: Int,
     pageContents: List<PageContent>,
     onLoadImage: (PageContent) -> Bitmap,
     onImageClick: () -> Unit,
     onPageChange: (Int) -> Unit
 ) {
-
     val scope = rememberCoroutineScope()
     val pageState = rememberPageCurlState(initialCurrent = curPage)
+    val background = if (isDarkMode) Color.Black else Color.Transparent
 
     LaunchedEffect(pageState) {
         snapshotFlow { pageState.current }.collect {
@@ -43,6 +46,7 @@ fun CurlPager(
             bitmap = onLoadImage(pageContents[it]).asImageBitmap(),
             modifier = Modifier
                 .fillMaxSize()
+                .background(background)
                 .clickable {
                     onImageClick()
                 }

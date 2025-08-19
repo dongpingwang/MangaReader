@@ -21,10 +21,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
@@ -40,22 +36,23 @@ import com.wolf2.reader.config.AppColor
 import com.wolf2.reader.config.AppConfig
 import com.wolf2.reader.config.mmkvEmit
 import com.wolf2.reader.popBackStack
-import com.wolf2.reader.ui.common.ChooseDialog
 import com.yangdai.opennote.presentation.theme.DarkBlueColors
 import com.yangdai.opennote.presentation.theme.DarkGreenColors
 import com.yangdai.opennote.presentation.theme.DarkOrangeColors
 import com.yangdai.opennote.presentation.theme.DarkPurpleColors
 import com.yangdai.opennote.presentation.theme.DarkRedColors
+import me.zhanghai.compose.preference.ListPreference
+import me.zhanghai.compose.preference.ListPreferenceType
 import me.zhanghai.compose.preference.ProvidePreferenceLocals
 import me.zhanghai.compose.preference.SwitchPreference
-import me.zhanghai.compose.preference.preference
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AppearanceScreen() {
-    var curDialog by remember { mutableIntStateOf(-1) }
-    val themeMode = AppConfig.themeMode.collectAsStateWithLifecycle()
-    val themeDesc = stringArrayResource(R.array.theme_modes)[themeMode.value]
+    val themeModeFlow = AppConfig.themeMode.collectAsStateWithLifecycle()
+    val themeDescs = stringArrayResource(R.array.theme_modes).toList()
+    val curThemeMode = themeDescs[themeModeFlow.value]
+
     val amoled = AppConfig.amoled.collectAsStateWithLifecycle()
     val appColor = AppConfig.appColor.collectAsStateWithLifecycle()
     val colorSchemes = listOf(
@@ -69,9 +66,9 @@ fun AppearanceScreen() {
     val colorSchemeTexts = stringArrayResource(R.array.color_scheme_descriptions)
     val hapticFeedback = LocalHapticFeedback.current
 
-    val navLabelShow = AppConfig.navLabelShow.collectAsStateWithLifecycle()
-    val navLabelShowDesc = stringArrayResource(R.array.nav_label_show)[navLabelShow.value]
-
+    val navLabelShowFlow = AppConfig.navLabelShow.collectAsStateWithLifecycle()
+    val navLabelShowDescs = stringArrayResource(R.array.nav_label_show).toList()
+    val curNavLabelShow = navLabelShowDescs[navLabelShowFlow.value]
 
     Column {
         TopAppBar(title = {
@@ -118,16 +115,22 @@ fun AppearanceScreen() {
                     }
                 }
 
-                preference(
-                    key = "theme_mode", title = {
-                        Text(text = stringResource(R.string.settings_theme_mode))
-                    }, summary = {
-                        Text(text = themeDesc)
-                    },
-                    onClick = {
-                        curDialog = 0
-                    }
-                )
+                item {
+                    ListPreference(
+                        value = curThemeMode,
+                        onValueChange = {
+                            AppConfig.themeMode.mmkvEmit(themeDescs.indexOf(it))
+                        },
+                        values = themeDescs,
+                        title = {
+                            Text(text = stringResource(R.string.settings_theme_mode))
+                        },
+                        summary = {
+                            Text(text = curThemeMode)
+                        },
+                        type = ListPreferenceType.DROPDOWN_MENU
+                    )
+                }
                 item {
                     SwitchPreference(
                         value = amoled.value,
@@ -147,49 +150,24 @@ fun AppearanceScreen() {
                     HorizontalDivider()
                 }
 
-                preference(
-                    key = "nav_label_show", title = {
-                        Text(text = stringResource(R.string.settings_nav_label_show))
-                    }, summary = {
-                        Text(text = navLabelShowDesc)
-                    },
-                    onClick = {
-                        curDialog = 1
-                    }
-                )
+                item {
+                    ListPreference(
+                        value = curNavLabelShow,
+                        onValueChange = {
+                            AppConfig.navLabelShow.mmkvEmit(navLabelShowDescs.indexOf(it))
+                        },
+                        values = navLabelShowDescs,
+                        title = {
+                            Text(text = stringResource(R.string.settings_nav_label_show))
+                        },
+                        summary = {
+                            Text(text = curNavLabelShow)
+                        },
+                        type = ListPreferenceType.DROPDOWN_MENU
+                    )
+                }
             }
         }
-    }
-
-    if (curDialog >= 0) {
-        val dialog = curDialog
-        ChooseDialog(
-            title = when (dialog) {
-                0 -> stringResource(R.string.settings_theme_mode)
-                1 -> stringResource(R.string.settings_nav_label_show)
-                else -> ""
-            },
-            cur = when (dialog) {
-                0 -> themeMode.value
-                1 -> navLabelShow.value
-                else -> 0
-            },
-            chooses = when (dialog) {
-                0 -> stringArrayResource(R.array.theme_modes).toList()
-                1 -> stringArrayResource(R.array.nav_label_show).toList()
-                else -> emptyList()
-            },
-            onChooseChange = {
-                when (dialog) {
-                    0 -> AppConfig.themeMode.mmkvEmit(it)
-                    1 -> AppConfig.navLabelShow.mmkvEmit(it)
-                    else -> {}
-                }
-            },
-            onDismissRequest = {
-                curDialog = -1
-            }
-        )
     }
 }
 

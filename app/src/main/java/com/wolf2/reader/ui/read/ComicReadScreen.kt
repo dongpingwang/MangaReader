@@ -5,8 +5,10 @@ import android.graphics.BitmapFactory
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -14,8 +16,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.wolf2.reader.config.PagerSwitchEffect
 import com.wolf2.reader.mode.entity.book.Book
 import com.wolf2.reader.mode.entity.book.PageContent
@@ -41,6 +45,7 @@ fun ReadScreen(bookUuid: String, from: String) {
     val showSnackbar = uiState.snackbar != null
     var showJumpDialog by remember { mutableStateOf(false) }
     val curPage by viewModel.curPageFlow.collectAsStateWithLifecycle()
+    val systemUiController = rememberSystemUiController()
 
     fun toggleBarsVisibility() {
         showAppBar = !showAppBar
@@ -63,8 +68,14 @@ fun ReadScreen(bookUuid: String, from: String) {
         )
     }
 
+    systemUiController.isSystemBarsVisible = uiState.fullScreen.not()
+    var modifier = Modifier.fillMaxSize()
+    if (uiState.fullScreen) {
+        modifier = modifier.systemBarsPadding()
+    }
+
     Box(
-        modifier = Modifier.fillMaxSize()
+        modifier = modifier
     ) {
         when (uiState.bookResult) {
             is LoadResult.Loading -> MyLoadingIndicator()
@@ -75,6 +86,7 @@ fun ReadScreen(bookUuid: String, from: String) {
                     PagerSwitchEffect.fromInt(uiState.pagerSwitchEffect)
                 when (pagerEffect) {
                     PagerSwitchEffect.VerticalPage, PagerSwitchEffect.HorizontalPage -> VHPager(
+                        isDarkMode = uiState.darkMode,
                         isVerticalPager = pagerEffect == PagerSwitchEffect.VerticalPage,
                         curPage = uiState.curPage,
                         pageContents = book.pageContents,
@@ -87,6 +99,7 @@ fun ReadScreen(bookUuid: String, from: String) {
                         })
 
                     PagerSwitchEffect.CurlPage -> CurlPager(
+                        isDarkMode = uiState.darkMode,
                         curPage = uiState.curPage,
                         pageContents = book.pageContents,
                         onLoadImage = {
@@ -100,6 +113,7 @@ fun ReadScreen(bookUuid: String, from: String) {
 
                     PagerSwitchEffect.VerticalList -> {
                         RVPager(
+                            isDarkMode = uiState.darkMode,
                             curPage = uiState.curPage,
                             pageContents = book.pageContents,
                             onLoadImage = {
@@ -112,7 +126,9 @@ fun ReadScreen(bookUuid: String, from: String) {
                     }
 
                     PagerSwitchEffect.SwipeTinder -> {
-                        TinderPager(curPage = uiState.curPage,
+                        TinderPager(
+                            isDarkMode = uiState.darkMode,
+                            curPage = uiState.curPage,
                             pageContents = book.pageContents,
                             onLoadImage = {
                                 loadImage(it)
@@ -166,11 +182,10 @@ fun ReadScreen(bookUuid: String, from: String) {
                 onBookMarkToggle = { viewModel.onEvent(ReadUiEvent.OnBookMarkToggle) },
                 onJumpPage = { showJumpDialog = true },
                 onPageSwitchEffectChange = {
-                    viewModel.onEvent(
-                        ReadUiEvent.OnPageSwitchEffectChange(
-                            it
-                        )
-                    )
+                    viewModel.onEvent(ReadUiEvent.OnPageSwitchEffectChange(it))
+                },
+                onNavToSettings = {
+                    viewModel.onEvent(ReadUiEvent.OnNavigationToSettings)
                 }
             )
         }

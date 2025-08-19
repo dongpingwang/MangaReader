@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.wolf2.reader.R
 import com.wolf2.reader.util.MD5Util
 import com.wolf2.reader.config.AppConfig
+import com.wolf2.reader.config.ChapterDisplay
 import com.wolf2.reader.config.mmkvEmit
 import com.wolf2.reader.mode.db.DatabaseHelper
 import com.wolf2.reader.mode.entity.BookMark
@@ -41,12 +42,14 @@ sealed class ReadUiEvent {
     data object OnPrevChapter : ReadUiEvent()
     data object OnNextChapter : ReadUiEvent()
     data class OnPageChange(val pageInt: Int, val updateImmediately: Boolean) : ReadUiEvent()
-
+    data object OnNavigationToSettings : ReadUiEvent()
 }
 
 data class ReadUiState(
     val pagerSwitchEffect: Int = AppConfig.pagerSwitchEffect.value,
     val darkMode: Boolean = AppConfig.darkMode.value,
+    val fullScreen: Boolean = AppConfig.readerFullScreen.value,
+    val chapterDisplay: Int = AppConfig.chapterDisplay.value,
     val readRecord: ReadRecord = ReadRecord(),
     val bookMarks: MutableList<BookMark> = mutableListOf(),
     val bookResult: LoadResult<Book> = LoadResult.Loading,
@@ -127,6 +130,18 @@ class ReadViewModel(val bookUuid: String, val from: String) : ViewModel() {
                     _uiState.update { it.copy(darkMode = v) }
                 }
             }
+
+            launch {
+                AppConfig.readerFullScreen.collectLatest { v ->
+                    _uiState.update { it.copy(fullScreen = v) }
+                }
+            }
+
+            launch {
+                AppConfig.chapterDisplay.collectLatest { v ->
+                    _uiState.update { it.copy(chapterDisplay = v) }
+                }
+            }
         }
     }
 
@@ -158,9 +173,12 @@ class ReadViewModel(val bookUuid: String, val from: String) : ViewModel() {
         }
     }
 
-
     fun getCurPage(): Int {
         return readRecord.curPage
+    }
+
+    private fun isChapterTotalDisplay(): Boolean {
+        return ChapterDisplay.fromInt(_uiState.value.chapterDisplay) == ChapterDisplay.Total
     }
 
     private fun getCurChapterTriple(): Triple<Int, Chapter, List<Chapter>>? {
@@ -180,7 +198,7 @@ class ReadViewModel(val bookUuid: String, val from: String) : ViewModel() {
     fun getCurChapterPageRange(): IntRange {
         val triple = getCurChapterTriple()
         val book = (_uiState.value.bookResult as LoadResult.Success<Book>).data
-        if (triple == null) {
+        if (triple == null || isChapterTotalDisplay()) {
             return IntRange(0, book.pageContents.size - 1)
         }
         return triple.second.pageIndexRange
@@ -188,8 +206,9 @@ class ReadViewModel(val bookUuid: String, val from: String) : ViewModel() {
 
     fun getChapterTitle(): String {
         val triple = getCurChapterTriple()
+
         val book = (_uiState.value.bookResult as LoadResult.Success<Book>).data
-        if (triple == null) {
+        if (triple == null || isChapterTotalDisplay()) {
             return book.title
         }
         return triple.second.title
@@ -197,7 +216,7 @@ class ReadViewModel(val bookUuid: String, val from: String) : ViewModel() {
 
     fun getChapterProgress(): String {
         val triple = getCurChapterTriple()
-        if (triple == null) {
+        if (triple == null || isChapterTotalDisplay()) {
             val percent = readRecord.percent()
             val numbers = readRecord.numbers()
             return "$numbers $percent"
@@ -296,6 +315,8 @@ class ReadViewModel(val bookUuid: String, val from: String) : ViewModel() {
             is ReadUiEvent.OnNextChapter -> nextChapter()
 
             is ReadUiEvent.OnPageChange -> updateReadRecord(event.pageInt, event.updateImmediately)
+
+            is ReadUiEvent.OnNavigationToSettings -> navigate(Routes.SETTINGS_READER)
         }
     }
 

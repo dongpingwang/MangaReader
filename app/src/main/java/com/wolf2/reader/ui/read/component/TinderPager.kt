@@ -1,12 +1,14 @@
 package com.wolf2.reader.ui.read.component
 
 import android.graphics.Bitmap
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.unit.dp
 import com.spartapps.swipeablecards.state.rememberSwipeableCardsState
@@ -21,6 +23,7 @@ import net.engawapg.lib.zoomable.zoomable
 
 @Composable
 fun TinderPager(
+    isDarkMode: Boolean,
     curPage: Int,
     pageContents: List<PageContent>,
     onLoadImage: (PageContent) -> Bitmap,
@@ -31,6 +34,7 @@ fun TinderPager(
         initialCardIndex = curPage,
         itemCount = { pageContents.size }
     )
+    val background = if (isDarkMode) Color.Black else Color.Transparent
     val scope = rememberCoroutineScope()
     scope.launch {
         state.setCurrentIndex(curPage)
@@ -56,6 +60,7 @@ fun TinderPager(
                     .asImageBitmap(),
                 modifier = Modifier
                     .fillMaxSize()
+                    .background(background)
                     .zoomable(zoomState = rememberZoomState(), onTap = {
                         onImageClick()
                     })

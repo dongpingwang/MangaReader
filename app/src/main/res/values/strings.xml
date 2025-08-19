@@ -66,4 +66,10 @@
     <string name="settings_dynamic_color_summary">根据壁纸切换合适的主题（仅Android12+）</string>
     <string name="settings_color_scheme">配色主题</string>
     <string name="settings_nav_label_show">导航栏标签</string>
+    <string name="settings_reader_mode">默认模式</string>
+    <string name="settings_reader_full_screen">全屏沉淀</string>
+    <string name="settings_reader_full_screen_summary">隐藏状态栏和导航栏</string>
+    <string name="settings_reader_black_background">关灯</string>
+    <string name="settings_reader_black_background_summary">界面设置成黑色背景</string>
+    <string name="settings_reader_chapter_display">章节进度显示</string>
 </resources>

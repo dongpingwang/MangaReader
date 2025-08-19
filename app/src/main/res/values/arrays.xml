@@ -33,4 +33,9 @@
         <item>选中时显示</item>
         <item>不显示</item>
     </string-array>
+
+    <string-array name="chapter_display">
+        <item>按章节</item>
+        <item>全书</item>
+    </string-array>
 </resources>

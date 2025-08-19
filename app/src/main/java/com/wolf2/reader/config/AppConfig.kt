@@ -30,4 +30,8 @@ object AppConfig : MMKVOwner(mmapID = "app_settings") {
     val appColor by mmkvInt().asStateFlow()
 
     val navLabelShow by mmkvInt(default = NavLabelShow.Hidden.toInt()).asStateFlow()
+
+    val readerFullScreen by mmkvBool(false).asStateFlow()
+
+    val chapterDisplay by mmkvInt().asStateFlow()
 }

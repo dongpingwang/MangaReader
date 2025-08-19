@@ -11,4 +11,5 @@ object Routes {
     const val SETTINGS_APPEARANCE= "settings_appearance"
     const val SETTINGS_DOWNLOAD= "settings_download"
     const val SETTINGS_ABOUT = "settings_about"
+    const val SETTINGS_READER = "settings_reader"
 }

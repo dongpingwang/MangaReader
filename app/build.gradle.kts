@@ -150,5 +150,7 @@ dependencies {
     // ksp(libs.room.compiler)
     annotationProcessor(libs.room.compiler)
 
+    implementation(libs.accompanist.systemuicontroller)
+
     androidTestImplementation(composeBom)
 }

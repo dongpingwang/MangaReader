@@ -30,6 +30,7 @@ import com.wolf2.reader.ui.search.SearchScreen
 import com.wolf2.reader.ui.setting.AboutScreen
 import com.wolf2.reader.ui.setting.AppearanceScreen
 import com.wolf2.reader.ui.setting.DownloadScreen
+import com.wolf2.reader.ui.setting.ReaderScreen
 import com.wolf2.reader.ui.setting.SettingScreen
 import com.wolf2.reader.ui.theme.ComicReaderTheme
 
@@ -118,6 +119,10 @@ fun ReaderNavGraph() {
 
             composable(Routes.SETTINGS_ABOUT) {
                 AboutScreen()
+            }
+
+            composable(Routes.SETTINGS_READER) {
+                ReaderScreen()
             }
         }
 

@@ -1,5 +1,6 @@
 package com.wolf2.reader.ui.read.component
-
+import androidx.compose.foundation.background
+import androidx.compose.ui.graphics.Color
 import android.content.res.Configuration
 import android.graphics.Bitmap
 import androidx.compose.foundation.layout.fillMaxSize
@@ -21,6 +22,7 @@ import net.engawapg.lib.zoomable.zoomable
 
 @Composable
 fun RVPager(
+    isDarkMode: Boolean,
     curPage: Int,
     pageContents: List<PageContent>,
     onLoadImage: (PageContent) -> Bitmap,
@@ -35,7 +37,7 @@ fun RVPager(
     val configuration = LocalConfiguration.current
     val isPortrait = configuration.orientation == Configuration.ORIENTATION_PORTRAIT
     val contentScale = if (isPortrait) ContentScale.FillWidth else ContentScale.FillHeight
-
+    val background = if (isDarkMode) Color.Black else Color.Transparent
 
     LaunchedEffect(listState) {
         snapshotFlow { listState.firstVisibleItemIndex }.collect {
@@ -50,6 +52,7 @@ fun RVPager(
                 contentScale = contentScale,
                 modifier = Modifier
                     .fillMaxSize()
+                    .background(background)
                     .zoomable(zoomState = rememberZoomState(), onTap = { onImageClick() })
             )
 
