@@ -34,4 +34,8 @@ object AppConfig : MMKVOwner(mmapID = "app_settings") {
     val readerFullScreen by mmkvBool(false).asStateFlow()
 
     val chapterDisplay by mmkvInt().asStateFlow()
+
+    val shelfFilter = MutableStateFlow(-1)
+
+    val shelfSort by mmkvInt().asStateFlow()
 }

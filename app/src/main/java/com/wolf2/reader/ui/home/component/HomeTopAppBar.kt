@@ -1,9 +1,10 @@
 package com.wolf2.reader.ui.home.component
 
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.FilterAlt
+import androidx.compose.material.icons.outlined.FilterList
 import androidx.compose.material.icons.outlined.MoreVert
 import androidx.compose.material.icons.outlined.Search
-import androidx.compose.material.icons.outlined.Sort
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -17,9 +18,10 @@ import com.wolf2.reader.R
 @Composable
 fun HomeTopAppBar(
     curPageIndex: Int,
-    onNavigationToSearch: () -> Unit = {},
-    onShowSortDialog: () -> Unit = {},
-    onShowMenuDialog: () -> Unit = {}
+    onNavigationToSearch: () -> Unit,
+    onShowFilterDialog: () -> Unit,
+    onShowSortDialog: () -> Unit,
+    onShowMenuDialog: () -> Unit
 ) {
 
     TopAppBar(title = {
@@ -31,9 +33,15 @@ fun HomeTopAppBar(
                 contentDescription = null
             )
         }
+        IconButton(onClick = onShowFilterDialog) {
+            Icon(
+                imageVector = Icons.Outlined.FilterAlt,
+                contentDescription = null
+            )
+        }
         IconButton(onClick = onShowSortDialog) {
             Icon(
-                imageVector = Icons.Outlined.Sort,
+                imageVector = Icons.Outlined.FilterList,
                 contentDescription = null
             )
         }

@@ -15,9 +15,6 @@ import kotlinx.coroutines.flow.Flow
 interface BookDao {
 
     @Query("SELECT * FROM BOOK")
-    fun getAll(): List<Book>
-
-    @Query("SELECT * FROM BOOK")
     fun allBooks(): PagingSource<Int, Book>
 
     @Query("SELECT * FROM BOOK")

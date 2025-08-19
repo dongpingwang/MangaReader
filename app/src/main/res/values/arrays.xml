@@ -38,4 +38,18 @@
         <item>按章节</item>
         <item>全书</item>
     </string-array>
+
+    <string-array name="shelf_filter">
+        <item>全部</item>
+        <item>在读</item>
+        <item>未读</item>
+        <item>收藏</item>
+    </string-array>
+
+    <string-array name="shelf_sort">
+        <item>最新阅读时间</item>
+        <item>标题</item>
+        <item>作者</item>
+    </string-array>
+
 </resources>

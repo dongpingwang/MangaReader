@@ -23,13 +23,17 @@ sealed class HomeUiEvent {
     data class OnShelfLayoutModeChange(val mode: Int) : HomeUiEvent()
     data class OnShelfLayoutColumnChange(val column: Int) : HomeUiEvent()
     data object OnNavigationToSettings : HomeUiEvent()
+    data class OnFilterChange(val filter: Int) : HomeUiEvent()
+    data class OnSortChange(val sort: Int) : HomeUiEvent()
 }
 
 data class HomeUiState(
     val curTab: Int = 0,
     val shelfLayoutMode: Int = AppConfig.shelfLayoutMode.value,
     val shelfLayoutColumn: Int = AppConfig.shelfLayoutMode.value,
-    val navLabelShow: Int = AppConfig.navLabelShow.value
+    val navLabelShow: Int = AppConfig.navLabelShow.value,
+    val curFilter: Int = AppConfig.shelfFilter.value,
+    val curSort: Int = AppConfig.shelfSort.value
 )
 
 class HomeViewModel : ViewModel() {
@@ -62,6 +66,18 @@ class HomeViewModel : ViewModel() {
             launch {
                 AppConfig.navLabelShow.collectLatest { v ->
                     _uiState.update { it.copy(navLabelShow = v) }
+                }
+            }
+
+            launch {
+                AppConfig.shelfFilter.collectLatest { v ->
+                    _uiState.update { it.copy(curFilter = v) }
+                }
+            }
+
+            launch {
+                AppConfig.shelfSort.collectLatest { v ->
+                    _uiState.update { it.copy(curSort = v) }
                 }
             }
         }
@@ -97,6 +113,14 @@ class HomeViewModel : ViewModel() {
 
             is HomeUiEvent.OnNavigationToSettings -> {
                 navigate(Routes.SETTINGS)
+            }
+
+            is HomeUiEvent.OnFilterChange -> {
+                AppConfig.shelfFilter.update { event.filter }
+            }
+
+            is HomeUiEvent.OnSortChange -> {
+                AppConfig.shelfSort.mmkvEmit(event.sort)
             }
         }
     }

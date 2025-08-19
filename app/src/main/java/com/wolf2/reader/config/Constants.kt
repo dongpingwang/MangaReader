@@ -84,3 +84,30 @@ enum class ChapterDisplay(private val value: Int) {
         fun ChapterDisplay.toInt() = value
     }
 }
+
+enum class ShelfFilter(private val value: Int) {
+    ALL(0),
+    UnRead(1),
+    Reading(2),
+    Favorite(3);
+
+    companion object {
+        fun fromInt(value: Int) =
+            ShelfFilter.entries.firstOrNull { it.value == value } ?: ALL
+
+        fun ShelfFilter.toInt() = value
+    }
+}
+
+enum class ShelfSort(private val value: Int) {
+    LastReadTime(0),
+    Title(1),
+    Author(2);
+
+    companion object {
+        fun fromInt(value: Int) =
+            ShelfSort.entries.firstOrNull { it.value == value } ?: LastReadTime
+
+        fun ShelfSort.toInt() = value
+    }
+}
