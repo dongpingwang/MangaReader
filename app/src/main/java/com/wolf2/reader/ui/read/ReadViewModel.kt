@@ -1,5 +1,7 @@
 package com.wolf2.reader.ui.read
 
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -59,14 +61,14 @@ data class ReadUiState(
         get() = readRecord.curPage
 }
 
-class ReadViewModel(val bookUuid: String, val from: String) : ViewModel() {
+class ReadViewModel(val bookUuid: String, val from: String, val curPageArg: Int?) : ViewModel() {
 
     companion object {
         @Suppress("UNCHECKED_CAST")
-        fun provideFactory(bookUuid: String, from: String): ViewModelProvider.Factory =
+        fun provideFactory(bookUuid: String, from: String, curPage: Int?): ViewModelProvider.Factory =
             object : ViewModelProvider.Factory {
                 override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                    return ReadViewModel(bookUuid, from) as T
+                    return ReadViewModel(bookUuid, from, curPage) as T
                 }
             }
     }
@@ -108,6 +110,9 @@ class ReadViewModel(val bookUuid: String, val from: String) : ViewModel() {
                         pageCount = book.extraInfo.pageCount,
                         lastReadTimeMillis = System.currentTimeMillis()
                     )
+                if (curPageArg != null && curPageArg >= 0) {
+                    readRecord.curPage = curPageArg
+                }
                 val bookMarks =
                     DatabaseHelper.bookMarkDao().queryByBookUuid(bookUuid).toMutableList()
                 _uiState.update {
@@ -152,7 +157,7 @@ class ReadViewModel(val bookUuid: String, val from: String) : ViewModel() {
         }
     }
 
-    fun updateReadRecord(curPage: Int, updateImmediately: Boolean = false) {
+    private fun updateReadRecord(curPage: Int, updateImmediately: Boolean = false) {
         viewModelScope.launch(Dispatchers.IO) {
             val newRecord = _uiState.value.readRecord.copy(
                 curPage = curPage,
@@ -173,7 +178,7 @@ class ReadViewModel(val bookUuid: String, val from: String) : ViewModel() {
         }
     }
 
-    fun getCurPage(): Int {
+    private fun getCurPage(): Int {
         return readRecord.curPage
     }
 
@@ -204,11 +209,11 @@ class ReadViewModel(val bookUuid: String, val from: String) : ViewModel() {
         return triple.second.pageIndexRange
     }
 
-    fun getChapterTitle(): String {
+    fun getChapterTitle(ignoreConfig: Boolean = false): String {
         val triple = getCurChapterTriple()
 
         val book = (_uiState.value.bookResult as LoadResult.Success<Book>).data
-        if (triple == null || isChapterTotalDisplay()) {
+        if (triple == null || (isChapterTotalDisplay() && !ignoreConfig)) {
             return book.title
         }
         return triple.second.title
@@ -257,6 +262,15 @@ class ReadViewModel(val bookUuid: String, val from: String) : ViewModel() {
         return fileReader?.getImageBuffer(page)
     }
 
+    fun loadImage(pageContent: PageContent): Bitmap {
+        val buffer = getImageBuffer(pageContent)
+        return BitmapFactory.decodeByteArray(
+            getImageBuffer(pageContent),
+            0,
+            buffer?.size ?: 0
+        )
+    }
+
     private fun toggleBookMark() {
         viewModelScope.launch(Dispatchers.IO) {
             val bookMarks = _uiState.value.bookMarks
@@ -265,7 +279,11 @@ class ReadViewModel(val bookUuid: String, val from: String) : ViewModel() {
                 bookMarks.remove(findMark)
                 DatabaseHelper.bookMarkDao().delete(findMark)
             } else {
-                val mark = BookMark(bookUuid = bookUuid, pageIndex = getCurPage())
+                val mark = BookMark(
+                    bookUuid = bookUuid,
+                    pageIndex = getCurPage(),
+                    chapterName = getChapterTitle(ignoreConfig = true)
+                )
                 bookMarks.add(mark)
                 DatabaseHelper.bookMarkDao().insert(mark)
             }

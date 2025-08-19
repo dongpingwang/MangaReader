@@ -34,18 +34,23 @@ fun BookDetailScreen(
     val scaffoldState = rememberBottomSheetScaffoldState(bottomSheetState)
     val scope = rememberCoroutineScope()
 
+    fun navigationToRead(pageIndex: Int) {
+        viewModel.onEvent(DetailUiEvent.OnNavigationToRead(pageIndex))
+        if (scaffoldState.bottomSheetState.hasExpandedState) {
+            scope.launch {
+                bottomSheetState.partialExpand()
+            }
+        }
+    }
+
     BottomSheetScaffold(
         sheetPeekHeight = 102.dp,
         scaffoldState = scaffoldState,
         sheetContent = {
             DetailSheetContent(
+                uiState = uiState,
                 onNavigationToRead = {
-                    viewModel.onEvent(DetailUiEvent.OnNavigationToRead)
-                    if (scaffoldState.bottomSheetState.hasExpandedState) {
-                        scope.launch {
-                            bottomSheetState.partialExpand()
-                        }
-                    }
+                    navigationToRead(-1)
                 },
                 onCopyContent = {
                     viewModel.onEvent(DetailUiEvent.OnCopyContent)
@@ -55,7 +60,11 @@ fun BookDetailScreen(
                 },
                 onShareBookFile = {
                     viewModel.onEvent(DetailUiEvent.OnShareBookFile)
-                }
+                },
+                onPageChange = {
+                    navigationToRead(it)
+                },
+                onLoadImage = { viewModel.loadImage(it) }
             )
         }, topBar = {
             DetailTopAppbar(onBackHandle = {

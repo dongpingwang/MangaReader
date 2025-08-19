@@ -72,4 +72,7 @@
     <string name="settings_reader_black_background">关灯</string>
     <string name="settings_reader_black_background_summary">界面设置成黑色背景</string>
     <string name="settings_reader_chapter_display">章节进度显示</string>
+
+    <string name="empty_charpter_hint">没有目录信息</string>
+    <string name="empty_bookmark_hint">没有添加书签</string>
 </resources>

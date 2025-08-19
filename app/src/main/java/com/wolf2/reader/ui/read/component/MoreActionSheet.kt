@@ -1,6 +1,5 @@
 package com.wolf2.reader.ui.read.component
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -31,6 +30,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
@@ -61,7 +61,7 @@ fun MoreActionSheet(
         }, modifier = Modifier.clickable {
             onDismissRequest()
             onSavePicture()
-        })
+        }, colors = ListItemDefaults.colors().copy(containerColor = Color.Transparent))
 
         ListItem(headlineContent = {
             Text(stringResource(if (markedStatus) R.string.bookmark_remove else R.string.bookmark_add))
@@ -73,7 +73,7 @@ fun MoreActionSheet(
         }, modifier = Modifier.clickable {
             markedStatus = !markedStatus
             onBookMarkToggle()
-        })
+        }, colors = ListItemDefaults.colors().copy(containerColor = Color.Transparent))
 
         ListItem(headlineContent = {
             Text(stringResource(R.string.jump_page))
@@ -82,12 +82,11 @@ fun MoreActionSheet(
         }, modifier = Modifier.clickable {
             onDismissRequest()
             onJumpPage()
-        })
+        }, colors = ListItemDefaults.colors().copy(containerColor = Color.Transparent))
 
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(ListItemDefaults.containerColor)
         ) {
             Text(
                 stringResource(R.string.read_mode),
@@ -132,6 +131,6 @@ fun MoreActionSheet(
         }, modifier = Modifier.clickable {
             onDismissRequest()
             onNavToSettings()
-        })
+        }, colors = ListItemDefaults.colors().copy(containerColor = Color.Transparent))
     }
 }

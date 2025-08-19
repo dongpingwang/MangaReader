@@ -1,13 +1,17 @@
 package com.wolf2.reader.ui.detail
 
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.wolf2.reader.R
 import com.wolf2.reader.mode.db.DatabaseHelper
+import com.wolf2.reader.mode.entity.BookMark
 import com.wolf2.reader.mode.entity.FavoriteBook
 import com.wolf2.reader.mode.entity.ReadRecord
 import com.wolf2.reader.mode.entity.book.Book
+import com.wolf2.reader.mode.entity.book.PageContent
 import com.wolf2.reader.navigate
 import com.wolf2.reader.popBackStack
 import com.wolf2.reader.reader.CachedReader
@@ -33,7 +37,7 @@ sealed class DetailUiEvent {
     data class OnFavoriteChange(val favorite: Boolean) : DetailUiEvent()
     data class OnTitleChange(val title: String) : DetailUiEvent()
     data class OnAuthorChange(val author: String) : DetailUiEvent()
-    data object OnNavigationToRead : DetailUiEvent()
+    data class OnNavigationToRead(val curPage: Int = -1) : DetailUiEvent()
     data object OnDeleteReadRecord : DetailUiEvent()
     data object OnShareBookFile : DetailUiEvent()
     data object OnCopyContent : DetailUiEvent()
@@ -42,7 +46,9 @@ sealed class DetailUiEvent {
 data class DetailUiState(
     val bookResult: LoadResult<Book> = LoadResult.Loading,
     val favorite: Boolean = false,
-    val readRecord: ReadRecord? = null
+    val readRecord: ReadRecord? = null,
+    val bookMarks: MutableList<BookMark> = mutableListOf(),
+    val updateTimeMillis: Long = System.currentTimeMillis()
 )
 
 class DetailViewModel(val bookUuid: String) : ViewModel() {
@@ -80,7 +86,6 @@ class DetailViewModel(val bookUuid: String) : ViewModel() {
     override fun onCleared() {
         super.onCleared()
         fileReader?.close()
-
     }
 
     private fun queryBookData() {
@@ -92,11 +97,14 @@ class DetailViewModel(val bookUuid: String) : ViewModel() {
         }
         val readRecord = DatabaseHelper.readRecordDao().getReadRecord(bookUuid)
         val favorite = DatabaseHelper.favoriteBookDao().getFavoriteBook(bookUuid) != null
+        val bookMarks = DatabaseHelper.bookMarkDao().queryByBookUuid(bookUuid).toMutableList()
         _uiState.update {
             it.copy(
                 bookResult = LoadResult.Success(book),
                 readRecord = readRecord,
-                favorite = favorite
+                favorite = favorite,
+                bookMarks = bookMarks,
+                updateTimeMillis = System.currentTimeMillis()
             )
         }
     }
@@ -119,7 +127,25 @@ class DetailViewModel(val bookUuid: String) : ViewModel() {
         if (needUpdate) {
             DatabaseHelper.bookDao().update(book)
         }
-        _uiState.update { it.copy(bookResult = LoadResult.Success(book)) }
+        _uiState.update {
+            it.copy(
+                bookResult = LoadResult.Success(book),
+                updateTimeMillis = System.currentTimeMillis()
+            )
+        }
+    }
+
+    fun getImageBuffer(page: PageContent): ByteArray? {
+        return fileReader?.getImageBuffer(page)
+    }
+
+    fun loadImage(pageContent: PageContent): Bitmap {
+        val buffer = getImageBuffer(pageContent)
+        return BitmapFactory.decodeByteArray(
+            getImageBuffer(pageContent),
+            0,
+            buffer?.size ?: 0
+        )
     }
 
     fun onEvent(event: DetailUiEvent) {
@@ -132,7 +158,8 @@ class DetailViewModel(val bookUuid: String) : ViewModel() {
 
             is DetailUiEvent.OnAuthorChange -> updateAuthor(event.author)
 
-            is DetailUiEvent.OnNavigationToRead -> navigate("${Routes.READ}/${bookUuid}/${Routes.BOOK_DETAIL}")
+            is DetailUiEvent.OnNavigationToRead -> navigate("${Routes.READ}/${bookUuid}/${Routes.BOOK_DETAIL}/${event.curPage}")
+
 
             is DetailUiEvent.OnDeleteReadRecord -> deleteReadRecord()
 

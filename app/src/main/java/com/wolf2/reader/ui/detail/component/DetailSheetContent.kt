@@ -1,5 +1,6 @@
 package com.wolf2.reader.ui.detail.component
 
+import android.graphics.Bitmap
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -11,18 +12,15 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
-import androidx.compose.material.icons.outlined.BookmarkBorder
-import androidx.compose.material.icons.outlined.FormatListBulleted
-import androidx.compose.material.icons.outlined.GridView
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.SplitButtonDefaults
 import androidx.compose.material3.SplitButtonLayout
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -32,37 +30,39 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.wolf2.reader.R
+import com.wolf2.reader.mode.entity.book.PageContent
+import com.wolf2.reader.ui.common.chapter.HeadButtons
+import com.wolf2.reader.ui.common.chapter.SheetContent
+import com.wolf2.reader.ui.detail.DetailUiState
+import com.wolf2.reader.util.LoadResult
 import me.saket.cascade.CascadeDropdownMenu
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun DetailSheetContent(
+    uiState: DetailUiState,
     onNavigationToRead: () -> Unit,
     onCopyContent: () -> Unit,
     onDeleteReadRecord: () -> Unit,
     onShareBookFile: () -> Unit,
+    onPageChange: (Int) -> Unit,
+    onLoadImage: (PageContent) -> Bitmap,
 ) {
+    var selectedIndex by remember { mutableIntStateOf(0) }
+    val loadComplete = uiState.bookResult is LoadResult.Success
+
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(horizontal = 16.dp)
     ) {
-        var checked by remember { mutableStateOf(false) }
+        var sblClicked by remember { mutableStateOf(false) }
 
         Row(
             verticalAlignment = Alignment.CenterVertically,
         ) {
 
-            IconButton(onClick = {}) {
-                Icon(imageVector = Icons.Outlined.FormatListBulleted, contentDescription = null)
-            }
-
-            IconButton(onClick = {}) {
-                Icon(imageVector = Icons.Outlined.GridView, contentDescription = null)
-            }
-            IconButton(onClick = {}) {
-                Icon(imageVector = Icons.Outlined.BookmarkBorder, contentDescription = null)
-            }
+            HeadButtons(selectedIndex = selectedIndex, onSelectChange = { selectedIndex = it })
 
             Spacer(modifier = Modifier.weight(1F))
 
@@ -77,34 +77,47 @@ fun DetailSheetContent(
                     },
                     trailingButton = {
                         SplitButtonDefaults.TrailingButton(
-                            checked = checked,
-                            onCheckedChange = { checked = it },
+                            checked = sblClicked,
+                            onCheckedChange = { sblClicked = it },
                         ) {
-                            val rotation by animateFloatAsState(targetValue = if (checked) 180f else 0f)
+                            val rotation by animateFloatAsState(targetValue = if (sblClicked) 180f else 0f)
                             Icon(
                                 Icons.Filled.KeyboardArrowDown,
                                 modifier =
-                                    Modifier
-                                        .size(SplitButtonDefaults.TrailingIconSize)
-                                        .graphicsLayer {
-                                            this.rotationZ = rotation
-                                        },
+                                Modifier
+                                    .size(SplitButtonDefaults.TrailingIconSize)
+                                    .graphicsLayer {
+                                        this.rotationZ = rotation
+                                    },
                                 contentDescription = null
                             )
                         }
                     }
                 )
 
-                if (checked) {
+                if (sblClicked) {
                     SblDropMenu(
                         onCopyContent = onCopyContent,
                         onDeleteReadRecord = onDeleteReadRecord,
                         onShareBookFile = onShareBookFile,
                         onDismissRequest = {
-                            checked = false
+                            sblClicked = false
                         })
                 }
             }
+        }
+
+        if (loadComplete) {
+            val book = (uiState.bookResult as LoadResult.Success).data
+            SheetContent(
+                selectedIndex = selectedIndex,
+                chapters = book.chapters,
+                pageContents = book.pageContents,
+                bookMarks = uiState.bookMarks,
+                onSelectChange = { selectedIndex = it },
+                onPageChange = onPageChange,
+                onLoadImage = onLoadImage
+            )
         }
     }
 }

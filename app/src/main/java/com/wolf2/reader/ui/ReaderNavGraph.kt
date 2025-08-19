@@ -77,18 +77,19 @@ fun ReaderNavGraph() {
                 BookDetailScreen(bookUuid = bookUuid)
             }
             composable(
-                route = "${Routes.READ}/{bookUuid}/{from}",
+                route = "${Routes.READ}/{bookUuid}/{from}/{curPage}",
                 arguments = listOf(navArgument("bookUuid") {
                     type = NavType.StringType
                 }, navArgument("from") {
                     type = NavType.StringType
+                }, navArgument("curPage") {
+                    type = NavType.IntType
                 })
             ) { backStackEntry ->
-                val bookUuid = backStackEntry.arguments?.getString("bookUuid")
-                val from = backStackEntry.arguments?.getString("from")
-                requireNotNull(bookUuid)
-                requireNotNull(from)
-                ReadScreen(bookUuid = bookUuid, from = from)
+                val bookUuid = backStackEntry.arguments?.getString("bookUuid") ?: return@composable
+                val from = backStackEntry.arguments?.getString("from") ?: return@composable
+                val curPage = backStackEntry.arguments?.getInt("curPage")
+                ReadScreen(bookUuid = bookUuid, from = from, curPage = curPage)
             }
 
             composable(Routes.BROWSER_BOOK) {
