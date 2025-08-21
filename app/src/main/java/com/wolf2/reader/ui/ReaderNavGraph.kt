@@ -5,6 +5,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.DisposableEffectResult
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
@@ -20,12 +22,11 @@ import com.wolf2.reader.config.AppConfig
 import com.wolf2.reader.config.AppTheme
 import com.wolf2.reader.globalViewContext
 import com.wolf2.reader.ui.browser.BrowserScreen
-import com.wolf2.reader.ui.common.OnLifecycleEvent
 import com.wolf2.reader.ui.detail.BookDetailScreen
 import com.wolf2.reader.ui.home.HomeScreen
 import com.wolf2.reader.ui.home.Routes
 import com.wolf2.reader.ui.preview.ImagePreviewScreen
-import com.wolf2.reader.ui.read.ReadScreen
+import com.wolf2.reader.ui.read.MangaReadScreen
 import com.wolf2.reader.ui.search.SearchScreen
 import com.wolf2.reader.ui.setting.AboutScreen
 import com.wolf2.reader.ui.setting.AppearanceScreen
@@ -57,6 +58,14 @@ fun ReaderNavGraph() {
             navController = navController,
             owner = LocalViewModelStoreOwner.current!!
         )
+        DisposableEffect(Unit) {
+            object : DisposableEffectResult {
+                override fun dispose() {
+                    globalViewContext = null
+                }
+            }
+        }
+
         NavHost(
             navController = navController, startDestination = Routes.HOME,
             modifier = Modifier.background(MaterialTheme.colorScheme.background)
@@ -89,7 +98,7 @@ fun ReaderNavGraph() {
                 val bookUuid = backStackEntry.arguments?.getString("bookUuid") ?: return@composable
                 val from = backStackEntry.arguments?.getString("from") ?: return@composable
                 val curPage = backStackEntry.arguments?.getInt("curPage")
-                ReadScreen(bookUuid = bookUuid, from = from, curPage = curPage)
+                MangaReadScreen(bookUuid = bookUuid, from = from, curPage = curPage)
             }
 
             composable(Routes.BROWSER_BOOK) {
@@ -126,10 +135,6 @@ fun ReaderNavGraph() {
                 ReaderScreen()
             }
         }
-
-        OnLifecycleEvent(onDispose = {
-            globalViewContext = null
-        })
     }
 
 }

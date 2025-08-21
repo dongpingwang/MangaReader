@@ -14,6 +14,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.compose.LifecycleStartEffect
+import androidx.lifecycle.compose.LifecycleStopOrDisposeEffectResult
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
@@ -35,8 +37,9 @@ import com.wolf2.reader.ui.read.component.TinderPager
 import com.wolf2.reader.util.LoadResult
 
 @Composable
-fun ReadScreen(bookUuid: String, from: String, curPage: Int?) {
-    val viewModel: ReadViewModel = viewModel(factory = ReadViewModel.provideFactory(bookUuid, from, curPage))
+fun MangaReadScreen(bookUuid: String, from: String, curPage: Int?) {
+    val viewModel: ReadViewModel =
+        viewModel(factory = ReadViewModel.provideFactory(bookUuid, from, curPage))
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var showAppBar by remember { mutableStateOf(false) }
     var showMoreSheet by remember { mutableStateOf(false) }
@@ -48,6 +51,16 @@ fun ReadScreen(bookUuid: String, from: String, curPage: Int?) {
 
     fun toggleBarsVisibility() {
         showAppBar = !showAppBar
+    }
+
+    systemUiController.isSystemBarsVisible = uiState.fullScreen.not()
+    LifecycleStartEffect(Unit) {
+        systemUiController.isSystemBarsVisible = uiState.fullScreen.not()
+        object : LifecycleStopOrDisposeEffectResult {
+            override fun runStopOrDisposeEffect() {
+                systemUiController.isSystemBarsVisible = true
+            }
+        }
     }
 
     fun updateReadRecord(pageInt: Int, updateImmediately: Boolean) {
@@ -62,7 +75,6 @@ fun ReadScreen(bookUuid: String, from: String, curPage: Int?) {
         return viewModel.loadImage(pageContent)
     }
 
-    systemUiController.isSystemBarsVisible = uiState.fullScreen.not()
     var modifier = Modifier.fillMaxSize()
     if (uiState.fullScreen) {
         modifier = modifier.systemBarsPadding()
