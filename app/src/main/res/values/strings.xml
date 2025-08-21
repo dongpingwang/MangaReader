@@ -75,4 +75,5 @@
 
     <string name="empty_charpter_hint">没有目录信息</string>
     <string name="empty_bookmark_hint">没有添加书签</string>
+    <string name="search_hint">搜索书名、作者</string>
 </resources>

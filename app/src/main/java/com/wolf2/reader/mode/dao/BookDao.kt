@@ -56,6 +56,9 @@ interface BookDao {
     )
     fun allBooksFilterFavorite(): PagingSource<Int, Book>
 
+    @Query("SELECT * FROM BOOK WHERE title LIKE '%' || :keyword || '%' OR author LIKE '%' || :keyword || '%'")
+    fun search(keyword: String): List<Book>
+
     @Query("SELECT * FROM BOOK WHERE uri = :uri")
     fun queryByUri(uri: Uri): Book?
 
