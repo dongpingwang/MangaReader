@@ -36,11 +36,11 @@ import com.wolf2.reader.config.AppColor
 import com.wolf2.reader.config.AppConfig
 import com.wolf2.reader.config.mmkvEmit
 import com.wolf2.reader.popBackStack
-import com.yangdai.opennote.presentation.theme.DarkBlueColors
-import com.yangdai.opennote.presentation.theme.DarkGreenColors
-import com.yangdai.opennote.presentation.theme.DarkOrangeColors
-import com.yangdai.opennote.presentation.theme.DarkPurpleColors
-import com.yangdai.opennote.presentation.theme.DarkRedColors
+import com.wolf2.reader.ui.theme.DarkBlueColors
+import com.wolf2.reader.ui.theme.DarkGreenColors
+import com.wolf2.reader.ui.theme.DarkOrangeColors
+import com.wolf2.reader.ui.theme.DarkPurpleColors
+import com.wolf2.reader.ui.theme.DarkRedColors
 import me.zhanghai.compose.preference.ListPreference
 import me.zhanghai.compose.preference.ListPreferenceType
 import me.zhanghai.compose.preference.ProvidePreferenceLocals

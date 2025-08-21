@@ -37,7 +37,6 @@ import com.wolf2.reader.ui.theme.ComicReaderTheme
 
 @Composable
 fun ReaderNavGraph() {
-
     val themeMode = AppConfig.themeMode.collectAsState()
     val darkTheme = when (AppTheme.fromInt(themeMode.value)) {
         AppTheme.SYSTEM -> isSystemInDarkTheme()
@@ -45,7 +44,6 @@ fun ReaderNavGraph() {
         AppTheme.DARK -> true
     }
     val appColor = AppConfig.appColor.collectAsState()
-
     val amoledFlow = AppConfig.amoled.collectAsState()
     ComicReaderTheme(
         darkMode = darkTheme,
@@ -136,5 +134,4 @@ fun ReaderNavGraph() {
             }
         }
     }
-
 }
