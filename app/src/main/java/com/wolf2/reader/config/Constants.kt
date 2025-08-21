@@ -87,8 +87,8 @@ enum class ChapterDisplay(private val value: Int) {
 
 enum class ShelfFilter(private val value: Int) {
     ALL(0),
-    UnRead(1),
-    Reading(2),
+    Reading(1),
+    UnRead(2),
     Favorite(3);
 
     companion object {

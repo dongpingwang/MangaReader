@@ -14,11 +14,47 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface BookDao {
 
-    @Query("SELECT * FROM BOOK")
-    fun allBooks(): PagingSource<Int, Book>
+    @Query(
+    """
+    SELECT b.*, MAX(rr.lastReadTimeMillis) as last_read_time FROM BOOK b
+    LEFT JOIN 
+    READRECORD rr ON b.uuid = rr.bookUuid GROUP BY b.uuid ORDER BY last_read_time DESC
+    """
+    )
+    fun allBooksSortReadTime(): PagingSource<Int, Book>
 
-    @Query("SELECT * FROM BOOK")
-    fun observeAll(): Flow<List<Book>>
+    @Query("SELECT * FROM BOOK ORDER BY title DESC")
+    fun allBooksSortTitle(): PagingSource<Int, Book>
+
+    @Query("SELECT * FROM BOOK ORDER BY author DESC")
+    fun allBooksSortAuthor(): PagingSource<Int, Book>
+
+    @Query(
+    """
+    SELECT BOOK.*,READRECORD.* FROM Book
+    INNER JOIN READRECORD ON BOOK.uuid == READRECORD.bookUuid
+    ORDER BY READRECORD.lastReadTimeMillis DESC     
+    """
+    )
+    fun allBooksFilterReading(): PagingSource<Int, Book>
+
+    @Query(
+    """
+    SELECT BOOK.* FROM BOOK
+    LEFT JOIN READRECORD ON BOOK.uuid = READRECORD.bookUuid
+    WHERE READRECORD.bookUuid IS NULL
+    ORDER BY BOOK.lastAddedTimeMillis DESC
+    """
+    )
+    fun allBooksFilterUnRead(): PagingSource<Int, Book>
+
+    @Query(
+    """
+    SELECT BOOK.*,FAVORITEBOOK.* FROM Book
+    INNER JOIN FAVORITEBOOK ON BOOK.uuid == FAVORITEBOOK.bookUuid 
+    """
+    )
+    fun allBooksFilterFavorite(): PagingSource<Int, Book>
 
     @Query("SELECT * FROM BOOK WHERE uri = :uri")
     fun queryByUri(uri: Uri): Book?
@@ -39,15 +75,15 @@ interface BookDao {
     fun delete(book: Book)
 
     @Query(
-        """
-        SELECT book.* FROM book
-        INNER JOIN (
-            SELECT bookUuid, MAX(lastReadTimeMillis) AS max_time
-            FROM READRECORD
-            GROUP BY bookUuid
-            ORDER BY max_time DESC
-            LIMIT 1
-        ) AS latest_record ON book.uuid = latest_record.bookUuid
+    """
+    SELECT book.* FROM book
+    INNER JOIN (
+       SELECT bookUuid, MAX(lastReadTimeMillis) AS max_time
+       FROM READRECORD
+       GROUP BY bookUuid
+       ORDER BY max_time DESC
+       LIMIT 1
+       ) AS latest_record ON book.uuid = latest_record.bookUuid
     """
     )
     fun observeLatestReadBook(): Flow<Book?>
