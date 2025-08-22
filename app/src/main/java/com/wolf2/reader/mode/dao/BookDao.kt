@@ -14,6 +14,10 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface BookDao {
 
+    @Query("SELECT * FROM BOOK")
+    fun getAllBooks() :List<Book>
+
+
     @Query(
     """
     SELECT b.*, MAX(rr.lastReadTimeMillis) as last_read_time FROM BOOK b

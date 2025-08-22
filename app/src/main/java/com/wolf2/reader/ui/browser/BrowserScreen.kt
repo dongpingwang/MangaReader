@@ -19,14 +19,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LifecyclePauseOrDisposeEffectResult
+import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.wolf2.reader.R
 import com.wolf2.reader.config.ebookMimeTypes
 import com.wolf2.reader.ui.common.MyLoadingIndicator
 import com.wolf2.reader.ui.common.MySnackbar
-import com.wolf2.reader.ui.common.OnLifecycleEvent
 import com.wolf2.reader.util.LoadResult
 import com.wolf2.reader.util.requestFullStorageAccess
 import timber.log.Timber
@@ -63,11 +63,13 @@ fun BrowserScreen() {
         }
     }
 
-    OnLifecycleEvent(onEvent = {
-        if (it == Lifecycle.Event.ON_RESUME) {
-            viewModel.onEvent(BrowserUiEvent.OnAccessChange)
+    LifecycleResumeEffect(Unit) {
+        viewModel.onEvent(BrowserUiEvent.OnAccessChange)
+        object : LifecyclePauseOrDisposeEffectResult{
+            override fun runPauseOrOnDisposeEffect() {
+            }
         }
-    })
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)

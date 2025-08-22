@@ -13,6 +13,7 @@ import com.wolf2.reader.config.mmkvEmit
 import com.wolf2.reader.mode.db.DatabaseHelper
 import com.wolf2.reader.mode.entity.BookMark
 import com.wolf2.reader.mode.entity.ReadRecord
+import com.wolf2.reader.mode.entity.ReadTime
 import com.wolf2.reader.mode.entity.book.Book
 import com.wolf2.reader.mode.entity.book.Chapter
 import com.wolf2.reader.mode.entity.book.PageContent
@@ -24,6 +25,7 @@ import com.wolf2.reader.reader.percent
 import com.wolf2.reader.ui.common.SnackbarModel
 import com.wolf2.reader.ui.home.Routes
 import com.wolf2.reader.ui.util.ImageCacheUtil
+import com.wolf2.reader.util.DateUtil
 import com.wolf2.reader.util.LoadResult
 import com.wolf2.reader.util.globalContext
 import kotlinx.coroutines.Dispatchers
@@ -45,6 +47,8 @@ sealed class ReadUiEvent {
     data object OnNextChapter : ReadUiEvent()
     data class OnPageChange(val pageInt: Int, val updateImmediately: Boolean) : ReadUiEvent()
     data object OnNavigationToSettings : ReadUiEvent()
+    data object OnLifecycleStart : ReadUiEvent()
+    data object OnLifecycleStop : ReadUiEvent()
 }
 
 data class ReadUiState(
@@ -65,7 +69,11 @@ class ReadViewModel(val bookUuid: String, val from: String, val curPageArg: Int?
 
     companion object {
         @Suppress("UNCHECKED_CAST")
-        fun provideFactory(bookUuid: String, from: String, curPage: Int?): ViewModelProvider.Factory =
+        fun provideFactory(
+            bookUuid: String,
+            from: String,
+            curPage: Int?
+        ): ViewModelProvider.Factory =
             object : ViewModelProvider.Factory {
                 override fun <T : ViewModel> create(modelClass: Class<T>): T {
                     return ReadViewModel(bookUuid, from, curPage) as T
@@ -335,6 +343,9 @@ class ReadViewModel(val bookUuid: String, val from: String, val curPageArg: Int?
             is ReadUiEvent.OnPageChange -> updateReadRecord(event.pageInt, event.updateImmediately)
 
             is ReadUiEvent.OnNavigationToSettings -> navigate(Routes.SETTINGS_READER)
+
+            is ReadUiEvent.OnLifecycleStart -> createReadTime()
+            is ReadUiEvent.OnLifecycleStop -> updateReadTime()
         }
     }
 
@@ -349,4 +360,22 @@ class ReadViewModel(val bookUuid: String, val from: String, val curPageArg: Int?
             },
             dismissed = { onEvent(ReadUiEvent.OnSnackbarDismiss) }
         )
+
+    private var readTime: ReadTime? = null
+
+    private fun createReadTime() {
+        val now = System.currentTimeMillis()
+        readTime = ReadTime(bookUuid = bookUuid, startReadTimeMillis = now, date = DateUtil.getDate(now))
+    }
+
+    private fun updateReadTime() {
+        if (readTime == null) {
+            throw IllegalStateException("readTime must's be null")
+        }
+        val rt = readTime!!
+        rt.endReadTimeMillis = System.currentTimeMillis()
+        viewModelScope.launch(Dispatchers.IO) {
+            DatabaseHelper.readTimeDao().insert(rt)
+        }
+    }
 }

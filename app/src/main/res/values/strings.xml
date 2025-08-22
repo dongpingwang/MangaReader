@@ -76,4 +76,10 @@
     <string name="empty_charpter_hint">没有目录信息</string>
     <string name="empty_bookmark_hint">没有添加书签</string>
     <string name="search_hint">搜索书名、作者</string>
+    <string name="empty_history_hint">没有阅读记录</string>
+    <string name="history_read_time_desc">阅读%d分钟，共%d分钟</string>
+
+    <string name="today">今天</string>
+    <string name="yesterday">昨天</string>
+
 </resources>

@@ -1,13 +1,7 @@
 package com.wolf2.reader.ui.shelf
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -16,6 +10,7 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import com.wolf2.reader.R
 import com.wolf2.reader.config.ShelfLayout
 import com.wolf2.reader.mode.entity.book.Book
+import com.wolf2.reader.ui.common.EmptyHint
 import com.wolf2.reader.ui.home.HomeUiState
 import com.wolf2.reader.ui.home.HomeViewModel
 import com.wolf2.reader.ui.shelf.component.ShelfGridContent
@@ -36,7 +31,7 @@ fun BookShelfScreen() {
     val bookPagingItems = pager.flow.collectAsLazyPagingItems()
 
     when {
-        bookPagingItems.itemCount <= 0 -> EmptyHint {
+        bookPagingItems.itemCount <= 0 -> EmptyHint(hint = stringResource(R.string.btn_browser_book)) {
             vm.onEvent(
                 BookShelfUiEvent.OnNavigationToBrowser
             )
@@ -83,14 +78,5 @@ private fun ShelfContent(
                 vm.onEvent(BookShelfUiEvent.OnItemLongClick(it))
             }
         )
-    }
-}
-
-@Composable
-private fun EmptyHint(onNavigationToBrowser: () -> Unit = {}) {
-    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        TextButton(onClick = onNavigationToBrowser) {
-            Text(text = stringResource(R.string.btn_browser_book))
-        }
     }
 }

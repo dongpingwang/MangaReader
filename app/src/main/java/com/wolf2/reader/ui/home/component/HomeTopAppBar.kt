@@ -1,5 +1,7 @@
 package com.wolf2.reader.ui.home.component
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.layout.Row
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.FilterAlt
 import androidx.compose.material.icons.outlined.FilterList
@@ -27,23 +29,27 @@ fun HomeTopAppBar(
     TopAppBar(title = {
         Text(text = stringResource(if (curPageIndex == 0) R.string.navi_book_shelf else R.string.navi_history))
     }, actions = {
-        IconButton(onClick = onNavigationToSearch) {
-            Icon(
-                imageVector = Icons.Outlined.Search,
-                contentDescription = null
-            )
-        }
-        IconButton(onClick = onShowFilterDialog) {
-            Icon(
-                imageVector = Icons.Outlined.FilterAlt,
-                contentDescription = null
-            )
-        }
-        IconButton(onClick = onShowSortDialog) {
-            Icon(
-                imageVector = Icons.Outlined.FilterList,
-                contentDescription = null
-            )
+        AnimatedVisibility(curPageIndex == 0) {
+            Row {
+                IconButton(onClick = onNavigationToSearch) {
+                    Icon(
+                        imageVector = Icons.Outlined.Search,
+                        contentDescription = null
+                    )
+                }
+                IconButton(onClick = onShowFilterDialog) {
+                    Icon(
+                        imageVector = Icons.Outlined.FilterAlt,
+                        contentDescription = null
+                    )
+                }
+                IconButton(onClick = onShowSortDialog) {
+                    Icon(
+                        imageVector = Icons.Outlined.FilterList,
+                        contentDescription = null
+                    )
+                }
+            }
         }
         IconButton(onClick = onShowMenuDialog) {
             Icon(

@@ -53,7 +53,6 @@ class BookShelfViewModel : ViewModel() {
         viewModelScope.launch {
             launch(Dispatchers.IO) {
                 DatabaseHelper.readRecordDao().observeAll().collectLatest {
-                    Timber.d("readRecords: $it")
                     val readRecords = it
                     _uiState.update {
                         it.copy(readRecords = readRecords)

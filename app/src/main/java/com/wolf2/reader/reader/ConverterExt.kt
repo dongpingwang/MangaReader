@@ -1,7 +1,9 @@
 package com.wolf2.reader.reader
 
+import androidx.compose.ui.util.fastForEach
 import androidx.documentfile.provider.DocumentFile
 import com.wolf2.reader.mode.entity.ReadRecord
+import com.wolf2.reader.mode.entity.ReadTime
 import com.wolf2.reader.mode.entity.book.Book
 import kotlin.math.roundToInt
 
@@ -61,4 +63,16 @@ fun IntRange.numbers(progress: Int): String {
     val total = this.last - this.first + 1
     val cur = progress - this.first + 1
     return "${cur}/${total}"
+}
+
+fun ReadTime.duration(): Long {
+    return this.endReadTimeMillis - this.startReadTimeMillis
+}
+
+fun List<ReadTime>.durations(): Long {
+    var duration = 0L
+    this.fastForEach {
+        duration += it.duration()
+    }
+    return duration
 }

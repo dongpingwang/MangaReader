@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "55a84cd9b8e432bc31ac95adde9c0123",
+    "identityHash": "1ecc9ca702f9b0b49842e4d3c85a6944",
     "entities": [
       {
         "tableName": "Book",
@@ -146,11 +146,11 @@
       },
       {
         "tableName": "BookMark",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`_uuid` TEXT NOT NULL, `bookUuid` TEXT NOT NULL, `pageIndex` INTEGER NOT NULL, `chapterName` TEXT NOT NULL, `lastAddedTimeMillis` INTEGER NOT NULL, PRIMARY KEY(`_uuid`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`uuid` TEXT NOT NULL, `bookUuid` TEXT NOT NULL, `pageIndex` INTEGER NOT NULL, `chapterName` TEXT NOT NULL, `lastAddedTimeMillis` INTEGER NOT NULL, PRIMARY KEY(`uuid`))",
         "fields": [
           {
             "fieldPath": "_uuid",
-            "columnName": "_uuid",
+            "columnName": "uuid",
             "affinity": "TEXT",
             "notNull": true
           },
@@ -182,14 +182,56 @@
         "primaryKey": {
           "autoGenerate": false,
           "columnNames": [
-            "_uuid"
+            "uuid"
+          ]
+        }
+      },
+      {
+        "tableName": "ReadTime",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`uuid` TEXT NOT NULL, `bookUuid` TEXT NOT NULL, `startReadTimeMillis` INTEGER NOT NULL, `endReadTimeMillis` INTEGER NOT NULL, `date` TEXT NOT NULL, PRIMARY KEY(`uuid`))",
+        "fields": [
+          {
+            "fieldPath": "_uuid",
+            "columnName": "uuid",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "bookUuid",
+            "columnName": "bookUuid",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "startReadTimeMillis",
+            "columnName": "startReadTimeMillis",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "endReadTimeMillis",
+            "columnName": "endReadTimeMillis",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "date",
+            "columnName": "date",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "uuid"
           ]
         }
       }
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '55a84cd9b8e432bc31ac95adde9c0123')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '1ecc9ca702f9b0b49842e4d3c85a6944')"
     ]
   }
 }

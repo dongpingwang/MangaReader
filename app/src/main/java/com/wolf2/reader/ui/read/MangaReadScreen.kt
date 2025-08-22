@@ -56,9 +56,11 @@ fun MangaReadScreen(bookUuid: String, from: String, curPage: Int?) {
     systemUiController.isSystemBarsVisible = uiState.fullScreen.not()
     LifecycleStartEffect(Unit) {
         systemUiController.isSystemBarsVisible = uiState.fullScreen.not()
+        viewModel.onEvent(ReadUiEvent.OnLifecycleStart)
         object : LifecycleStopOrDisposeEffectResult {
             override fun runStopOrDisposeEffect() {
                 systemUiController.isSystemBarsVisible = true
+                viewModel.onEvent(ReadUiEvent.OnLifecycleStop)
             }
         }
     }

@@ -10,7 +10,9 @@ import kotlin.uuid.Uuid
 @Entity(tableName = "BookMark")
 data class BookMark(
     @PrimaryKey
+    @ColumnInfo(name = "uuid")
     var _uuid: String = Uuid.random().toString(),// uuid，主键，自动生成，**无用**
+    @ColumnInfo(name = "bookUuid")
     var bookUuid: String = "", // 书籍uuid
     @ColumnInfo(name = "pageIndex")
     var pageIndex: Int = 0, // 书签位置页面，从0开始

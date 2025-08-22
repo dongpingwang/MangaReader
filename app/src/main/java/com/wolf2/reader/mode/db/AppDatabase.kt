@@ -10,9 +10,11 @@ import com.wolf2.reader.mode.dao.BookDao
 import com.wolf2.reader.mode.dao.BookMarkDao
 import com.wolf2.reader.mode.dao.FavoriteBookDao
 import com.wolf2.reader.mode.dao.ReadRecordDao
+import com.wolf2.reader.mode.dao.ReadTimeDao
 import com.wolf2.reader.mode.entity.BookMark
 import com.wolf2.reader.mode.entity.FavoriteBook
 import com.wolf2.reader.mode.entity.ReadRecord
+import com.wolf2.reader.mode.entity.ReadTime
 import com.wolf2.reader.mode.entity.book.Book
 import timber.log.Timber
 
@@ -21,7 +23,13 @@ private const val DATABASE_VERSION = 1
 
 @TypeConverters(RoomTypeConverters::class)
 @Database(
-    entities = [Book::class, ReadRecord::class, FavoriteBook::class, BookMark::class],
+    entities = [
+        Book::class,
+        ReadRecord::class,
+        FavoriteBook::class,
+        BookMark::class,
+        ReadTime::class
+    ],
     version = DATABASE_VERSION
 )
 private abstract class AppDatabase : RoomDatabase() {
@@ -29,6 +37,7 @@ private abstract class AppDatabase : RoomDatabase() {
     abstract fun readRecordDao(): ReadRecordDao
     abstract fun favoriteDao(): FavoriteBookDao
     abstract fun bookMarkDao(): BookMarkDao
+    abstract fun readTimeDao(): ReadTimeDao
 }
 
 object DatabaseHelper {
@@ -68,5 +77,9 @@ object DatabaseHelper {
 
     fun bookMarkDao(): BookMarkDao {
         return appDatabase().bookMarkDao()
+    }
+
+    fun readTimeDao(): ReadTimeDao {
+        return appDatabase().readTimeDao()
     }
 }

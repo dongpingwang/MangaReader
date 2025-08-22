@@ -38,4 +38,6 @@ object AppConfig : MMKVOwner(mmapID = "app_settings") {
     val shelfFilter = MutableStateFlow(-1)
 
     val shelfSort by mmkvInt().asStateFlow()
+
+    val homeTab = MutableStateFlow(0)
 }

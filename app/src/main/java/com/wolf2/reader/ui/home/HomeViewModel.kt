@@ -30,7 +30,7 @@ sealed class HomeUiEvent {
 }
 
 data class HomeUiState(
-    val curTab: Int = 0,
+    val curTab: Int = AppConfig.homeTab.value,
     val shelfLayoutMode: Int = AppConfig.shelfLayoutMode.value,
     val shelfLayoutColumn: Int = AppConfig.shelfLayoutMode.value,
     val navLabelShow: Int = AppConfig.navLabelShow.value,
@@ -82,6 +82,12 @@ class HomeViewModel : ViewModel() {
                     _uiState.update { it.copy(curSort = v) }
                 }
             }
+
+            launch {
+                AppConfig.homeTab.collectLatest { v ->
+                    _uiState.update { it.copy(curTab = v) }
+                }
+            }
         }
     }
 
@@ -90,6 +96,7 @@ class HomeViewModel : ViewModel() {
     fun onEvent(event: HomeUiEvent) {
         when (event) {
             is HomeUiEvent.OnTabChange -> {
+                AppConfig.homeTab.update { event.tab }
                 _uiState.update { it.copy(curTab = event.tab) }
             }
 
