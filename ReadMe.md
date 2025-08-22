@@ -5,16 +5,21 @@
 ## 🖼️ Screenshots
 
 <div style="overflow-x: auto; white-space: nowrap;">
-
-<img src="screenshots/1.png" width="15%" alt=""/>
-<img src="screenshots/2.png" width="15%" alt=""/>
-<img src="screenshots/3.png" width="15%" alt=""/>
-
+<img src="screenshots/1.jpg" width="20%" alt=""/>
+<img src="screenshots/2.jpg" width="20%" alt=""/>
+<img src="screenshots/3.jpg" width="20%" alt=""/>
 </div>
 
-Here's a video:
-- https://www.bilibili.com/video/BV1UnYezkEjx/
+<div style="overflow-x: auto; white-space: nowrap;">
+<img src="screenshots/4.jpg" width="20%" alt=""/>
+<img src="screenshots/5.jpg" width="20%" alt=""/>
+<img src="screenshots/6.jpg" width="20%" alt=""/>
+</div>
 
+<div style="overflow-x: auto; white-space: nowrap;">
+<img src="screenshots/7.jpg" width="20%" alt=""/>
+<img src="screenshots/8.jpg" width="20%" alt=""/>
+</div>
 
 
 ## 特性
@@ -26,5 +31,5 @@ Here's a video:
 - 阅读记录
 - 动态主题
 
----
-> 注意：该项目正在开发中，解析、阅读器核心功能已开发完成
+## 下载
+- 在release页面下载
