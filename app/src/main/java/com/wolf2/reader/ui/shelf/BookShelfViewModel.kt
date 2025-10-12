@@ -73,12 +73,14 @@ class BookShelfViewModel : ViewModel() {
         }
     }
 
+    private val pageSize = 10
     private fun pager(source: () -> PagingSource<Int, Book>): Pager<Int, Book> {
         return Pager(
             config = PagingConfig(
-                pageSize = 10,
-                enablePlaceholders = true,
-                maxSize = 30
+                pageSize = pageSize,
+                enablePlaceholders = false,
+                initialLoadSize = pageSize,
+                prefetchDistance = pageSize
             ),
             pagingSourceFactory = source
         )
