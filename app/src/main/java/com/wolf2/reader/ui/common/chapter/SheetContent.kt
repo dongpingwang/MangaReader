@@ -21,6 +21,7 @@ fun SheetContent(
     onSelectChange: (Int) -> Unit,
     onPageChange: (Int) -> Unit,
     onLoadBuffer: (PageContent) -> ByteArray?,
+    onLoadBitmap: (PageContent) -> Bitmap?,
 ) {
     val pagerState = rememberPagerState(initialPage = selectedIndex) { 2 }
     val scope = rememberCoroutineScope()
@@ -49,7 +50,8 @@ fun SheetContent(
                 bookMarks = bookMarks,
                 pageContents = pageContents,
                 onPageChange = onPageChange,
-                onLoadBuffer = onLoadBuffer
+                onLoadBuffer = onLoadBuffer,
+                onLoadBitmap = onLoadBitmap
             )
         }
     }

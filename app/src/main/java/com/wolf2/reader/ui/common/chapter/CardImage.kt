@@ -21,6 +21,7 @@ fun CardImage(
     pageContent: PageContent,
     onPageChange: (Int) -> Unit,
     onLoadBuffer: (PageContent) -> ByteArray?,
+    onLoadBitmap: (PageContent) -> Bitmap?,
 ) {
     OutlinedCard(
         onClick = { onPageChange(pageIndex) },
@@ -35,6 +36,12 @@ fun CardImage(
         if (pageContent.imageUri != Uri.EMPTY) {
             PageAsyncImage(
                 model = pageContent.imageUri,
+                modifier = Modifier
+                    .fillMaxSize()
+            )
+        } else if (pageContent.pageIndex >= 0) {
+            PageAsyncImage(
+                model = onLoadBitmap(pageContent),
                 modifier = Modifier
                     .fillMaxSize()
             )

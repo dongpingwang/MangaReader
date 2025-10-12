@@ -25,7 +25,7 @@ fun RVPager(
     isDarkMode: Boolean,
     curPage: Int,
     pageContents: List<PageContent>,
-    onLoadImage: (PageContent) -> Bitmap,
+    onLoadImage: (PageContent) -> Bitmap?,
     onImageClick: () -> Unit,
     onPageChange: (Int) -> Unit
 ) {

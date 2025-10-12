@@ -6,6 +6,7 @@ object EbookUtil {
     private val mobiFileMimeTypes = listOf("application/x-mobipocket-ebook")
     private val azw3FileMimeTypes =
         listOf("application/vnd.amazon.mobi8-ebook", "application/octet-stream")
+    private val pdfFileMimeTypes = listOf("application/pdf")
 
     val allFileFormats = listOf(
         "epub",
@@ -33,5 +34,9 @@ object EbookUtil {
 
     fun isAzw3MimeType(mimeType: String?): Boolean {
         return azw3FileMimeTypes.contains(mimeType)
+    }
+
+    fun isPdfMimeType(mimeType: String?): Boolean {
+        return pdfFileMimeTypes.contains(mimeType)
     }
 }

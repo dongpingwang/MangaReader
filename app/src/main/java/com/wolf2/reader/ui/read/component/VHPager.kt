@@ -1,5 +1,6 @@
 package com.wolf2.reader.ui.read.component
 
+import android.graphics.Bitmap
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.pager.HorizontalPager
@@ -23,6 +24,7 @@ fun VHPager(
     curPage: Int,
     pageContents: List<PageContent>,
     onLoadBuffer: (PageContent) -> ByteArray?,
+    onLoadBitmap: (PageContent) -> Bitmap?,
     onImageClick: () -> Unit,
     onPageChange: (Int) -> Unit
 ) {
@@ -51,6 +53,7 @@ fun VHPager(
             ReaderPageAsyncImage(
                 pageContent = pageContents[it],
                 onLoadBuffer = onLoadBuffer,
+                onLoadBitmap = onLoadBitmap,
                 modifier = modifier
             )
         }
@@ -59,6 +62,7 @@ fun VHPager(
             ReaderPageAsyncImage(
                 pageContent = pageContents[it],
                 onLoadBuffer = onLoadBuffer,
+                onLoadBitmap = onLoadBitmap,
                 modifier = modifier
             )
         }

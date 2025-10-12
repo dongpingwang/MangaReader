@@ -6,6 +6,7 @@ data class PageContent(
     var pageHref: String = "", // epub每一页href
     var markupUid: Int = 0,  // mobi每一页markupUid
     var imageUri: Uri = Uri.EMPTY, // 文件夹图片Uri
+    var pageIndex: Int = -1, // pdf每一页index
 ) {
     constructor(pageHref: String) : this(pageHref = pageHref, markupUid = 0, imageUri = Uri.EMPTY)
 

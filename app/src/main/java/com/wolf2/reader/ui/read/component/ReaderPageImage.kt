@@ -13,7 +13,7 @@ import com.wolf2.reader.ui.common.PageImage
 @Composable
 fun ReaderPageImage(
     pageContent: PageContent,
-    onLoadImage: (PageContent) -> Bitmap,
+    onLoadImage: (PageContent) -> Bitmap?,
     contentScale: ContentScale = ContentScale.Fit,
     modifier: Modifier = Modifier
 ) {
@@ -32,7 +32,7 @@ fun ReaderPageImage(
 //    }
 
     PageImage(
-        bitmap = onLoadImage(pageContent).asImageBitmap(),
+        bitmap = onLoadImage(pageContent)?.asImageBitmap(),
         contentScale = contentScale,
         modifier = modifier
     )
@@ -42,6 +42,7 @@ fun ReaderPageImage(
 fun ReaderPageAsyncImage(
     pageContent: PageContent,
     onLoadBuffer: (PageContent) -> ByteArray?,
+    onLoadBitmap: (PageContent) -> Bitmap?,
     contentScale: ContentScale = ContentScale.Fit,
     modifier: Modifier = Modifier
 ) {
@@ -58,9 +59,19 @@ fun ReaderPageAsyncImage(
 //            modifier = modifier
 //        )
 //    }
-    PageAsyncImage(
-        model = onLoadBuffer(pageContent),
-        contentScale = contentScale,
-        modifier = modifier
-    )
+
+    if (pageContent.pageIndex >= 0) {
+        PageAsyncImage(
+            model = onLoadBitmap(pageContent),
+            contentScale = contentScale,
+            modifier = modifier
+        )
+    } else {
+        PageAsyncImage(
+            model = onLoadBuffer(pageContent),
+            contentScale = contentScale,
+            modifier = modifier
+        )
+    }
+
 }

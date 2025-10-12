@@ -1,5 +1,6 @@
 package com.wolf2.reader.ui.common.chapter
 
+import android.graphics.Bitmap
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -21,6 +22,7 @@ fun PageGrid(
     pageContents: List<PageContent>,
     onPageChange: (Int) -> Unit,
     onLoadBuffer: (PageContent) -> ByteArray?,
+    onLoadBitmap: (PageContent) -> Bitmap?,
 ) {
     if (chapters.size <= 1) {
         EmptyHint(hint = R.string.empty_charpter_hint)
@@ -61,7 +63,8 @@ fun PageGrid(
                     pageIndex = i,
                     pageContent = pageContent,
                     onPageChange = onPageChange,
-                    onLoadBuffer = onLoadBuffer
+                    onLoadBuffer = onLoadBuffer,
+                    onLoadBitmap = onLoadBitmap,
                 )
             }
         }

@@ -78,7 +78,7 @@ fun MangaReadScreen(bookUuid: String, from: String, curPage: Int?) {
         return viewModel.getImageBuffer(pageContent)
     }
 
-    fun loadImage(pageContent: PageContent): Bitmap {
+    fun loadImage(pageContent: PageContent): Bitmap? {
         return viewModel.loadImage(pageContent)
     }
 
@@ -113,6 +113,8 @@ fun MangaReadScreen(bookUuid: String, from: String, curPage: Int?) {
                         pageContents = book.pageContents,
                         onLoadBuffer = {
                             loadBuffer(it)
+                        }, onLoadBitmap = {
+                            loadImage(it)
                         }, onImageClick = {
                             toggleBarsVisibility()
                         }, onPageChange = {
@@ -237,7 +239,8 @@ fun MangaReadScreen(bookUuid: String, from: String, curPage: Int?) {
                     showChapterSheet = false
                     updateReadRecord(it, true)
                 },
-                onLoadBuffer = { loadBuffer(it) }
+                onLoadBuffer = { loadBuffer(it) },
+                onLoadBitmap = { loadImage(it) }
             )
         }
     }

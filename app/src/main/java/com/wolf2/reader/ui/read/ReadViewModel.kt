@@ -279,13 +279,8 @@ class ReadViewModel(val bookUuid: String, val from: String, val curPageArg: Int?
         return fileReader?.getImageBuffer(page)
     }
 
-    fun loadImage(pageContent: PageContent): Bitmap {
-        val buffer = getImageBuffer(pageContent)
-        return BitmapFactory.decodeByteArray(
-            getImageBuffer(pageContent),
-            0,
-            buffer?.size ?: 0
-        )
+    fun loadImage(pageContent: PageContent): Bitmap? {
+        return fileReader?.getImageBitmap(pageContent)
     }
 
     private fun toggleBookMark() {

@@ -1,5 +1,6 @@
 package com.wolf2.reader.ui.common.chapter
 
+import android.graphics.Bitmap
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -21,6 +22,7 @@ fun BookMarkGrid(
     pageContents: List<PageContent>,
     onPageChange: (Int) -> Unit,
     onLoadBuffer: (PageContent) -> ByteArray?,
+    onLoadBitmap: (PageContent) -> Bitmap?,
 ) {
     if (bookMarks.isEmpty()) {
         EmptyHint(hint = R.string.empty_bookmark_hint)
@@ -45,7 +47,8 @@ fun BookMarkGrid(
                         pageIndex = pageIndex,
                         pageContent = pageContent,
                         onPageChange = onPageChange,
-                        onLoadBuffer = onLoadBuffer
+                        onLoadBuffer = onLoadBuffer,
+                        onLoadBitmap = onLoadBitmap,
                     )
                 }
             }

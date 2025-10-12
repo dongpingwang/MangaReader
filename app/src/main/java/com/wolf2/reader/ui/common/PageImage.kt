@@ -63,6 +63,21 @@ fun PageAsyncImage(
 
 @Composable
 fun PageAsyncImage(
+    model: Bitmap?,
+    contentScale: ContentScale = ContentScale.Fit,
+    modifier: Modifier = Modifier
+) {
+    AsyncImage(
+        model = model,
+        contentScale = contentScale,
+        filterQuality = FilterQuality.High,
+        contentDescription = null,
+        modifier = modifier
+    )
+}
+
+@Composable
+fun PageAsyncImage(
     model: Uri,
     contentScale: ContentScale = ContentScale.Fit,
     modifier: Modifier = Modifier
@@ -78,10 +93,11 @@ fun PageAsyncImage(
 
 @Composable
 fun PageImage(
-    bitmap: ImageBitmap,
+    bitmap: ImageBitmap?,
     contentScale: ContentScale = ContentScale.Fit,
     modifier: Modifier = Modifier
 ) {
+    if (bitmap == null) return
     Image(
         bitmap = bitmap,
         contentScale = contentScale,

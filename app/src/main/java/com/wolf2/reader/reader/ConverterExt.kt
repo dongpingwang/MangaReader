@@ -4,10 +4,12 @@ import android.net.Uri
 import androidx.compose.ui.util.fastForEach
 import androidx.documentfile.provider.DocumentFile
 import com.anggrayudi.storage.extension.toDocumentFile
+import com.shockwave.pdfium.PdfDocument
 import com.wolf2.reader.mode.entity.ReadRecord
 import com.wolf2.reader.mode.entity.ReadTime
 import com.wolf2.reader.mode.entity.book.Book
 import com.wolf2.reader.mode.entity.book.CoverImage
+import com.wolf2.reader.mode.entity.book.Metadata
 import com.wolf2.reader.util.globalContext
 import com.wolf2.reader.util.isDirectoryEarly
 import com.wolf2.reader.util.listFilesCount
@@ -133,4 +135,8 @@ fun List<ReadTime>.durations(): Long {
         duration += it.duration()
     }
     return duration
+}
+
+fun PdfDocument.Meta.toBookMetadata(): Metadata {
+    return Metadata(title = this.title, author = this.author)
 }

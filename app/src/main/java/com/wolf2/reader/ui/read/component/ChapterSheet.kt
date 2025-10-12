@@ -1,5 +1,6 @@
 package com.wolf2.reader.ui.read.component
 
+import android.graphics.Bitmap
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalBottomSheet
@@ -24,6 +25,7 @@ fun ChapterSheet(
     onDismissRequest: () -> Unit,
     onPageChange: (Int) -> Unit,
     onLoadBuffer: (PageContent) -> ByteArray?,
+    onLoadBitmap: (PageContent) -> Bitmap?,
 ) {
     var selectedIndex by remember { mutableIntStateOf(0) }
 
@@ -40,7 +42,8 @@ fun ChapterSheet(
             bookMarks = bookMarks,
             onSelectChange = { selectedIndex = it },
             onPageChange = onPageChange,
-            onLoadBuffer = onLoadBuffer
+            onLoadBuffer = onLoadBuffer,
+            onLoadBitmap = onLoadBitmap,
         )
     }
 }

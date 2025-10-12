@@ -1,5 +1,7 @@
 package com.wolf2.reader.reader
 
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import com.anggrayudi.storage.file.DocumentFileCompat
 import com.anggrayudi.storage.file.mimeType
 import com.wolf2.reader.config.EbookUtil
@@ -56,8 +58,11 @@ class CachedReader private constructor(private val source: Book) {
             reader = EpubFileReader(source)
         } else if (EbookUtil.isMobiMimeType(mimeType) || EbookUtil.isAzw3MimeType(mimeType)) {
             reader = MobiFileReader(source)
+        } else if (EbookUtil.isPdfMimeType(mimeType)) {
+            reader = PdfFileReader(source)
         }
         reader?.read(updateMetadata, updatePageContent)
+
         return true
     }
 
@@ -76,6 +81,14 @@ class CachedReader private constructor(private val source: Book) {
 
     fun getImageBuffer(page: PageContent): ByteArray? {
         return reader?.getImageBuffer(page)
+    }
+
+    fun getImageBitmap(page: PageContent): Bitmap? {
+        if (reader is PdfFileReader) {
+            return (reader as PdfFileReader).getPageBitmap(page.pageIndex)
+        }
+        val buffer = getImageBuffer(page) ?: return null
+        return BitmapFactory.decodeByteArray(buffer, 0, buffer.size)
     }
 
     fun close() {

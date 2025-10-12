@@ -51,6 +51,20 @@ public class PdfDocument {
         public String getModDate() {
             return modDate;
         }
+
+        @Override
+        public String toString() {
+            return "Meta{" +
+                    "title='" + title + '\'' +
+                    ", author='" + author + '\'' +
+                    ", subject='" + subject + '\'' +
+                    ", keywords='" + keywords + '\'' +
+                    ", creator='" + creator + '\'' +
+                    ", producer='" + producer + '\'' +
+                    ", creationDate='" + creationDate + '\'' +
+                    ", modDate='" + modDate + '\'' +
+                    '}';
+        }
     }
 
     public static class Bookmark {
