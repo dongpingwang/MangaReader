@@ -16,7 +16,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.platform.LocalContext
-import com.wolf2.reader.config.AppColor
+import com.wolf2.reader.constant.AppColor
 
 private fun darkenColor(color: Color, factor: Float): Color {
     return lerp(color, Color.Black, factor)

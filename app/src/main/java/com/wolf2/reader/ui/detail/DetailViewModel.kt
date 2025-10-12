@@ -205,9 +205,7 @@ class DetailViewModel(val bookUuid: String) : ViewModel() {
 
     private fun shareBook() {
         val book = (_uiState.value.bookResult as LoadResult.Success<Book>).data
-        val filePath = book.uri.storagePath()
-        requireNotNull(filePath)
-        AppUtil.shareFile(filePath, book.mimeType)
+        AppUtil.shareFile(book.uri, book.mimeType)
     }
 
     private fun copyContent() {

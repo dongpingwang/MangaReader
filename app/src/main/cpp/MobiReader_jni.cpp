@@ -53,7 +53,7 @@ MOBIRawml *getNativeMOBIRawmlPtr(JNIEnv *env, jobject thiz) {
 
 extern "C"
 JNIEXPORT jint JNICALL
-Java_com_wolf2_reader_reader_MobiFileReader_nativeInit(JNIEnv *env, jobject thiz, jstring path) {
+Java_com_wolf2_reader_reader_MobiFileReader_nativeInitByPath(JNIEnv *env, jobject thiz, jstring path) {
     MOBIData *m = mobi_init();
     if (m == nullptr) {
         LOGE("mobi_init error");
@@ -68,6 +68,44 @@ Java_com_wolf2_reader_reader_MobiFileReader_nativeInit(JNIEnv *env, jobject thiz
     FILE *file = fopen(file_path, "rb");
     if (file == nullptr) {
         LOGE("fopen error");
+        mobi_free(m);
+        return MOBI_FILE_NOT_FOUND;
+    }
+    MOBI_RET mobi_ret = mobi_load_file(m, file);
+    fclose(file);
+    if (mobi_ret != MOBI_SUCCESS) {
+        mobi_free(m);
+        return MOBI_ERROR;
+    }
+    MOBIRawml *rawml = mobi_init_rawml(m);
+    if (rawml == nullptr) {
+        mobi_free_rawml(rawml);
+        return MOBI_ERROR;
+    }
+    mobi_ret = mobi_parse_rawml(rawml, m);
+    if (mobi_ret != MOBI_SUCCESS) {
+        mobi_free_rawml(rawml);
+        return MOBI_ERROR;
+    }
+    injectNativeMOBIDataPtr(env, thiz, m);
+    injectNativeMOBIRawmlPtr(env, thiz, rawml);
+
+    return MOBI_SUCCESS;
+}
+
+
+extern "C"
+JNIEXPORT jint JNICALL
+Java_com_wolf2_reader_reader_MobiFileReader_nativeInitByFd(JNIEnv *env, jobject thiz, jint fd) {
+    MOBIData *m = mobi_init();
+    if (m == nullptr) {
+        LOGE("mobi_init error");
+        return MOBI_INIT_FAILED;
+    }
+    LOGI("fdopen fd:%d", fd);
+    FILE *file = fdopen(fd,"r");
+    if (file == nullptr) {
+        LOGE("fdopen error");
         mobi_free(m);
         return MOBI_FILE_NOT_FOUND;
     }

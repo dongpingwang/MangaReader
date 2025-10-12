@@ -32,15 +32,34 @@ EPUB3Ref getNativeEPUB3Ref(JNIEnv *env, jobject thiz) {
 extern "C"
 JNIEXPORT jint
 JNICALL
-Java_com_wolf2_reader_reader_EpubFileReader_nativeInit(JNIEnv *env, jobject thiz, jstring path) {
+Java_com_wolf2_reader_reader_EpubFileReader_nativeInitByPath(JNIEnv *env, jobject thiz,
+                                                             jstring path) {
     const char *file_path = env->GetStringUTFChars(path, nullptr);
-    LOGI("nativeInit: %s", file_path);
+    LOGI("nativeInitByPath: %s", file_path);
     if (file_path == nullptr) {
         LOGI("file_path is null");
         return kEPUB3FileNotFoundInArchiveError;
     }
     EPUB3Error error = kEPUB3Success;
     EPUB3Ref epub3Ref = EPUB3CreateWithArchiveAtPath(file_path, &error);
+    if (epub3Ref == nullptr) {
+        return kEPUB3ArchiveUnavailableError;
+    }
+    injectNativeEPUB3RefPtr(env, thiz, epub3Ref);
+    return kEPUB3Success;
+}
+
+extern "C"
+JNIEXPORT jint
+JNICALL
+Java_com_wolf2_reader_reader_EpubFileReader_nativeInitByFd(JNIEnv *env, jobject thiz, jint fd) {
+    LOGI("nativeInitByFd: %d", fd);
+    if (fd <= 0) {
+        LOGI("fd is null");
+        return kEPUB3FileNotFoundInArchiveError;
+    }
+    EPUB3Error error = kEPUB3Success;
+    EPUB3Ref epub3Ref = EPUB3CreateWithArchiveAtFd(fd, &error);
     if (epub3Ref == nullptr) {
         return kEPUB3ArchiveUnavailableError;
     }

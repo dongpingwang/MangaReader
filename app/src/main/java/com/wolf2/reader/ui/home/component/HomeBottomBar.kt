@@ -11,7 +11,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import com.wolf2.reader.R
-import com.wolf2.reader.config.NavLabelShow
+import com.wolf2.reader.constant.NavLabelShow
 import com.wolf2.reader.ui.home.HomeUiState
 
 @Composable

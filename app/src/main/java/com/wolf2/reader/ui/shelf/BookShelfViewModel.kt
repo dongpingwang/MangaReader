@@ -7,8 +7,8 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingSource
 import com.wolf2.reader.config.AppConfig
-import com.wolf2.reader.config.ShelfFilter
-import com.wolf2.reader.config.ShelfSort
+import com.wolf2.reader.constant.ShelfFilter
+import com.wolf2.reader.constant.ShelfSort
 import com.wolf2.reader.mode.db.DatabaseHelper
 import com.wolf2.reader.mode.entity.ReadRecord
 import com.wolf2.reader.mode.entity.book.Book
@@ -20,7 +20,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import timber.log.Timber
 
 sealed class BookShelfUiEvent {
     data object OnNavigationToBrowser : BookShelfUiEvent()

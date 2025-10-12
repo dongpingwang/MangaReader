@@ -64,7 +64,7 @@ fun BookDetailScreen(
                 onPageChange = {
                     navigationToRead(it)
                 },
-                onLoadImage = { viewModel.loadImage(it) }
+                onLoadBuffer = {viewModel.getImageBuffer(it)}
             )
         }, topBar = {
             DetailTopAppbar(onBackHandle = {

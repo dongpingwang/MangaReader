@@ -4,8 +4,6 @@ import android.content.ClipData
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
-import androidx.core.content.FileProvider
-import java.io.File
 
 object AppUtil {
 
@@ -28,14 +26,7 @@ object AppUtil {
         }.onFailure { it.printStackTrace() }
     }
 
-
-    fun shareFile(path: String, fileType: String) {
-        val file = File(path)
-        val uri = FileProvider.getUriForFile(
-            globalContext,
-            "${globalContext.packageName}.fileprovider",
-            file
-        )
+    fun shareFile(uri: Uri, fileType: String) {
         val shareIntent = Intent(Intent.ACTION_SEND).apply {
             type = fileType
             putExtra(Intent.EXTRA_STREAM, uri)
@@ -45,7 +36,7 @@ object AppUtil {
             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK.or(Intent.FLAG_ACTIVITY_CLEAR_TOP))
             addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-                clipData = ClipData.newRawUri(file.name, uri)
+                clipData = ClipData.newRawUri(null, uri)
             }
         }
         globalContext.startActivity(chooserIntent)

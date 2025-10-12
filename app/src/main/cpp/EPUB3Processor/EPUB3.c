@@ -17,6 +17,49 @@
 #define LOGD(...) __android_log_print(ANDROID_LOG_ERROR, TAG, __VA_ARGS__)
 #define LOGE(...) __android_log_print(ANDROID_LOG_ERROR, TAG, __VA_ARGS__)
 
+#include <unistd.h>
+#include <sys/types.h>
+
+// 实现一个使用 fd 的 fopen 函数
+static voidpf ZCALLBACK fd_fopen(voidpf opaque, const void* filename, int mode) {
+    // 这里我们忽略 filename 参数，因为我们直接使用 fd
+    // opaque 将被设置为我们的文件描述符 (fd)
+    return opaque;
+}
+
+// 实现 fread
+static uLong ZCALLBACK fd_fread(voidpf opaque, voidpf stream, void* buf, uLong size) {
+    int fd = (int)(intptr_t)opaque;
+    ssize_t readSize = read(fd, buf, size);
+    return (readSize >= 0) ? (uLong)readSize : 0;
+}
+
+// 实现 fseek
+static ZPOS64_T ZCALLBACK fd_fseek(voidpf opaque, voidpf stream, ZPOS64_T offset, int origin) {
+    int fd = (int)(intptr_t)opaque;
+    off64_t result = lseek64(fd, offset, origin);
+    return (result == -1) ? -1 : 0;
+}
+
+// 实现 ftell
+static ZPOS64_T ZCALLBACK fd_ftell(voidpf opaque, voidpf stream) {
+    int fd = (int)(intptr_t)opaque;
+    off64_t result = lseek64(fd, 0, SEEK_CUR);
+    return (result == -1) ? -1 : result;
+}
+
+// 实现 fclose
+static int ZCALLBACK fd_fclose(voidpf opaque, voidpf stream) {
+    int fd = (int)(intptr_t)opaque;
+    return close(fd);
+}
+
+// 获取当前文件大小的实现 (可选，但推荐)
+static int ZCALLBACK fd_error(voidpf opaque, voidpf stream) {
+    // 简单返回 0 表示无错误，可根据需要实现
+    return 0;
+}
+
 const char * kEPUB3TypeID = "_EPUB3_t";
 const char * kEPUB3MetadataTypeID = "_EPUB3Metadata_t";
 const char * kEPUB3MetadataItemTypeID = "_EPUB3MetadataItem_t";
@@ -234,6 +277,22 @@ EXPORT EPUB3Ref EPUB3CreateWithArchiveAtPath(const char * path, EPUB3Error *erro
   return epub;
 }
 
+EXPORT EPUB3Ref EPUB3CreateWithArchiveAtFd(const int fd, EPUB3Error *error)
+{
+    EPUB3Ref epub = EPUB3Create();
+    *error = EPUB3PrepareArchiveAtFd(epub, fd);
+    if(*error != kEPUB3Success) {
+        EPUB3Release(epub);
+        return NULL;
+    }
+    *error = EPUB3InitAndValidate(epub);
+    if(*error != kEPUB3Success) {
+        EPUB3Release(epub);
+        return NULL;
+    }
+    return epub;
+}
+
 EPUB3Error EPUB3PrepareArchiveAtPath(EPUB3Ref epub, const char * path)
 {
   assert(epub != NULL);
@@ -249,6 +308,34 @@ EPUB3Error EPUB3PrepareArchiveAtPath(EPUB3Ref epub, const char * path)
   else // unzOpen can return a NULL filestream
     error = kEPUB3UnknownError;
   return error;
+}
+
+EPUB3Error EPUB3PrepareArchiveAtFd(EPUB3Ref epub, const int fd)
+{
+    assert(epub != NULL);
+    EPUB3Error error = kEPUB3Success;
+    // 1. 初始化自定义 I/O 函数表
+    zlib_filefunc64_def ffunc;
+    ffunc.zopen64_file = fd_fopen;
+    ffunc.zread_file = fd_fread;
+    ffunc.zwrite_file = NULL; // 只读，解压不需要写
+    ffunc.ztell64_file = fd_ftell;
+    ffunc.zseek64_file = (seek64_file_func) fd_fseek;
+    ffunc.zclose_file = fd_fclose;
+    ffunc.zerror_file = fd_error;
+    ffunc.opaque = (voidpf)(intptr_t)fd; // 将 fd 作为 opaque 传递，这样上面的回调函数就能用到它
+    // 2. 使用自定义 I/O 打开 Zip 文件
+    // 注意：第二个参数这里传入 NULL，因为我们的 fopen 回调忽略了文件名，只使用了 opaque (fd)
+    unzFile archive = unzOpen2_64(NULL, &ffunc);
+
+    if (archive != NULL)
+    {
+        epub->archive = archive;
+        //epub->archiveFileCount = EPUB3GetFileCountInArchive(archive);
+    }
+    else // unzOpen can return a NULL filestream
+        error = kEPUB3UnknownError;
+    return error;
 }
 
 EPUB3Error EPUB3InitAndValidate(EPUB3Ref epub)

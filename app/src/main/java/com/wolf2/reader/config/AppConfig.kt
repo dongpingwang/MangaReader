@@ -1,7 +1,8 @@
 package com.wolf2.reader.config
 
 import com.dylanc.mmkv.MMKVOwner
-import com.wolf2.reader.config.NavLabelShow.Companion.toInt
+import com.wolf2.reader.constant.NavLabelShow
+import com.wolf2.reader.constant.NavLabelShow.Companion.toInt
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -40,4 +41,6 @@ object AppConfig : MMKVOwner(mmapID = "app_settings") {
     val shelfSort by mmkvInt().asStateFlow()
 
     val homeTab = MutableStateFlow(0)
+
+    var fileFormats by mmkvStringSet(default = EbookUtil.allFileFormats.toSet())
 }

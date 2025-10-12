@@ -4,8 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.wolf2.reader.config.AppConfig
-import com.wolf2.reader.config.ShelfFilter
-import com.wolf2.reader.config.ShelfFilter.Companion.toInt
+import com.wolf2.reader.constant.ShelfFilter
+import com.wolf2.reader.constant.ShelfFilter.Companion.toInt
 import com.wolf2.reader.config.mmkvEmit
 import com.wolf2.reader.mode.db.DatabaseHelper
 import com.wolf2.reader.mode.entity.book.Book

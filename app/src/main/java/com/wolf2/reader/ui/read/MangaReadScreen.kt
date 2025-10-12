@@ -1,6 +1,10 @@
 package com.wolf2.reader.ui.read
 
+import android.app.Activity
+import android.content.Intent
 import android.graphics.Bitmap
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -19,7 +23,7 @@ import androidx.lifecycle.compose.LifecycleStopOrDisposeEffectResult
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
-import com.wolf2.reader.config.PagerSwitchEffect
+import com.wolf2.reader.constant.PagerSwitchEffect
 import com.wolf2.reader.mode.entity.book.Book
 import com.wolf2.reader.mode.entity.book.PageContent
 import com.wolf2.reader.ui.common.MyLoadingIndicator
@@ -35,6 +39,7 @@ import com.wolf2.reader.ui.read.component.ReadTopAppBar
 import com.wolf2.reader.ui.read.component.VHPager
 import com.wolf2.reader.ui.read.component.TinderPager
 import com.wolf2.reader.util.LoadResult
+import timber.log.Timber
 
 @Composable
 fun MangaReadScreen(bookUuid: String, from: String, curPage: Int?) {
@@ -76,6 +81,14 @@ fun MangaReadScreen(bookUuid: String, from: String, curPage: Int?) {
     fun loadImage(pageContent: PageContent): Bitmap {
         return viewModel.loadImage(pageContent)
     }
+
+    val launcher =
+        rememberLauncherForActivityResult(contract = ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                Timber.d("picker uri: ${result.data}")
+                result.data?.data?.let { viewModel.onEvent(ReadUiEvent.OnCacheImage(it)) }
+            }
+        }
 
     var modifier = Modifier.fillMaxSize()
     if (uiState.fullScreen) {
@@ -184,7 +197,14 @@ fun MangaReadScreen(bookUuid: String, from: String, curPage: Int?) {
                 marked = viewModel.isCurPageBookMarked(),
                 pageSwitchEffect = uiState.pagerSwitchEffect,
                 onDismissRequest = { showMoreSheet = false },
-                onSavePicture = { viewModel.onEvent(ReadUiEvent.OnCacheImage) },
+                onSavePicture = {
+                    val intent = Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
+                        addCategory(Intent.CATEGORY_OPENABLE)
+                        type = "image/png"
+                        putExtra(Intent.EXTRA_TITLE, "MReader_${System.currentTimeMillis()}.png")
+                    }
+                    launcher.launch(intent)
+                },
                 onBookMarkToggle = { viewModel.onEvent(ReadUiEvent.OnBookMarkToggle) },
                 onJumpPage = { showJumpDialog = true },
                 onPageSwitchEffectChange = {
@@ -217,7 +237,7 @@ fun MangaReadScreen(bookUuid: String, from: String, curPage: Int?) {
                     showChapterSheet = false
                     updateReadRecord(it, true)
                 },
-                onLoadImage = { loadImage(it) }
+                onLoadBuffer = { loadBuffer(it) }
             )
         }
     }

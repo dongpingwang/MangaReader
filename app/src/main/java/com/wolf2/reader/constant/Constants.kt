@@ -1,14 +1,4 @@
-package com.wolf2.reader.config
-
-import android.os.Environment
-
-data object Constants {
-    // 缓存目录
-    val appShortName = "MReader"
-    val dirRoot = "${Environment.getExternalStorageDirectory().path}/$appShortName"
-    val dirCoverImage = "$dirRoot/coverImages"
-    val dirCacheImage = "$dirRoot/cacheImages"
-}
+package com.wolf2.reader.constant
 
 enum class AppTheme(private val value: Int) {
     SYSTEM(0),

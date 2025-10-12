@@ -196,6 +196,7 @@ void * EPUB3ObjectInitWithTypeID(void *object, const char *typeID);
 
 EPUB3Ref EPUB3Create();
 EPUB3Error EPUB3PrepareArchiveAtPath(EPUB3Ref epub, const char * path);
+EPUB3Error EPUB3PrepareArchiveAtFd(EPUB3Ref epub, const int fd);
 EPUB3Error EPUB3InitAndValidate(EPUB3Ref epub);
 void EPUB3SetStringValue(char ** location, const char *value);
 char * EPUB3CopyStringValue(char ** location);

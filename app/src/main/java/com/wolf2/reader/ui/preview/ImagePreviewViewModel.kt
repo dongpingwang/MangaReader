@@ -1,34 +1,35 @@
 package com.wolf2.reader.ui.preview
 
+import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import com.wolf2.reader.config.MemoryGlobal
 import com.wolf2.reader.popBackStack
-import com.wolf2.reader.ui.util.ImageCacheUtil
 import com.wolf2.reader.util.AppUtil
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
-data class ImagePreviewUiState(val imgPath: String)
+data class ImagePreviewUiState(val imageUri: Uri)
 
 sealed class ImagePreviewUiEvent {
     data object OnBackHandle : ImagePreviewUiEvent()
     data object OnShare : ImagePreviewUiEvent()
 }
 
-class ImagePreviewViewModel(imgName: String) : ViewModel() {
+class ImagePreviewViewModel() : ViewModel() {
 
     companion object {
         @Suppress("UNCHECKED_CAST")
-        fun provideFactory(imgName: String): ViewModelProvider.Factory =
+        fun provideFactory(): ViewModelProvider.Factory =
             object : ViewModelProvider.Factory {
                 override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                    return ImagePreviewViewModel(imgName) as T
+                    return ImagePreviewViewModel() as T
                 }
             }
     }
 
     private var _uiState =
-        MutableStateFlow(ImagePreviewUiState(imgPath = ImageCacheUtil.getCacheImageDiskPath(imgName)))
+        MutableStateFlow(ImagePreviewUiState(imageUri = MemoryGlobal.cacheImageUri!!))
     val uiState = _uiState.asStateFlow()
 
     fun onEvent(event: ImagePreviewUiEvent) {
@@ -36,7 +37,7 @@ class ImagePreviewViewModel(imgName: String) : ViewModel() {
             is ImagePreviewUiEvent.OnBackHandle -> popBackStack()
 
             is ImagePreviewUiEvent.OnShare -> {
-                AppUtil.shareFile(path = _uiState.value.imgPath, fileType = "image/*")
+                AppUtil.shareFile(uri = _uiState.value.imageUri, fileType = "image/*")
             }
         }
     }

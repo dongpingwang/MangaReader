@@ -10,17 +10,16 @@ import androidx.compose.material3.OutlinedCard
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.unit.dp
 import com.wolf2.reader.mode.entity.book.PageContent
-import com.wolf2.reader.ui.read.component.PageImage
+import com.wolf2.reader.ui.common.PageAsyncImage
 
 @Composable
 fun CardImage(
     pageIndex: Int,
     pageContent: PageContent,
     onPageChange: (Int) -> Unit,
-    onLoadImage: (PageContent) -> Bitmap,
+    onLoadBuffer: (PageContent) -> ByteArray?,
 ) {
     OutlinedCard(
         onClick = { onPageChange(pageIndex) },
@@ -32,8 +31,9 @@ fun CardImage(
             .padding(4.dp)
             .fillMaxSize()
     ) {
-        PageImage(
-            bitmap = onLoadImage(pageContent).asImageBitmap(),
+        PageAsyncImage(
+            model = onLoadBuffer(pageContent),
+            bitmapConfig = Bitmap.Config.ALPHA_8,
             modifier = Modifier
                 .fillMaxSize()
         )

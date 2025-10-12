@@ -32,7 +32,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastForEachIndexed
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.wolf2.reader.R
-import com.wolf2.reader.config.AppColor
+import com.wolf2.reader.constant.AppColor
 import com.wolf2.reader.config.AppConfig
 import com.wolf2.reader.config.mmkvEmit
 import com.wolf2.reader.popBackStack

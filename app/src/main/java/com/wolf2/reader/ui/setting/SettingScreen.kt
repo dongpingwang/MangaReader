@@ -6,7 +6,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ArrowBack
 import androidx.compose.material.icons.outlined.DeveloperMode
-import androidx.compose.material.icons.outlined.Download
+import androidx.compose.material.icons.outlined.Folder
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.LocalLibrary
 import androidx.compose.material.icons.outlined.Palette
@@ -72,13 +72,13 @@ fun SettingScreen() {
                 })
 
                 preference(key = "download", title = {
-                    Text(text = stringResource(R.string.settings_download))
+                    Text(text = stringResource(R.string.settings_saf))
                 }, icon = {
-                    Icon(imageVector = Icons.Outlined.Download, contentDescription = null)
+                    Icon(imageVector = Icons.Outlined.Folder, contentDescription = null)
                 }, summary = {
-                    Text(text = stringResource(R.string.settings_download_summary))
+                    Text(text = stringResource(R.string.settings_saf_summary))
                 }, onClick = {
-                    navigate(Routes.SETTINGS_DOWNLOAD)
+                    navigate(Routes.SETTINGS_SAF)
                 })
 
                 preference(key = "develop", title = {

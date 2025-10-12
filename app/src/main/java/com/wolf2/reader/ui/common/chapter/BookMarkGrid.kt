@@ -1,6 +1,5 @@
 package com.wolf2.reader.ui.common.chapter
 
-import android.graphics.Bitmap
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -16,13 +15,12 @@ import com.wolf2.reader.mode.entity.book.PageContent
 
 const val columns = 5
 
-// todo 加载图片可能出现OOM
 @Composable
 fun BookMarkGrid(
     bookMarks: List<BookMark>,
     pageContents: List<PageContent>,
     onPageChange: (Int) -> Unit,
-    onLoadImage: (PageContent) -> Bitmap,
+    onLoadBuffer: (PageContent) -> ByteArray?,
 ) {
     if (bookMarks.isEmpty()) {
         EmptyHint(hint = R.string.empty_bookmark_hint)
@@ -47,7 +45,7 @@ fun BookMarkGrid(
                         pageIndex = pageIndex,
                         pageContent = pageContent,
                         onPageChange = onPageChange,
-                        onLoadImage = onLoadImage
+                        onLoadBuffer = onLoadBuffer
                     )
                 }
             }

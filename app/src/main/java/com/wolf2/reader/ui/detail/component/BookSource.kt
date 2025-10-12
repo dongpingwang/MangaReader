@@ -39,7 +39,7 @@ fun BookSource(book: Book, readRecord: ReadRecord?) {
             .background(MaterialTheme.colorScheme.surfaceDim)
             .padding(8.dp)
     ) {
-        val path = book.uri.storagePath()?.removePrefix("/storage/emulated/0/") ?: ""
+        val path = book.uri.storagePath() ?: ""
 
         Row {
             Text(

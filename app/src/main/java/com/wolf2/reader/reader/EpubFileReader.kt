@@ -1,14 +1,17 @@
 package com.wolf2.reader.reader
 
+import android.os.ParcelFileDescriptor
 import androidx.compose.ui.util.fastForEachIndexed
+import com.anggrayudi.storage.file.DocumentFileCompat
 import com.wolf2.reader.mode.entity.book.Book
 import com.wolf2.reader.mode.entity.book.Chapter
 import com.wolf2.reader.mode.entity.book.CoverImage
 import com.wolf2.reader.mode.entity.book.ExtraInfo
 import com.wolf2.reader.mode.entity.book.Metadata
 import com.wolf2.reader.mode.entity.book.PageContent
-import com.wolf2.reader.ui.util.ImageCacheUtil
-import com.wolf2.reader.util.storagePath
+import com.wolf2.reader.cache.ImageCacheUtil
+import com.wolf2.reader.util.closeQuietly
+import com.wolf2.reader.util.globalContext
 import com.wolf2.reader.util.traceMillis
 import org.jsoup.Jsoup
 import timber.log.Timber
@@ -23,6 +26,7 @@ class EpubFileReader(private val book: Book) : Closeable {
     }
 
     private var isInitSuccess = false
+    private var pfd: ParcelFileDescriptor? = null
 
     private fun checkCondition(): Boolean {
         return isInitSuccess
@@ -30,14 +34,24 @@ class EpubFileReader(private val book: Book) : Closeable {
 
     fun readEpub(updateMetadata: Boolean, updatePageContent: Boolean) {
         traceMillis {
-            val path = book.uri.storagePath()
-            if (path == null) {
-                Timber.e("BOOK Path is NULL")
+            val documentFile = DocumentFileCompat.fromUri(globalContext, book.uri)
+            if (documentFile == null) {
+                Timber.e("book file is null")
                 return@traceMillis
             }
-            Timber.d("book uri : ${book.uri} ==> $path")
+            Timber.d("book uri : ${book.uri} ==> ${documentFile.name}")
 
-            val initStatus = nativeInit(path)
+            val fileDescriptor = runCatching {
+                globalContext.contentResolver.openFileDescriptor(book.uri, "r")
+            }.onFailure { it.printStackTrace() }.getOrNull()
+
+            if (fileDescriptor == null) {
+                Timber.e("book fileDescriptor is null")
+                return@traceMillis
+            }
+            pfd = fileDescriptor
+
+            val initStatus = nativeInitByFd(fileDescriptor.detachFd())
             Timber.d("initStatus: ret = $initStatus")
             isInitSuccess = initStatus == 0
             if (!isInitSuccess) {
@@ -86,7 +100,7 @@ class EpubFileReader(private val book: Book) : Closeable {
     private fun cacheCoverImage() {
         val result = ImageCacheUtil.cacheCoverImage(book.uri.toString(), book.cover)
         if (result) {
-            book.cover.diskPath = ImageCacheUtil.getCoverImageDiskPath(book.uri.toString())
+            book.cover.diskPath = ImageCacheUtil.getCoverImageDiskFile(book.uri.toString())
         }
     }
 
@@ -170,13 +184,16 @@ class EpubFileReader(private val book: Book) : Closeable {
 
     override fun close() {
         if (!checkCondition()) return
+        pfd?.closeQuietly()
         isInitSuccess = false
         nativeDestroy()
     }
 
     private var nativeEPUB3RefPtr: Long = 0L
 
-    private external fun nativeInit(path: String): Int
+    private external fun nativeInitByFd(fd: Int): Int
+
+    private external fun nativeInitByPath(path: String): Int
 
     private external fun nativeDestroy()
 

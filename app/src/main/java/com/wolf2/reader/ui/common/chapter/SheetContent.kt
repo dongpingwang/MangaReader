@@ -20,7 +20,7 @@ fun SheetContent(
     bookMarks: List<BookMark>,
     onSelectChange: (Int) -> Unit,
     onPageChange: (Int) -> Unit,
-    onLoadImage: (PageContent) -> Bitmap,
+    onLoadBuffer: (PageContent) -> ByteArray?,
 ) {
     val pagerState = rememberPagerState(initialPage = selectedIndex) { 3 }
     val scope = rememberCoroutineScope()
@@ -42,14 +42,14 @@ fun SheetContent(
                 chapters = chapters,
                 pageContents = pageContents,
                 onPageChange = onPageChange,
-                onLoadImage = onLoadImage
+                onLoadBuffer = onLoadBuffer
             )
 
             2 -> BookMarkGrid(
                 bookMarks = bookMarks,
                 pageContents = pageContents,
                 onPageChange = onPageChange,
-                onLoadImage = onLoadImage
+                onLoadBuffer = onLoadBuffer
             )
         }
     }

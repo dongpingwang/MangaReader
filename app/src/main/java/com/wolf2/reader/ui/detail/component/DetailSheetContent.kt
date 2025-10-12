@@ -1,6 +1,5 @@
 package com.wolf2.reader.ui.detail.component
 
-import android.graphics.Bitmap
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -46,7 +45,7 @@ fun DetailSheetContent(
     onDeleteReadRecord: () -> Unit,
     onShareBookFile: () -> Unit,
     onPageChange: (Int) -> Unit,
-    onLoadImage: (PageContent) -> Bitmap,
+    onLoadBuffer: (PageContent) -> ByteArray?,
 ) {
     var selectedIndex by remember { mutableIntStateOf(0) }
     val loadComplete = uiState.bookResult is LoadResult.Success
@@ -116,7 +115,7 @@ fun DetailSheetContent(
                 bookMarks = uiState.bookMarks,
                 onSelectChange = { selectedIndex = it },
                 onPageChange = onPageChange,
-                onLoadImage = onLoadImage
+                onLoadBuffer = onLoadBuffer
             )
         }
     }

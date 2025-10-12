@@ -2,13 +2,14 @@ package com.wolf2.reader.ui.read
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.wolf2.reader.R
-import com.wolf2.reader.util.MD5Util
 import com.wolf2.reader.config.AppConfig
-import com.wolf2.reader.config.ChapterDisplay
+import com.wolf2.reader.config.MemoryGlobal
+import com.wolf2.reader.constant.ChapterDisplay
 import com.wolf2.reader.config.mmkvEmit
 import com.wolf2.reader.mode.db.DatabaseHelper
 import com.wolf2.reader.mode.entity.BookMark
@@ -24,10 +25,10 @@ import com.wolf2.reader.reader.numbers
 import com.wolf2.reader.reader.percent
 import com.wolf2.reader.ui.common.SnackbarModel
 import com.wolf2.reader.ui.home.Routes
-import com.wolf2.reader.ui.util.ImageCacheUtil
 import com.wolf2.reader.util.DateUtil
 import com.wolf2.reader.util.LoadResult
 import com.wolf2.reader.util.globalContext
+import com.wolf2.reader.util.takePersistableUriPermission
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -41,7 +42,7 @@ sealed class ReadUiEvent {
     data object OnDisplayCacheImage : ReadUiEvent()
     data object OnBackHandle : ReadUiEvent()
     data object OnBookMarkToggle : ReadUiEvent()
-    data object OnCacheImage : ReadUiEvent()
+    data class OnCacheImage(val uri: Uri) : ReadUiEvent()
     data class OnPageSwitchEffectChange(val effect: Int) : ReadUiEvent()
     data object OnPrevChapter : ReadUiEvent()
     data object OnNextChapter : ReadUiEvent()
@@ -90,7 +91,6 @@ class ReadViewModel(val bookUuid: String, val from: String, val curPageArg: Int?
     private var fileReader: CachedReader? = null
     private var existsReadRecord = false
     private lateinit var readRecord: ReadRecord
-    private var cacheImgName: String? = null
 
     init {
         viewModelScope.launch {
@@ -251,18 +251,27 @@ class ReadViewModel(val bookUuid: String, val from: String, val curPageArg: Int?
         AppConfig.pagerSwitchEffect.mmkvEmit(effect)
     }
 
-    private fun cacheImage() {
+    private fun cacheImage(uri: Uri) {
         viewModelScope.launch(Dispatchers.IO) {
-            val book = (_uiState.value.bookResult as LoadResult.Success<Book>).data
-            val pageContent = book.pageContents[getCurPage()]
-            val buffer = fileReader?.getImageBuffer(pageContent)
-            val displayName =
-                MD5Util.getMD5String16(pageContent.pageHref + pageContent.markupUid, null)
-            val ret = if (buffer == null) false else ImageCacheUtil.cacheImage(buffer, displayName)
-            Timber.d("cacheImage: ret = $ret")
-            if (!ret) return@launch
-            cacheImgName = displayName
-            _uiState.update { it.copy(snackbar = cacheImageSnackbar, readRecord = readRecord) }
+            globalContext.contentResolver.openOutputStream(uri, "w").use {
+                val book = (_uiState.value.bookResult as LoadResult.Success<Book>).data
+                val pageContent = book.pageContents[getCurPage()]
+                val buffer = fileReader?.getImageBuffer(pageContent)
+                runCatching {
+                    it?.write(buffer)
+                }.onFailure {
+                    it.printStackTrace()
+                }.onSuccess {
+                    MemoryGlobal.cacheImageUri = uri
+                    uri.takePersistableUriPermission()
+                    _uiState.update {
+                        it.copy(
+                            snackbar = cacheImageSnackbar,
+                            readRecord = readRecord
+                        )
+                    }
+                }
+            }
         }
     }
 
@@ -326,13 +335,13 @@ class ReadViewModel(val bookUuid: String, val from: String, val curPageArg: Int?
         when (event) {
             is ReadUiEvent.OnSnackbarDismiss -> _uiState.update { it.copy(snackbar = null) }
 
-            is ReadUiEvent.OnDisplayCacheImage -> cacheImgName?.let { navigate("${Routes.IMAGE_PREVIEW}/$it") }
+            is ReadUiEvent.OnDisplayCacheImage -> navigateToPreview()
 
             is ReadUiEvent.OnBackHandle -> popBackStack()
 
             is ReadUiEvent.OnBookMarkToggle -> toggleBookMark()
 
-            is ReadUiEvent.OnCacheImage -> cacheImage()
+            is ReadUiEvent.OnCacheImage -> cacheImage(event.uri)
 
             is ReadUiEvent.OnPageSwitchEffectChange -> setPagerSwitchEffect(event.effect)
 
@@ -347,6 +356,10 @@ class ReadViewModel(val bookUuid: String, val from: String, val curPageArg: Int?
             is ReadUiEvent.OnLifecycleStart -> createReadTime()
             is ReadUiEvent.OnLifecycleStop -> updateReadTime()
         }
+    }
+
+    private fun navigateToPreview() {
+        navigate(Routes.IMAGE_PREVIEW)
     }
 
     private val cacheImageSnackbar =
@@ -365,7 +378,8 @@ class ReadViewModel(val bookUuid: String, val from: String, val curPageArg: Int?
 
     private fun createReadTime() {
         val now = System.currentTimeMillis()
-        readTime = ReadTime(bookUuid = bookUuid, startReadTimeMillis = now, date = DateUtil.getDate(now))
+        readTime =
+            ReadTime(bookUuid = bookUuid, startReadTimeMillis = now, date = DateUtil.getDate(now))
     }
 
     private fun updateReadTime() {

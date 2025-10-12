@@ -32,7 +32,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.wolf2.reader.R
-import com.wolf2.reader.ui.read.component.PageAsyncImage
+import com.wolf2.reader.ui.common.PageAsyncImage
 import me.saket.cascade.CascadeDropdownMenu
 import net.engawapg.lib.zoomable.rememberZoomState
 import net.engawapg.lib.zoomable.zoomable
@@ -40,10 +40,10 @@ import net.engawapg.lib.zoomable.zoomable
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ImagePreviewScreen(imgName: String) {
+fun ImagePreviewScreen() {
 
     val viewModel: ImagePreviewViewModel =
-        viewModel(factory = ImagePreviewViewModel.provideFactory(imgName))
+        viewModel(factory = ImagePreviewViewModel.provideFactory())
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var showAppBar by remember { mutableStateOf(false) }
     var showDropMenu by remember { mutableStateOf(false) }
@@ -102,6 +102,6 @@ fun ImagePreviewScreen(imgName: String) {
             })
         }
     }) { innerPadding ->
-        PageAsyncImage(model = uiState.imgPath, modifier = modifier)
+        PageAsyncImage(model = uiState.imageUri, modifier = modifier)
     }
 }

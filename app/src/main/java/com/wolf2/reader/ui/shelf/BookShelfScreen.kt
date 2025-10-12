@@ -8,7 +8,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.wolf2.reader.R
-import com.wolf2.reader.config.ShelfLayout
+import com.wolf2.reader.constant.ShelfLayout
 import com.wolf2.reader.mode.entity.book.Book
 import com.wolf2.reader.ui.common.EmptyHint
 import com.wolf2.reader.ui.home.HomeUiState

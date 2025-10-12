@@ -23,7 +23,7 @@
     <string name="to_book_shelf">查看</string>
     <string name="error_book_file_not_found">请检查书籍文件路径或者文件查看权限</string>
     <string name="confirm">确定</string>
-    <string name="picker_book">浏览书籍</string>
+    <string name="picker_book">选择书籍目录</string>
     <string name="sort_asc">正序</string>
     <string name="sort_desc">反序</string>
 
@@ -46,8 +46,10 @@
     <string name="settings_appearance_summary">颜色模式，视图选项，语言</string>
     <string name="settings_reader">阅读</string>
     <string name="settings_reader_summary">阅读模式，阅读页面</string>
-    <string name="settings_download">下载</string>
-    <string name="settings_download_summary">封面缓存，图片保存</string>
+    <string name="settings_saf">浏览</string>
+    <string name="settings_saf_summary">书籍目录，文件格式</string>
+    <string name="settings_book_folder">已添加的文件夹</string>
+    <string name="settings_book_format">可扫描的文件格式</string>
     <string name="settings_develop">调试</string>
     <string name="settings_develop_summary">应用日志</string>
     <string name="settings_about">关于</string>
@@ -56,9 +58,7 @@
     <string name="settings_version_code">版本号 %d</string>
     <string name="settings_source">源代码</string>
     <string name="settings_source_url">https://github.com/dongpingwang/MangaReader</string>
-    <string name="settings_cache_dir">图片缓存目录</string>
-    <string name="settings_cover_image_extension">书籍封面保存为图片</string>
-    <string name="settings_cover_image_extension_summary">开启后，系统图库将显示这些图片</string>
+    <string name="settings_saf_dir">书籍文件夹</string>
     <string name="settings_theme_mode">颜色模式</string>
     <string name="settings_dark_amoled_mode">纯黑深色模式</string>
     <string name="settings_dark_amoled_mode_summary">在AMOLED屏幕上更省电</string>

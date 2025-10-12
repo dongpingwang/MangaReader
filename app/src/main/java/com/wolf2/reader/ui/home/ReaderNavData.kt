@@ -9,7 +9,7 @@ object Routes {
     const val IMAGE_PREVIEW = "image_preview"
     const val SETTINGS = "settings"
     const val SETTINGS_APPEARANCE= "settings_appearance"
-    const val SETTINGS_DOWNLOAD= "settings_download"
+    const val SETTINGS_SAF= "settings_saf"
     const val SETTINGS_ABOUT = "settings_about"
     const val SETTINGS_READER = "settings_reader"
 }

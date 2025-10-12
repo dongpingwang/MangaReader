@@ -1,27 +1,10 @@
 package com.wolf2.reader.util
 
 import android.content.Intent
+import android.content.UriPermission
 import android.net.Uri
-import android.os.Build
-import android.os.Environment
-import android.provider.Settings
-import androidx.annotation.RequiresApi
-import androidx.core.net.toUri
 import com.anggrayudi.storage.file.DocumentFileCompat
-import com.anggrayudi.storage.file.getAbsolutePath
-
-@RequiresApi(Build.VERSION_CODES.R)
-fun requestFullStorageAccess() {
-    val intent = Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION)
-    val uri = ("package:" + globalContext.packageName).toUri()
-    intent.setData(uri)
-    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK.or(Intent.FLAG_ACTIVITY_CLEAR_TOP))
-    globalContext.startActivity(intent)
-}
-
-fun isExternalStorageManager(): Boolean {
-    return Environment.isExternalStorageManager()
-}
+import com.anggrayudi.storage.file.getSimplePath
 
 fun Uri.takePersistableUriPermission(): Boolean {
     return runCatching {
@@ -41,6 +24,14 @@ fun Uri.releasePersistableUriPermission(): Boolean {
     }.onFailure { it.printStackTrace() }.isSuccess
 }
 
+fun getPersistedUriPermissions(): List<UriPermission> {
+    return globalContext.contentResolver.persistedUriPermissions
+}
+
+fun Uri.checkUriPermissions(): Boolean {
+    return DocumentFileCompat.fromUri(globalContext, this)?.canRead() == true
+}
+
 fun Uri.storagePath(): String? {
-    return DocumentFileCompat.fromUri(globalContext, this)?.getAbsolutePath(globalContext)
+    return DocumentFileCompat.fromUri(globalContext, this)?.getSimplePath(globalContext)
 }

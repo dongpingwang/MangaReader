@@ -17,9 +17,9 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.wolf2.reader.MainActivity
 import com.wolf2.reader.AppViewContext
-import com.wolf2.reader.config.AppColor
+import com.wolf2.reader.constant.AppColor
 import com.wolf2.reader.config.AppConfig
-import com.wolf2.reader.config.AppTheme
+import com.wolf2.reader.constant.AppTheme
 import com.wolf2.reader.globalViewContext
 import com.wolf2.reader.ui.browser.BrowserScreen
 import com.wolf2.reader.ui.detail.BookDetailScreen
@@ -30,7 +30,7 @@ import com.wolf2.reader.ui.read.MangaReadScreen
 import com.wolf2.reader.ui.search.SearchScreen
 import com.wolf2.reader.ui.setting.AboutScreen
 import com.wolf2.reader.ui.setting.AppearanceScreen
-import com.wolf2.reader.ui.setting.DownloadScreen
+import com.wolf2.reader.ui.setting.SafScreen
 import com.wolf2.reader.ui.setting.ReaderScreen
 import com.wolf2.reader.ui.setting.SettingScreen
 import com.wolf2.reader.ui.theme.ComicReaderTheme
@@ -103,14 +103,8 @@ fun ReaderNavGraph() {
                 BrowserScreen()
             }
 
-            composable(
-                route = "${Routes.IMAGE_PREVIEW}/{imgName}",
-                arguments = listOf(navArgument("imgName") {
-                    type = NavType.StringType
-                }),
-            ) { backStackEntry ->
-                val imgName = backStackEntry.arguments?.getString("imgName") ?: return@composable
-                ImagePreviewScreen(imgName = imgName)
+            composable(Routes.IMAGE_PREVIEW) {
+                ImagePreviewScreen()
             }
 
             composable(Routes.SETTINGS) {
@@ -121,8 +115,8 @@ fun ReaderNavGraph() {
                 AppearanceScreen()
             }
 
-            composable(Routes.SETTINGS_DOWNLOAD) {
-                DownloadScreen()
+            composable(Routes.SETTINGS_SAF) {
+                SafScreen()
             }
 
             composable(Routes.SETTINGS_ABOUT) {

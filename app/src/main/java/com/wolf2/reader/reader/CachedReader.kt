@@ -1,11 +1,13 @@
 package com.wolf2.reader.reader
 
+import com.anggrayudi.storage.file.DocumentFileCompat
+import com.anggrayudi.storage.file.mimeType
+import com.wolf2.reader.config.EbookUtil
 import com.wolf2.reader.mode.entity.book.Book
 import com.wolf2.reader.mode.entity.book.PageContent
-import com.wolf2.reader.util.isExternalStorageManager
-import com.wolf2.reader.util.storagePath
+import com.wolf2.reader.util.checkUriPermissions
+import com.wolf2.reader.util.globalContext
 import timber.log.Timber
-import java.io.File
 
 class CachedReader private constructor(private val from: Book) {
 
@@ -35,25 +37,22 @@ class CachedReader private constructor(private val from: Book) {
     }
 
     fun readBook(updateMetadata: Boolean = true, updatePageContent: Boolean = true): Boolean {
-        if (!isExternalStorageManager()) {
-            Timber.e("no access all files permission")
+        val documentFile = DocumentFileCompat.fromUri(globalContext, from.uri)
+        if (documentFile == null) {
+            Timber.e("book file is null")
             return false
         }
-        val path = from.uri.storagePath()
-        if (path == null) {
-            Timber.e("book file path is null")
+        if (!documentFile.uri.checkUriPermissions()) {
+            Timber.e("book uri hasn't permissions")
             return false
         }
-        if (!File(path).exists()) {
-            Timber.e("book file is not exists")
-            return false
-        }
-        if (path.endsWith(".epub")) {
+        val mimeType = documentFile.mimeType
+        if (EbookUtil.isEpubMimeType(mimeType)) {
             format = 0
             epubFileReader = EpubFileReader(from).apply {
                 readEpub(updateMetadata, updatePageContent)
             }
-        } else if (path.endsWith(".mobi") || path.endsWith(".azw") || path.endsWith(".azw3")) {
+        } else if (EbookUtil.isMobiMimeType(mimeType) || EbookUtil.isAzw3MimeType(mimeType)) {
             format = 1
             mobiFileReader = MobiFileReader(from).apply {
                 readMobi(updateMetadata, updatePageContent)
@@ -99,6 +98,8 @@ class CachedReader private constructor(private val from: Book) {
         epubFileReader = null
         mobiFileReader = null
         closed = true
+        // 主动gc一下，回收大量bitmap内存
+        System.gc()
     }
 
     fun ifClosed(): Boolean {

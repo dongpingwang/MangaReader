@@ -31,6 +31,8 @@ typedef struct EPUB3TocItem * EPUB3TocItemRef;
 /* Creates and returns reference to an EPUB stored at path */
 EPUB3Ref EPUB3CreateWithArchiveAtPath(const char * path, EPUB3Error *error);
 
+EPUB3Ref EPUB3CreateWithArchiveAtFd(const int fd, EPUB3Error *error);
+
 /* Memory management */
 void EPUB3Retain(EPUB3Ref epub);
 void EPUB3Release(EPUB3Ref epub);

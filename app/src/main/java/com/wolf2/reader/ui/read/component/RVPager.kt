@@ -1,4 +1,5 @@
 package com.wolf2.reader.ui.read.component
+
 import androidx.compose.foundation.background
 import androidx.compose.ui.graphics.Color
 import android.content.res.Configuration
@@ -16,6 +17,7 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import com.wolf2.reader.mode.entity.book.PageContent
+import com.wolf2.reader.ui.common.PageImage
 import kotlinx.coroutines.launch
 import net.engawapg.lib.zoomable.rememberZoomState
 import net.engawapg.lib.zoomable.zoomable
@@ -39,6 +41,11 @@ fun RVPager(
     val contentScale = if (isPortrait) ContentScale.FillWidth else ContentScale.FillHeight
     val background = if (isDarkMode) Color.Black else Color.Transparent
 
+    val modifier = Modifier
+        .fillMaxSize()
+        .background(background)
+        .zoomable(zoomState = rememberZoomState(), onTap = { onImageClick() })
+
     LaunchedEffect(listState) {
         snapshotFlow { listState.firstVisibleItemIndex }.collect {
             onPageChange(it)
@@ -46,18 +53,12 @@ fun RVPager(
     }
     LazyColumn(state = listState) {
         items(pageContents) {
-
             PageImage(
                 bitmap = onLoadImage(it).asImageBitmap(),
                 contentScale = contentScale,
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(background)
-                    .zoomable(zoomState = rememberZoomState(), onTap = { onImageClick() })
+                modifier = modifier
             )
-
         }
-
     }
 }
 
