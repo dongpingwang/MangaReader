@@ -38,6 +38,8 @@ fun AboutScreen() {
         })
 
         val sourceUrl = stringResource(R.string.settings_source_url)
+        val issueUrl = stringResource(R.string.settings_issue_url)
+        val contactUrl = stringResource(R.string.settings_contact_url)
 
         ProvidePreferenceLocals {
             LazyColumn(modifier = Modifier.fillMaxSize()) {
@@ -79,6 +81,44 @@ fun AboutScreen() {
                     onClick = {
                         AppUtil.openBrowser(sourceUrl.toUri())
                     }
+                )
+
+
+                preference(
+                    key = "about_issue",
+                    title = {
+                        Text(
+                            text = stringResource(R.string.settings_issue)
+                        )
+                    },
+                    summary = {
+                        Text(
+                            text = issueUrl,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    },
+                    onClick = {
+                        AppUtil.openBrowser(issueUrl.toUri())
+                    }
+                )
+
+                preference(
+                    key = "about_contact",
+                    title = {
+                        Text(
+                            text = stringResource(R.string.settings_contact)
+                        )
+                    },
+                    summary = {
+                        Text(
+                            text = contactUrl,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    },
+                    onClick = {
+                    },
                 )
             }
         }

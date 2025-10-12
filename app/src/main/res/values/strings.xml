@@ -57,7 +57,11 @@
     <string name="settings_version_name">@string/settings_about_summary</string>
     <string name="settings_version_code">版本号 %d</string>
     <string name="settings_source">源代码</string>
+    <string name="settings_issue">问题反馈</string>
+    <string name="settings_contact">联系作者</string>
     <string name="settings_source_url">https://github.com/dongpingwang/MangaReader</string>
+    <string name="settings_issue_url">https://github.com/dongpingwang/MangaReader/issues</string>
+    <string name="settings_contact_url">QQ：927718579</string>
     <string name="settings_saf_dir">书籍文件夹</string>
     <string name="settings_theme_mode">颜色模式</string>
     <string name="settings_dark_amoled_mode">纯黑深色模式</string>
