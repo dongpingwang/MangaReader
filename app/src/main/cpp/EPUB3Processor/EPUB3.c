@@ -99,13 +99,12 @@ EXPORT EPUB3Error EPUB3GetPathsOfSequentialResources(EPUB3Ref epub, const char *
     int32_t count = 0;
     EPUB3SpineItemListItemPtr itemPtr = epub->spine->head;
     while(itemPtr != NULL) {
-      if(itemPtr->item->isLinear) {
+      if(itemPtr->item->isLinear && itemPtr->item->manifestItem != NULL) {
         resources[count] = itemPtr->item->manifestItem->href;
         count++;
       }
       itemPtr = itemPtr->next;
     }
-
   }
 
   return error;

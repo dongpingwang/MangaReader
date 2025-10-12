@@ -165,6 +165,9 @@ class EpubFileReader(private val book: Book) : Closeable {
         body.select("img").forEach {
             imgHrefs.add(getImgHref(it.attr("src")))
         }
+        body.select("image").forEach {
+            imgHrefs.add(getImgHref(it.attr("xlink:href")))
+        }
         return imgHrefs.firstOrNull()
     }
 

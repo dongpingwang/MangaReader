@@ -178,9 +178,11 @@ Java_com_wolf2_reader_reader_EpubFileReader_nativeGetPageContents(JNIEnv *env, j
     EPUB3GetPathsOfSequentialResources(epub3Ref, resources);
     for (int i = 0; i < resourceCount; ++i) {
         const char *href = resources[i];
-        jobject pageContent = createPageContent(env, thiz, (char *) href);
-        env->CallBooleanMethod(arrayList, addMethod, pageContent);
-        env->DeleteLocalRef(pageContent);
+        if (href != NULL) {
+            jobject pageContent = createPageContent(env, thiz, (char *) href);
+            env->CallBooleanMethod(arrayList, addMethod, pageContent);
+            env->DeleteLocalRef(pageContent);
+        }
     }
     return arrayList;
 }
