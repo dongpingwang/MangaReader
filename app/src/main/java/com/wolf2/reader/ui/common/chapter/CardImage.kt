@@ -1,6 +1,7 @@
 package com.wolf2.reader.ui.common.chapter
 
 import android.graphics.Bitmap
+import android.net.Uri
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -31,11 +32,19 @@ fun CardImage(
             .padding(4.dp)
             .fillMaxSize()
     ) {
-        PageAsyncImage(
-            model = onLoadBuffer(pageContent),
-            bitmapConfig = Bitmap.Config.ALPHA_8,
-            modifier = Modifier
-                .fillMaxSize()
-        )
+        if (pageContent.imageUri != Uri.EMPTY) {
+            PageAsyncImage(
+                model = pageContent.imageUri,
+                modifier = Modifier
+                    .fillMaxSize()
+            )
+        } else {
+            PageAsyncImage(
+                model = onLoadBuffer(pageContent),
+                bitmapConfig = Bitmap.Config.ALPHA_8,
+                modifier = Modifier
+                    .fillMaxSize()
+            )
+        }
     }
 }

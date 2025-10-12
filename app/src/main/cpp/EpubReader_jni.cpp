@@ -136,7 +136,7 @@ jobject createPageContent(JNIEnv *env, jobject thiz, char *resourceHref) {
     if (cls == nullptr) {
         return nullptr;
     }
-    jmethodID constructor = env->GetMethodID(cls, "<init>", "(Ljava/lang/String;I)V");
+    jmethodID constructor = env->GetMethodID(cls, "<init>", "(Ljava/lang/String;)V");
     if (constructor == nullptr) {
         env->DeleteLocalRef(cls);
         return nullptr;
@@ -146,7 +146,7 @@ jobject createPageContent(JNIEnv *env, jobject thiz, char *resourceHref) {
         env->DeleteLocalRef(cls);
         return nullptr;
     }
-    jobject pageContent = env->NewObject(cls, constructor, href, 0);
+    jobject pageContent = env->NewObject(cls, constructor, href);
     env->DeleteLocalRef(href);
     env->DeleteLocalRef(cls);
     return pageContent;

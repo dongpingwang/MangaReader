@@ -50,22 +50,22 @@ fun HeadButtons(
             Icon(imageVector = Icons.Outlined.FormatListBulleted, contentDescription = null)
         }
 
-        ToggleButton(
-            checked = curIndex == 1,
-            onCheckedChange = {
-                curIndex = 1
-                onSelectChange(1)
-            },
-            modifier = Modifier
-                .semantics { role = Role.RadioButton }
-                .padding(horizontal = 2.dp),
-            shapes = ButtonGroupDefaults.connectedMiddleButtonShapes()
-        ) {
-            Icon(imageVector = Icons.Outlined.GridView, contentDescription = null)
-        }
+//        ToggleButton(
+//            checked = curIndex == 1,
+//            onCheckedChange = {
+//                curIndex = 1
+//                onSelectChange(1)
+//            },
+//            modifier = Modifier
+//                .semantics { role = Role.RadioButton }
+//                .padding(horizontal = 2.dp),
+//            shapes = ButtonGroupDefaults.connectedMiddleButtonShapes()
+//        ) {
+//            Icon(imageVector = Icons.Outlined.GridView, contentDescription = null)
+//        }
 
         ToggleButton(
-            checked = curIndex == 2,
+            checked = curIndex == 1,
             onCheckedChange = {
                 curIndex = 2
                 onSelectChange(2)

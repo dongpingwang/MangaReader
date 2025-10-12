@@ -30,4 +30,14 @@ data class Chapter(
         level = level,
         posfid = posfid,
     )
+
+    // for directory
+    constructor(title: String, pageIndexRange: IntRange) : this(
+        title = title,
+        pageIndexRange = pageIndexRange,
+        parent = null,
+        pageHref = "",
+        level = 1,
+        posfid = 0,
+    )
 }

@@ -15,11 +15,11 @@ import kotlinx.coroutines.flow.Flow
 interface BookDao {
 
     @Query("SELECT * FROM BOOK")
-    fun getAllBooks() :List<Book>
+    fun getAllBooks(): List<Book>
 
 
     @Query(
-    """
+        """
     SELECT b.*, MAX(rr.lastReadTimeMillis) as last_read_time FROM BOOK b
     LEFT JOIN 
     READRECORD rr ON b.uuid = rr.bookUuid GROUP BY b.uuid ORDER BY last_read_time DESC
@@ -34,7 +34,7 @@ interface BookDao {
     fun allBooksSortAuthor(): PagingSource<Int, Book>
 
     @Query(
-    """
+        """
     SELECT BOOK.*,READRECORD.* FROM Book
     INNER JOIN READRECORD ON BOOK.uuid == READRECORD.bookUuid
     ORDER BY READRECORD.lastReadTimeMillis DESC     
@@ -43,7 +43,7 @@ interface BookDao {
     fun allBooksFilterReading(): PagingSource<Int, Book>
 
     @Query(
-    """
+        """
     SELECT BOOK.* FROM BOOK
     LEFT JOIN READRECORD ON BOOK.uuid = READRECORD.bookUuid
     WHERE READRECORD.bookUuid IS NULL
@@ -53,7 +53,7 @@ interface BookDao {
     fun allBooksFilterUnRead(): PagingSource<Int, Book>
 
     @Query(
-    """
+        """
     SELECT BOOK.*,FAVORITEBOOK.* FROM Book
     INNER JOIN FAVORITEBOOK ON BOOK.uuid == FAVORITEBOOK.bookUuid 
     """
@@ -70,6 +70,9 @@ interface BookDao {
     fun queryByUuid(uuid: String): Book?
 
     @Insert
+    fun insert(book: Book)
+
+    @Insert
     fun insertAll(books: List<Book>)
 
     @Query("DELETE FROM BOOK")
@@ -82,7 +85,7 @@ interface BookDao {
     fun delete(book: Book)
 
     @Query(
-    """
+        """
     SELECT book.* FROM book
     INNER JOIN (
        SELECT bookUuid, MAX(lastReadTimeMillis) AS max_time

@@ -53,7 +53,8 @@ MOBIRawml *getNativeMOBIRawmlPtr(JNIEnv *env, jobject thiz) {
 
 extern "C"
 JNIEXPORT jint JNICALL
-Java_com_wolf2_reader_reader_MobiFileReader_nativeInitByPath(JNIEnv *env, jobject thiz, jstring path) {
+Java_com_wolf2_reader_reader_MobiFileReader_nativeInitByPath(JNIEnv *env, jobject thiz,
+                                                             jstring path) {
     MOBIData *m = mobi_init();
     if (m == nullptr) {
         LOGE("mobi_init error");
@@ -103,7 +104,7 @@ Java_com_wolf2_reader_reader_MobiFileReader_nativeInitByFd(JNIEnv *env, jobject 
         return MOBI_INIT_FAILED;
     }
     LOGI("fdopen fd:%d", fd);
-    FILE *file = fdopen(fd,"r");
+    FILE *file = fdopen(fd, "r");
     if (file == nullptr) {
         LOGE("fdopen error");
         mobi_free(m);
@@ -230,13 +231,13 @@ jobject createPageContent(JNIEnv *env, jobject thiz, size_t uid) {
     if (cls == nullptr) {
         return nullptr;
     }
-    jmethodID constructor = env->GetMethodID(cls, "<init>", "(Ljava/lang/String;I)V");
+    jmethodID constructor = env->GetMethodID(cls, "<init>", "(I)V");
     if (constructor == nullptr) {
         env->DeleteLocalRef(cls);
         return nullptr;
     }
     jstring href = env->NewStringUTF("");
-    jobject pageContent = env->NewObject(cls, constructor, href, (jint) uid);
+    jobject pageContent = env->NewObject(cls, constructor, (jint) uid);
     env->DeleteLocalRef(href);
     env->DeleteLocalRef(cls);
     return pageContent;

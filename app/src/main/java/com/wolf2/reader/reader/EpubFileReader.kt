@@ -6,7 +6,6 @@ import com.anggrayudi.storage.file.DocumentFileCompat
 import com.wolf2.reader.mode.entity.book.Book
 import com.wolf2.reader.mode.entity.book.Chapter
 import com.wolf2.reader.mode.entity.book.CoverImage
-import com.wolf2.reader.mode.entity.book.ExtraInfo
 import com.wolf2.reader.mode.entity.book.Metadata
 import com.wolf2.reader.mode.entity.book.PageContent
 import com.wolf2.reader.cache.ImageCacheUtil
@@ -15,9 +14,8 @@ import com.wolf2.reader.util.globalContext
 import com.wolf2.reader.util.traceMillis
 import org.jsoup.Jsoup
 import timber.log.Timber
-import java.io.Closeable
 
-class EpubFileReader(private val book: Book) : Closeable {
+class EpubFileReader(private val book: Book) : BaseReader(book) {
 
     companion object {
         init {
@@ -71,16 +69,15 @@ class EpubFileReader(private val book: Book) : Closeable {
             }
 
             if (updatePageContent) {
-                val extraInfo = ExtraInfo()
+
                 parseChapters().let {
                     book.chapters = it
-                    extraInfo.chapterCount = it.size
+                    book.extraInfo.chapterCount = it.size
                 }
                 parseContent().let {
                     book.pageContents = it
-                    extraInfo.pageCount = it.size
+                    book.extraInfo.pageCount = it.size
                 }
-                book.extraInfo = extraInfo
 
                 parseChaptersRange(book.chapters, book.pageContents.size).let {
                     book.chapters = it
@@ -93,7 +90,6 @@ class EpubFileReader(private val book: Book) : Closeable {
         if (!checkCondition()) return null
         val href = nativeGetCoverImageHref() ?: ""
         val data = nativeGetCoverImage()
-        Timber.d("nativeGetCoverImageHref:$href")
         return CoverImage(href = href, data = data)
     }
 
@@ -155,7 +151,7 @@ class EpubFileReader(private val book: Book) : Closeable {
         }.onFailure { it.printStackTrace() }.getOrNull() ?: defValue
     }
 
-    fun pageHref2ImageHref(pageHref: String): String? {
+    private fun pageHref2ImageHref(pageHref: String): String? {
         if (!checkCondition()) return null
         val data = nativeGetResourceData(pageHref) ?: return null
         if (isCoverImage(pageHref)) return nativeGetCoverImageHref()
@@ -180,9 +176,18 @@ class EpubFileReader(private val book: Book) : Closeable {
         return imgHref.contains("cover_page")
     }
 
-    fun getImage(imgHref: String): ByteArray? {
+    private fun getImage(imgHref: String): ByteArray? {
         if (!checkCondition()) return null
         return nativeGetResourceData(imgHref)
+    }
+
+    override fun read(updateMetadata: Boolean, updatePageContent: Boolean) {
+        readEpub(updateMetadata, updatePageContent)
+    }
+
+    override fun getImageBuffer(page: PageContent): ByteArray? {
+        val imageHref = pageHref2ImageHref(page.pageHref) ?: return null
+        return getImage(imageHref)
     }
 
     override fun close() {

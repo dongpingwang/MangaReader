@@ -1,7 +1,5 @@
 package com.wolf2.reader.ui.detail
 
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -137,15 +135,6 @@ class DetailViewModel(val bookUuid: String) : ViewModel() {
 
     fun getImageBuffer(page: PageContent): ByteArray? {
         return fileReader?.getImageBuffer(page)
-    }
-
-    fun loadImage(pageContent: PageContent): Bitmap {
-        val buffer = getImageBuffer(pageContent)
-        return BitmapFactory.decodeByteArray(
-            getImageBuffer(pageContent),
-            0,
-            buffer?.size ?: 0
-        )
     }
 
     fun onEvent(event: DetailUiEvent) {

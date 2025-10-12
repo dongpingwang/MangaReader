@@ -22,7 +22,7 @@ fun SheetContent(
     onPageChange: (Int) -> Unit,
     onLoadBuffer: (PageContent) -> ByteArray?,
 ) {
-    val pagerState = rememberPagerState(initialPage = selectedIndex) { 3 }
+    val pagerState = rememberPagerState(initialPage = selectedIndex) { 2 }
     val scope = rememberCoroutineScope()
     scope.launch { pagerState.scrollToPage(selectedIndex) }
 
@@ -38,14 +38,14 @@ fun SheetContent(
                 onPageChange = onPageChange
             )
 
-            1 -> PageGrid(
-                chapters = chapters,
-                pageContents = pageContents,
-                onPageChange = onPageChange,
-                onLoadBuffer = onLoadBuffer
-            )
+//            1 -> PageGrid(
+//                chapters = chapters,
+//                pageContents = pageContents,
+//                onPageChange = onPageChange,
+//                onLoadBuffer = onLoadBuffer
+//            )
 
-            2 -> BookMarkGrid(
+            1 -> BookMarkGrid(
                 bookMarks = bookMarks,
                 pageContents = pageContents,
                 onPageChange = onPageChange,

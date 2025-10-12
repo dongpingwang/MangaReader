@@ -9,7 +9,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.unit.dp
 import com.spartapps.swipeablecards.state.rememberSwipeableCardsState
 import com.spartapps.swipeablecards.ui.SwipeableCardDirection
@@ -17,7 +16,6 @@ import com.spartapps.swipeablecards.ui.SwipeableCardsProperties
 import com.spartapps.swipeablecards.ui.lazy.LazySwipeableCards
 import com.spartapps.swipeablecards.ui.lazy.items
 import com.wolf2.reader.mode.entity.book.PageContent
-import com.wolf2.reader.ui.common.PageImage
 import kotlinx.coroutines.launch
 import net.engawapg.lib.zoomable.rememberZoomState
 import net.engawapg.lib.zoomable.zoomable
@@ -45,6 +43,14 @@ fun TinderPager(
             onPageChange(it)
         }
     }
+
+    val modifier = Modifier
+        .fillMaxSize()
+        .background(background)
+        .zoomable(zoomState = rememberZoomState(), onTap = {
+            onImageClick()
+        })
+
     LazySwipeableCards<PageContent>(
         properties = SwipeableCardsProperties(padding = 0.dp, stackedCardsOffset = 0.dp),
         state = state,
@@ -56,16 +62,7 @@ fun TinderPager(
         }
     ) {
         items(pageContents) { content, index, offset ->
-            PageImage(
-                bitmap = onLoadImage(content)
-                    .asImageBitmap(),
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(background)
-                    .zoomable(zoomState = rememberZoomState(), onTap = {
-                        onImageClick()
-                    })
-            )
+            ReaderPageImage(pageContent = content, onLoadImage = onLoadImage, modifier = modifier)
         }
     }
 

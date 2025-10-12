@@ -256,7 +256,7 @@ class ReadViewModel(val bookUuid: String, val from: String, val curPageArg: Int?
             globalContext.contentResolver.openOutputStream(uri, "w").use {
                 val book = (_uiState.value.bookResult as LoadResult.Success<Book>).data
                 val pageContent = book.pageContents[getCurPage()]
-                val buffer = fileReader?.getImageBuffer(pageContent)
+                val buffer = getImageBuffer(pageContent)
                 runCatching {
                     it?.write(buffer)
                 }.onFailure {

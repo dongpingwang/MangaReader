@@ -24,6 +24,8 @@
     <string name="error_book_file_not_found">请检查书籍文件路径或者文件查看权限</string>
     <string name="confirm">确定</string>
     <string name="picker_book">选择书籍目录</string>
+    <string name="directory_as_a_book">文件夹作为一本书</string>
+    <string name="directory_as_a_book_chapter">子文件夹作为章节</string>
     <string name="sort_asc">正序</string>
     <string name="sort_desc">反序</string>
 
@@ -50,6 +52,9 @@
     <string name="settings_saf_summary">书籍目录，文件格式</string>
     <string name="settings_book_folder">已添加的文件夹</string>
     <string name="settings_book_format">可扫描的文件格式</string>
+    <string name="settings_book_folder_as_book">文件夹作为一本书</string>
+    <string name="settings_book_folder_as_book_summary">章节、图片组成同 Mihon</string>
+    <string name="settings_book_folder_as_book_url">https://mihon.app/docs/guides/local-source</string>
     <string name="settings_develop">调试</string>
     <string name="settings_develop_summary">应用日志</string>
     <string name="settings_about">关于</string>

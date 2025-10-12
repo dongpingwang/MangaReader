@@ -6,7 +6,6 @@ import com.anggrayudi.storage.file.DocumentFileCompat
 import com.wolf2.reader.mode.entity.book.Book
 import com.wolf2.reader.mode.entity.book.Chapter
 import com.wolf2.reader.mode.entity.book.CoverImage
-import com.wolf2.reader.mode.entity.book.ExtraInfo
 import com.wolf2.reader.mode.entity.book.Metadata
 import com.wolf2.reader.mode.entity.book.PageContent
 import com.wolf2.reader.cache.ImageCacheUtil
@@ -16,9 +15,8 @@ import com.wolf2.reader.util.globalContext
 import com.wolf2.reader.util.traceMillis
 import org.jsoup.Jsoup
 import timber.log.Timber
-import java.io.Closeable
 
-class MobiFileReader(private val book: Book) : Closeable {
+class MobiFileReader(private val book: Book) : BaseReader(book) {
 
     companion object {
         init {
@@ -34,7 +32,6 @@ class MobiFileReader(private val book: Book) : Closeable {
     }
 
     fun readMobi(updateMetadata: Boolean, updatePageContent: Boolean) {
-
         traceMillis {
             val documentFile = DocumentFileCompat.fromUri(globalContext, book.uri)
             if (documentFile == null) {
@@ -74,17 +71,14 @@ class MobiFileReader(private val book: Book) : Closeable {
             }
 
             if (updatePageContent) {
-                val extraInfo = ExtraInfo()
                 parseChapters().let {
                     book.chapters = it
-                    extraInfo.chapterCount = it.size
+                    book.extraInfo.chapterCount = it.size
                 }
                 parseContent().let {
                     book.pageContents = it
-                    extraInfo.pageCount = it.size
+                    book.extraInfo.pageCount = it.size
                 }
-                book.extraInfo = extraInfo
-
                 parseChaptersRange(book.chapters, book.pageContents.size).let {
                     book.chapters = it
                 }
@@ -187,7 +181,7 @@ class MobiFileReader(private val book: Book) : Closeable {
         return merge
     }
 
-    fun markupUid2resourceUid(markupUid: Int): Int? {
+    private fun markupUid2resourceUid(markupUid: Int): Int? {
         if (!checkCondition()) return null
         val data = nativeGetMarkupData(markupUid) ?: return null
         val body = Jsoup.parse(String(data)).body()
@@ -206,9 +200,18 @@ class MobiFileReader(private val book: Book) : Closeable {
         }.onFailure { it.printStackTrace() }.getOrNull() ?: defValue
     }
 
-    fun getImage(resourceUid: Int): ByteArray? {
+    private fun getImage(resourceUid: Int): ByteArray? {
         if (!checkCondition()) return null
         return nativeGetResourceData(resourceUid)
+    }
+
+    override fun read(updateMetadata: Boolean, updatePageContent: Boolean) {
+        readMobi(updateMetadata, updatePageContent)
+    }
+
+    override fun getImageBuffer(page: PageContent): ByteArray? {
+        val imgResourceUid = markupUid2resourceUid(page.markupUid) ?: return null
+        return getImage(imgResourceUid)
     }
 
     override fun close() {

@@ -10,9 +10,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.asImageBitmap
 import com.wolf2.reader.mode.entity.book.PageContent
-import com.wolf2.reader.ui.common.PageImage
 import eu.wewox.pagecurl.ExperimentalPageCurlApi
 import eu.wewox.pagecurl.page.PageCurl
 import eu.wewox.pagecurl.page.rememberPageCurlState
@@ -41,16 +39,18 @@ fun CurlPager(
         pageState.snapTo(curPage)
     }
 
+    val modifier = Modifier
+        .fillMaxSize()
+        .background(background)
+        .clickable {
+            onImageClick()
+        }
     // TODO 点击事件与Zoomable冲突
     PageCurl(count = pageContents.size, state = pageState) {
-        PageImage(
-            bitmap = onLoadImage(pageContents[it]).asImageBitmap(),
-            modifier = Modifier
-                .fillMaxSize()
-                .background(background)
-                .clickable {
-                    onImageClick()
-                }
+        ReaderPageImage(
+            pageContent = pageContents[it],
+            onLoadImage = onLoadImage,
+            modifier = modifier
         )
     }
 }

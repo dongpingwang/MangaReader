@@ -22,11 +22,13 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.util.fastForEach
 import androidx.compose.ui.util.fastJoinToString
+import androidx.core.net.toUri
 import com.anggrayudi.storage.extension.isTreeDocumentFile
 import com.wolf2.reader.R
 import com.wolf2.reader.config.AppConfig
 import com.wolf2.reader.config.EbookUtil
 import com.wolf2.reader.popBackStack
+import com.wolf2.reader.util.AppUtil
 import com.wolf2.reader.util.getPersistedUriPermissions
 import com.wolf2.reader.util.releasePersistableUriPermission
 import com.wolf2.reader.util.storagePath
@@ -34,6 +36,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import me.zhanghai.compose.preference.MultiSelectListPreference
 import me.zhanghai.compose.preference.ProvidePreferenceLocals
+import me.zhanghai.compose.preference.preference
 
 @Preview
 @OptIn(ExperimentalMaterial3Api::class)
@@ -42,7 +45,8 @@ fun SafScreen() {
     val scope = rememberCoroutineScope()
 
     fun persistedUris(): List<String> {
-        return getPersistedUriPermissions().filter { it.uri.isTreeDocumentFile }.map { it.uri.storagePath().toString() }
+        return getPersistedUriPermissions().filter { it.uri.isTreeDocumentFile }
+            .map { it.uri.storagePath().toString() }
     }
 
     var uris by remember { mutableStateOf(persistedUris()) }
@@ -64,6 +68,8 @@ fun SafScreen() {
         AppConfig.fileFormats = keep
         fileFormats = getFileFormats().toList()
     }
+
+    val mihonUri = stringResource(R.string.settings_book_folder_as_book_url).toUri()
 
     Column {
         TopAppBar(title = {
@@ -108,7 +114,16 @@ fun SafScreen() {
                             )
                         })
                 }
+
+                preference(key = "book_folder_as_book", title = {
+                    Text(text = stringResource(R.string.settings_book_folder_as_book))
+                }, summary = {
+                    Text(text = stringResource(R.string.settings_book_folder_as_book_summary))
+                }, onClick = {
+                    AppUtil.openBrowser(mihonUri)
+                })
             }
+
         }
     }
 }

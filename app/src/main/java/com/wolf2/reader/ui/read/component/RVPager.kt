@@ -13,11 +13,9 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import com.wolf2.reader.mode.entity.book.PageContent
-import com.wolf2.reader.ui.common.PageImage
 import kotlinx.coroutines.launch
 import net.engawapg.lib.zoomable.rememberZoomState
 import net.engawapg.lib.zoomable.zoomable
@@ -53,8 +51,9 @@ fun RVPager(
     }
     LazyColumn(state = listState) {
         items(pageContents) {
-            PageImage(
-                bitmap = onLoadImage(it).asImageBitmap(),
+            ReaderPageImage(
+                pageContent = it,
+                onLoadImage = onLoadImage,
                 contentScale = contentScale,
                 modifier = modifier
             )

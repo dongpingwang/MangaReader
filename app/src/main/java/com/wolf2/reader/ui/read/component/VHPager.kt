@@ -12,7 +12,6 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import com.wolf2.reader.mode.entity.book.PageContent
-import com.wolf2.reader.ui.common.PageAsyncImage
 import kotlinx.coroutines.launch
 import net.engawapg.lib.zoomable.rememberZoomState
 import net.engawapg.lib.zoomable.zoomable
@@ -46,13 +45,22 @@ fun VHPager(
             onImageClick()
         })
 
+
     if (isVerticalPager) {
         VerticalPager(pagerState) {
-            PageAsyncImage(model = onLoadBuffer(pageContents[it]), modifier = modifier)
+            ReaderPageAsyncImage(
+                pageContent = pageContents[it],
+                onLoadBuffer = onLoadBuffer,
+                modifier = modifier
+            )
         }
     } else {
         HorizontalPager(pagerState) {
-            PageAsyncImage(model = onLoadBuffer(pageContents[it]), modifier = modifier)
+            ReaderPageAsyncImage(
+                pageContent = pageContents[it],
+                onLoadBuffer = onLoadBuffer,
+                modifier = modifier
+            )
         }
     }
 }

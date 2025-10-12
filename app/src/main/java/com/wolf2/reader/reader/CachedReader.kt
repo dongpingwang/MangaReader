@@ -9,12 +9,10 @@ import com.wolf2.reader.util.checkUriPermissions
 import com.wolf2.reader.util.globalContext
 import timber.log.Timber
 
-class CachedReader private constructor(private val from: Book) {
+class CachedReader private constructor(private val source: Book) {
 
-    private var format = 0
-    private var epubFileReader: EpubFileReader? = null
-    private var mobiFileReader: MobiFileReader? = null
     private var closed = false
+    private var reader: BaseReader? = null
 
     companion object {
         private var reader: CachedReader? = null
@@ -25,7 +23,7 @@ class CachedReader private constructor(private val from: Book) {
         }
 
         fun obtainLocalFileReader(book: Book): CachedReader {
-            if (reader != null && reader!!.from.uuid == book.uuid && !reader!!.ifClosed()) {
+            if (reader != null && reader!!.source.uuid == book.uuid && !reader!!.ifClosed()) {
                 return reader!!
             }
             return CachedReader(book).also { reader = it }
@@ -37,7 +35,7 @@ class CachedReader private constructor(private val from: Book) {
     }
 
     fun readBook(updateMetadata: Boolean = true, updatePageContent: Boolean = true): Boolean {
-        val documentFile = DocumentFileCompat.fromUri(globalContext, from.uri)
+        val documentFile = DocumentFileCompat.fromUri(globalContext, source.uri)
         if (documentFile == null) {
             Timber.e("book file is null")
             return false
@@ -46,18 +44,20 @@ class CachedReader private constructor(private val from: Book) {
             Timber.e("book uri hasn't permissions")
             return false
         }
+
+        if (source.extraInfo.directoryAsBook) {
+            reader = DirectoryReader(source)
+            reader?.read(updateMetadata, updatePageContent)
+            return true
+        }
+
         val mimeType = documentFile.mimeType
         if (EbookUtil.isEpubMimeType(mimeType)) {
-            format = 0
-            epubFileReader = EpubFileReader(from).apply {
-                readEpub(updateMetadata, updatePageContent)
-            }
+            reader = EpubFileReader(source)
         } else if (EbookUtil.isMobiMimeType(mimeType) || EbookUtil.isAzw3MimeType(mimeType)) {
-            format = 1
-            mobiFileReader = MobiFileReader(from).apply {
-                readMobi(updateMetadata, updatePageContent)
-            }
+            reader = MobiFileReader(source)
         }
+        reader?.read(updateMetadata, updatePageContent)
         return true
     }
 
@@ -66,37 +66,21 @@ class CachedReader private constructor(private val from: Book) {
         updateMetadata: Boolean = true,
         updatePageContent: Boolean = true
     ): Boolean {
-        val hasCache = from.pageContents.isNotEmpty()
+        val hasCache = source.pageContents.isNotEmpty()
         if (hasCache) {
-            copyBook(from = from, to = to)
+            copyBook(from = source, to = to)
             return true
         }
         return readBook(updateMetadata, updatePageContent)
     }
 
     fun getImageBuffer(page: PageContent): ByteArray? {
-        when (format) {
-            0 -> {
-                val imageHref = epubFileReader?.pageHref2ImageHref(page.pageHref)
-                if (imageHref == null) return null
-                return epubFileReader?.getImage(imageHref)
-            }
-
-            1 -> {
-                val imgResourceUid = mobiFileReader?.markupUid2resourceUid(page.markupUid)
-                if (imgResourceUid == null) return null
-                return mobiFileReader?.getImage(imgResourceUid)
-            }
-
-            else -> return null
-        }
+        return reader?.getImageBuffer(page)
     }
 
     fun close() {
-        epubFileReader?.close()
-        mobiFileReader?.close()
-        epubFileReader = null
-        mobiFileReader = null
+        reader?.close()
+        reader = null
         closed = true
         // 主动gc一下，回收大量bitmap内存
         System.gc()
