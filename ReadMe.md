@@ -24,6 +24,7 @@
 
 ## 特性
 - 支持多种格式（epub、mobi、azw3、pdf）导入、Wifi传输
+- 支持图片文件夹导入
 - 高性能，采用native解析文件
 - 简洁，体积小
 - Compose + Material Design3 开发设计

@@ -16,8 +16,8 @@ android {
         applicationId = "com.wolf2.reader"
         minSdk = 24
         targetSdk = 36
-        versionCode = 10
-        versionName = "1.0.0-20250822"
+        versionCode = 11
+        versionName = "1.0.1-20251101"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -93,7 +93,7 @@ dependencies {
     implementation(project(":swipeable_cards"))
 
     // https://github.com/oothp/PdfiumAndroid
-    // implementation(project(":PdfiumAndroid"))
+    implementation(project(":PdfiumAndroid"))
 
    // https://github.com/BobbyESP/Crashy
     implementation(project(":crashhandler"))
