@@ -10,7 +10,6 @@ import com.wolf2.reader.util.globalContext
 import com.wolf2.reader.util.isDirectoryEarly
 import com.wolf2.reader.util.listFilesUri
 import com.wolf2.reader.util.traceMillis
-import timber.log.Timber
 
 class DirectoryReader(private val book: Book) : BaseReader(book) {
 
@@ -42,10 +41,8 @@ class DirectoryReader(private val book: Book) : BaseReader(book) {
                 subDirectories.fastForEach { dir ->
                     val doc = dir.toDocumentFile(globalContext) ?: return@traceMillis
                     val files = doc.listFilesUri().sortedBy { it.path }
-                    Timber.d("filessss: ${files.size}")
                     files.fastForEach {
                         pages.add(PageContent(imageUri = it))
-                        Timber.d("addd pc --- $it")
                     }
                     val endIndex = startIndex + files.size
                     chapters.add(

@@ -12,13 +12,12 @@ object AppUtil {
     }
 
     fun getVersionName(): String {
-        return globalContext.packageManager.getPackageInfo(globalContext.packageName, 0).versionName
-            ?: ""
+        return globalContext.packageManager.getPackageInfo(globalContext.packageName, 0).versionName ?: ""
     }
 
     fun openBrowser(uri: Uri) {
         val intent = Intent(Intent.ACTION_VIEW).apply {
-            setData(uri)
+            data = uri
             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK.or(Intent.FLAG_ACTIVITY_CLEAR_TOP))
         }
         runCatching {

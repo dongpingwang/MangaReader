@@ -45,25 +45,26 @@ fun ReaderNavGraph() {
     }
     val appColor = AppConfig.appColor.collectAsState()
     val amoledFlow = AppConfig.amoled.collectAsState()
+
+    val navController = rememberNavController()
+    globalViewContext = AppViewContext(
+        activity = LocalActivity.current as MainActivity,
+        navController = navController,
+        owner = LocalViewModelStoreOwner.current!!
+    )
+    DisposableEffect(Unit) {
+        object : DisposableEffectResult {
+            override fun dispose() {
+                globalViewContext = null
+            }
+        }
+    }
+
     ComicReaderTheme(
         darkMode = darkTheme,
         amoledMode = amoledFlow.value,
         color = AppColor.fromInt(appColor.value)
     ) {
-        val navController = rememberNavController()
-        globalViewContext = AppViewContext(
-            activity = LocalActivity.current as MainActivity,
-            navController = navController,
-            owner = LocalViewModelStoreOwner.current!!
-        )
-        DisposableEffect(Unit) {
-            object : DisposableEffectResult {
-                override fun dispose() {
-                    globalViewContext = null
-                }
-            }
-        }
-
         NavHost(
             navController = navController, startDestination = Routes.HOME,
             modifier = Modifier.background(MaterialTheme.colorScheme.background)

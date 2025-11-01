@@ -13,21 +13,18 @@ class ReaderApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()
-        val app = this
         CoroutineScope(Dispatchers.IO).launch {
             traceMillis {
                 Timber.plant(Timber.DebugTree())
-                Timber.d("create")
-                DatabaseHelper.init(app)
-                setupCrashHandler {
-                    globalViewContext?.activity?.finish()
-                }
+                DatabaseHelper.init(this@ReaderApplication)
+                setupCrashHandler { finishMainActivity() }
+                Timber.d("app created")
             }
         }
     }
 
     override fun onTerminate() {
         super.onTerminate()
-        Timber.d("terminate")
+        Timber.d("app terminated")
     }
 }

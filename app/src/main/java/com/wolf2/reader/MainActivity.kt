@@ -7,15 +7,12 @@ import androidx.activity.enableEdgeToEdge
 import com.wolf2.reader.ui.ReaderNavGraph
 
 class MainActivity : ComponentActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
             ReaderNavGraph()
         }
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
     }
 }
