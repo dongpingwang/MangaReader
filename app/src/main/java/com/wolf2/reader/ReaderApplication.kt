@@ -16,7 +16,7 @@ class ReaderApplication : Application() {
         CoroutineScope(Dispatchers.IO).launch {
             traceMillis {
                 Timber.plant(Timber.DebugTree())
-                DatabaseHelper.init(this@ReaderApplication)
+                DatabaseHelper.init()
                 setupCrashHandler { finishMainActivity() }
                 Timber.d("app created")
             }

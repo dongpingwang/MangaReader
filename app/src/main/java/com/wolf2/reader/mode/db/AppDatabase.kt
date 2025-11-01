@@ -16,6 +16,7 @@ import com.wolf2.reader.mode.entity.FavoriteBook
 import com.wolf2.reader.mode.entity.ReadRecord
 import com.wolf2.reader.mode.entity.ReadTime
 import com.wolf2.reader.mode.entity.book.Book
+import com.wolf2.reader.util.globalContext
 import timber.log.Timber
 
 private const val DATABASE_NAME = "reader"
@@ -42,10 +43,8 @@ private abstract class AppDatabase : RoomDatabase() {
 
 object DatabaseHelper {
     private var appDatabase: AppDatabase? = null
-    private lateinit var app: Application
 
-    fun init(context: Application) {
-        app = context
+    fun init() {
         Timber.d("init db: ${appDatabase()}")
     }
 
@@ -54,7 +53,7 @@ object DatabaseHelper {
             return appDatabase!!
         } else {
             val database = Room.databaseBuilder(
-                app,
+                globalContext,
                 AppDatabase::class.java,
                 DATABASE_NAME
             ).build()
