@@ -33,4 +33,3 @@ dependencyResolutionManagement {
 
 rootProject.name = "MangaReader"
 include(":app")
-include(":PdfiumAndroid")

@@ -76,6 +76,9 @@ android {
 }
 
 dependencies {
+
+    implementation(fileTree("libs/PdfiumAndroid-release.aar"))
+
     // https://github.com/JakeWharton/timber
     implementation(libs.timber)
 
@@ -85,9 +88,6 @@ dependencies {
 
     // https://github.com/nanihadesuka/LazyColumnScrollbar
     implementation(libs.lazycolumnscrollbar)
-
-    // https://github.com/oothp/PdfiumAndroid
-    implementation(project(":PdfiumAndroid"))
 
     // https://github.com/jhy/jsoup
     implementation(libs.jsoup)
