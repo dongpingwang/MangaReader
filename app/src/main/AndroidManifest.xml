@@ -28,12 +28,6 @@
             </intent-filter>
         </activity>
 
-        <activity
-            android:name="com.bobbyesp.crashhandler.CrashHandlerActivity"
-            android:label="CrashHandlerActivity"
-            android:launchMode="singleTask"
-            android:theme="@style/Theme.ComicReader"/>
-
 
         <activity
             android:name="androidx.compose.ui.tooling.PreviewActivity"

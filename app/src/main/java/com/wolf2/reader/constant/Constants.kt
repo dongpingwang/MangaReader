@@ -38,9 +38,7 @@ enum class ShelfLayout(private val value: Int) {
 enum class PagerSwitchEffect(private val value: Int) {
     VerticalPage(0),
     HorizontalPage(1),
-    CurlPage(2),
-    VerticalList(3),
-    SwipeTinder(4);
+    VerticalList(2);
 
     companion object {
         fun fromInt(value: Int) =

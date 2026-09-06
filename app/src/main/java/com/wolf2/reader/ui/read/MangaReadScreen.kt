@@ -28,7 +28,6 @@ import com.wolf2.reader.mode.entity.book.Book
 import com.wolf2.reader.mode.entity.book.PageContent
 import com.wolf2.reader.ui.common.MyLoadingIndicator
 import com.wolf2.reader.ui.common.MySnackbar
-import com.wolf2.reader.ui.read.component.CurlPager
 import com.wolf2.reader.ui.common.ErrorIndicator
 import com.wolf2.reader.ui.read.component.ChapterSheet
 import com.wolf2.reader.ui.read.component.JumpPageDialog
@@ -37,7 +36,6 @@ import com.wolf2.reader.ui.read.component.RVPager
 import com.wolf2.reader.ui.read.component.ReadBottomBar
 import com.wolf2.reader.ui.read.component.ReadTopAppBar
 import com.wolf2.reader.ui.read.component.VHPager
-import com.wolf2.reader.ui.read.component.TinderPager
 import com.wolf2.reader.util.LoadResult
 import timber.log.Timber
 
@@ -121,35 +119,9 @@ fun MangaReadScreen(bookUuid: String, from: String, curPage: Int?) {
                             updateReadRecord(it, false)
                         })
 
-                    PagerSwitchEffect.CurlPage -> CurlPager(
-                        isDarkMode = uiState.darkMode,
-                        curPage = uiState.curPage,
-                        pageContents = book.pageContents,
-                        onLoadImage = {
-                            loadImage(it)
-                        }, onImageClick = {
-                            toggleBarsVisibility()
-                        }, onPageChange = {
-                            updateReadRecord(it, false)
-                        })
-
 
                     PagerSwitchEffect.VerticalList -> {
                         RVPager(
-                            isDarkMode = uiState.darkMode,
-                            curPage = uiState.curPage,
-                            pageContents = book.pageContents,
-                            onLoadImage = {
-                                loadImage(it)
-                            }, onImageClick = {
-                                toggleBarsVisibility()
-                            }, onPageChange = {
-                                updateReadRecord(it, false)
-                            })
-                    }
-
-                    PagerSwitchEffect.SwipeTinder -> {
-                        TinderPager(
                             isDarkMode = uiState.darkMode,
                             curPage = uiState.curPage,
                             pageContents = book.pageContents,

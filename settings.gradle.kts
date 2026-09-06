@@ -33,7 +33,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "MangaReader"
 include(":app")
-include(":pagecurl")
-include(":swipeable_cards")
 include(":PdfiumAndroid")
-include(":crashhandler")

@@ -86,17 +86,8 @@ dependencies {
     // https://github.com/nanihadesuka/LazyColumnScrollbar
     implementation(libs.lazycolumnscrollbar)
 
-    // https://github.com/oleksandrbalan/pagecurl
-    implementation(project(":pagecurl"))
-
-    // https://github.com/smartword-app/compose-swipeable-cards
-    implementation(project(":swipeable_cards"))
-
     // https://github.com/oothp/PdfiumAndroid
     implementation(project(":PdfiumAndroid"))
-
-   // https://github.com/BobbyESP/Crashy
-    implementation(project(":crashhandler"))
 
     // https://github.com/jhy/jsoup
     implementation(libs.jsoup)
